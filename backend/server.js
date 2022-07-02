@@ -1,6 +1,4 @@
 const http = require('http');
-
-
 var express = require("express")
 const { IPv4 } = require("ipaddr.js")
 const app = express()
@@ -63,11 +61,22 @@ app.post("/", (req, res) => {
 // Body: User gmail
 // Response: New user_id, new user id token
 
+app.post("/user/newuser", async (req, res) => {
+    try {
+        var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(req.body)
+        var objectId = req.body._id; 
+        res.status(200).send(objectId)
+    } catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
 // Check authorization POST https://shopeer.com/userDB/auth
 // Checks authorization of user
 // Body: User Id Token AND User details
 // Response: Pass/fail
+// NOTE: skipping as we decided to do google account auth
 
 
 // Retrieve User GET https://shopeer.com/userDB?user_id=[id]
@@ -75,18 +84,35 @@ app.post("/", (req, res) => {
 // Body: User Id Token AND User details
 // Response: Success/Fail
 
+app.get("/user/getuser", async (req, res) => {
+    try {
+        var find_cursor = await mongoClient.db("shopeer_database").collection("room_collection").find({_id:ObjectId(req.query._id)})
+        // var find_cursor = await mongoClient.db("shopeer_database").collection("room_collection").find()
+        // var objectId = req.body._id; 
+        res.status(200).send("yes")
+        var temp = await find_cursor.toArray()
+        console.log(temp)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
+
 
 // Retrieve Queried User List GET https://shopeer.com/userDB?searchQuery=[query] 
 // Retrieves list of users objects from User Database that match the  query parameter
 // Param: query
 // Body: User Id Token
 // Response: user object list
+// NOTE: Not needed as mongodb has query functionality
 
 
 // Add New Search POST https://shopeer.com/userDB/newSearch
 // Adds new search for the user in User Collection
 // Body: user_id, location, distance, activity, budget
 // Reponse: success/fail
+// NOTE: Need to figure out how search algo will work
 
 
 // Update Profile POST https://shopeer.com/userDB/updateProfile?user_id=[id]
@@ -95,29 +121,97 @@ app.post("/", (req, res) => {
 // Body: user id token AND New profile info {profile_pic, name, bio}
 // Response: success/fail
 
+app.put("/user/updateprofile", async (req, res) => {
+    try {
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:ObjectId(req.query._id)})
+        // var find_cursor = await mongoClient.db("shopeer_database").collection("room_collection").find()
+        // var objectId = req.body._id; 
+        res.status(200).send("yes")
+        var temp = await find_cursor.toArray()
+        console.log(temp)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
+// TODO
 // Remove Peer DELETE https://shopeer.com/userDB/removePeer
 // Deletes specified peer from the peers list of the user
 // Body: user id token, user_id, peer_id
 // Response:success / fail
 
+app.delete("/roomDeleteOne", async (req, res) => {
+    try {
+        console.log(req.query._id)
+        var result_debug = await mongoClient.db("shopeer_database").collection("room_collection").deleteOne({_id:ObjectId(req.query._id)})
+        // var result_debug = await mongoClient.db("shopeer_database").collection("room_collection").deleteOne({_id:ObjectId("62c0a5ff4c183de8407cb91b")})
+        // var result_debug = await mongoClient.db("shopeer_database").collection("room_collection").deleteOne({roomname: 'test_chatname2'})
+        
+        // console.log({_id:new mongodb.ObjectId("62bf9de0c9211571d293fdc5")})
+        console.log(result_debug)
+        res.status(200).send(result_debug)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
+// TODO
 // Add Sent Invitation POST https://shopeer.com/userDB/addInvite
 // Adds the invitation sent by the user in user’s “sent invitation” list and in peer’s “recieved invitation” list
 // Body: user id token, user_id, peer_id
 // Response:success / fail
 
+app.put("/addInvitation", async (req, res) => {
+    try {
+        const result_debug = await mongoClient.db("shopeer_database").collection("user_collection").replaceOne({ "task": 'Tutorial' }, req.body)
+        res.status(200).send("item modified successfully\n")
+        console.log(result_debug)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
+// TODO
 // Decline Invitation POST https://shopeer.com/userDB/declineInvite
 // Declines an invite from a peer by removing the invite from user's “recieved invitation” list and peer’s “sent invitation” list
 // Body: user id token, user_id, peer_id
 // Response:success / fail
 
+app.put("/declineInvite", async (req, res) => {
+    try {
+        const result_debug = await mongoClient.db("shopeer_database").collection("user_collection").replaceOne({ "task": 'Tutorial' }, req.body)
+        res.status(200).send("item modified successfully\n")
+        console.log(result_debug)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
+// TODO
 // Accept Invitation POST https://shopeer.com/userDB/acceptInvite
 // Accepts an invite from a peer by removing the invite from user's “received invitation” list and peer’s “sent invitation” list, and adding peer_id to “peers ids” list
 // Body: user id token, user_id, peer_id
 // Response:success / fail
+
+app.put("/acceptInvite", async (req, res) => {
+    try {
+        const result_debug = await mongoClient.db("shopeer_database").collection("user_collection").replaceOne({ "task": 'Tutorial' }, req.body)
+        res.status(200).send("item modified successfully\n")
+        console.log(result_debug)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
 //-------------------------------------------------------------------------------
 // Database Module: Room Collection Submodule
