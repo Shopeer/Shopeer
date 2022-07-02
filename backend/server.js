@@ -142,17 +142,26 @@ app.post("/roomInsertOne", async (req, res) => {
 
 app.get("/getAllRooms", async (req, res) => {
     try {
-        var result_debug = await mongoClient.db("shopeer_database").collection("room_collection").find()
-        var objectId = req.body._id; 
-        res.status(200).send(result_debug)
-        console.log(result_debug)
+        var find_cursor = await mongoClient.db("shopeer_database").collection("room_collection").find({roomname:{$exists: true}})
+        // var find_cursor = await mongoClient.db("shopeer_database").collection("room_collection").find()
+        // var objectId = req.body._id; 
+        res.status(200).send("yes")
+        var temp = await find_cursor.toArray()
+        console.log(temp)
+
+
+        // for(let i = 0; i < 2; i++){
+        //     if (find_cursor.hasNext() == false) {
+        //         break;
+        //     }
+        //     console.log(find_cursor.next())
+        // }
     }
     catch (err) {
         console.log(err)
         res.send(400).send(err)
     }
 })
-
 
 // Post message POST  https://shopeer.com/roomDB/message?room_id=[room_id]
 // Send a chat message to peer/ group
@@ -175,7 +184,6 @@ app.post("/messageInsertOne", async (req, res) => {
 // date = date.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})
 // let local_date = new Date(date)
 // let local_time = local_date.getHours() + ":" + local_date.getMinutes() + ":" + local_date.getSeconds();
-
 
 
 // Remove Chatroom DELETE https://shopeer.com/roomDB?room_id=[room_id]
