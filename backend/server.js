@@ -116,11 +116,24 @@ app.post("/roomInsertOne", async (req, res) => {
     }
 })
 
-
+// TODO: in progress
 // Get All Chatrooms GET https://shopeer.com/roomDB
 // Gets all chat rooms that a particular user is in.
 // Body: User Id Token AND User details
 // Response: List of room ids
+
+app.get("/getAllRooms", async (req, res) => {
+    try {
+        var result_debug = await mongoClient.db("shopeer_database").collection("room_collection").find()
+        var objectId = req.body._id; 
+        res.status(200).send(result_debug)
+        console.log(result_debug)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
 
 // Post message POST  https://shopeer.com/roomDB/message?room_id=[room_id]
@@ -132,9 +145,7 @@ app.post("/roomInsertOne", async (req, res) => {
 app.post("/messageInsertOne", async (req, res) => {
     try {
         var result_debug = await mongoClient.db("shopeer_database").collection("room_collection").insertOne(req.body)
-        var objectId = req.body._id; 
-        res.status(200).send(objectId)
-        // console.log(result_debug)
+        res.status(200).send("Success")
     }
     catch (err) {
         console.log(err)
@@ -142,11 +153,26 @@ app.post("/messageInsertOne", async (req, res) => {
     }
 })
 
+// let date = new Date()
+// date = date.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})
+// let local_date = new Date(date)
+// let local_time = local_date.getHours() + ":" + local_date.getMinutes() + ":" + local_date.getSeconds();
+
+
 
 // Remove Chatroom DELETE https://shopeer.com/roomDB?room_id=[room_id]
-// Param: room_id
+// Param: room_id (passed as req.body)
 // Response: success/fail
-
+app.post("/roomDeleteOne", async (req, res) => {
+    try {
+        var result_debug = await mongoClient.db("shopeer_database").collection("room_collection").deleteOne(req.body)
+        res.status(200).send("Success")
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
 
 
