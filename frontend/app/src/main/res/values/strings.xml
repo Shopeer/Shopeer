@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Shopeer</string>
+    <string name="login_button_caption">Login</string>
+    <string name="register_button_caption">Register</string>
 </resources>
