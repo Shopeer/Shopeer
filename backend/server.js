@@ -2,31 +2,17 @@ const http = require('http');
 var express = require("express")
 const { IPv4 } = require("ipaddr.js")
 const app = express()
-app.use(express.json())
 
 
 const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
-// const mongodb = require("mongodb")
 
-// const mongodb = require("mongodb")  // this is multiple return
-// const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
-// const mongoClient = new mongodb(uri)
-
-// const mongoose = require("mongoose")
-// mongoose.connect(uri)
-// const userSchema = new mongoose.Schema({
-// })
-// mongoose.model("namedb", userSchema)
-
-// address of this vm: 192.168.64.8:8081
-// address of Azure vm is: 40.122.233.185
-
-
+// local vm
 const IP = '192.168.64.15';
 const PORT = 3000;
 
+// azure vm
 // const IP = "40.122.233.185";
 // const PORT = "8081";
 
