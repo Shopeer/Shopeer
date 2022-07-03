@@ -31,7 +31,6 @@ app.use(express.json())
 app.get("/", (req, res) => {
     res.send("Hello world\n")
 })
-
 app.post("/", (req, res) => {
     res.send(req.body.text)
 })

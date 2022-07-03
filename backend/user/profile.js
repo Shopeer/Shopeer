@@ -17,8 +17,20 @@ const router = express.Router()
 // Body: user id token
 // Response: User details (profile, bio, name)
 
-
-
+router.get("/getprofile", async (req, res) => {
+    try {
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:ObjectId(req.query._id)})
+        // var find_cursor = await mongoClient.db("shopeer_database").collection("room_collection").find()
+        // var objectId = req.body._id; 
+        res.status(200).send("yes")
+        var temp = await find_cursor.toArray()
+        console.log(temp)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
 
 // Edit Profile PUT https://shopeer.com/user/profile?user_id=[user_id]
@@ -26,7 +38,20 @@ const router = express.Router()
 // Body: user id token AND New profile info {profile_pic, name, bio}
 // Response: success/fail
 
-
+router.put("/updateprofile", async (req, res) => {
+    try {
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:ObjectId(req.query._id)})
+        // var find_cursor = await mongoClient.db("shopeer_database").collection("room_collection").find()
+        // var objectId = req.body._id; 
+        res.status(200).send("yes")
+        var temp = await find_cursor.toArray()
+        console.log(temp)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
 
 
@@ -36,6 +61,20 @@ const router = express.Router()
 // Body: User Id Token
 // Response: success/fail
 
+router.delete("/remove_user", async (req, res) => {
+    try {
+        var find_cursor = await mongoClient.db("shopeer_database").collection("room_collection").find({_id:ObjectId(req.query._id)})
+        // var find_cursor = await mongoClient.db("shopeer_database").collection("room_collection").find()
+        // var objectId = req.body._id; 
+        res.status(200).send("yes")
+        var temp = await find_cursor.toArray()
+        console.log(temp)
+
+    } catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
 
 
@@ -50,9 +89,11 @@ router.post("/register", async (req, res) => {
         // var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(req.body)
         
         console.log(req.body)
+
+        var user_object = create_user_object(req.body)
         
-        var objectId = req.body.name; 
-        res.status(200).send(objectId)
+        res.status(200).send(user_object)
+
     } catch (err) {
         console.log(err)
         res.send(400).send(err)
@@ -60,14 +101,14 @@ router.post("/register", async (req, res) => {
 })
 
 
-// function create_user_object(input) {
-//     var user_object = {name: }
-// }
-
-
-
-
-
+function create_user_object(body) {
+    var user_object = {name: body.name,
+                        email: body.email,
+                        peers: null,
+                        invites: null,
+                        blocked: null}
+    return user_object
+}
 
 
 
