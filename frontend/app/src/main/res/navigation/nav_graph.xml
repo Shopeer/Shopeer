@@ -16,8 +16,8 @@
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
     <fragment
-        android:id="@+id/peersFragment"
-        android:name="com.example.shopeer.PeersFragment"
+        android:id="@+id/roomsFragment"
+        android:name="com.example.shopeer.RoomsFragment"
         android:label="fragment_peers"
-        tools:layout="@layout/fragment_peers" />
+        tools:layout="@layout/fragment_rooms" />
 </navigation>

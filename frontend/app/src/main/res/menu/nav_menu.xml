@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/peersFragment"
-        android:title="Peers"
-        android:icon="@drawable/icon_chat"/>
+        android:id="@+id/roomsFragment"
+        android:icon="@drawable/icon_chat"
+        android:title="Rooms" />
     <item
         android:id="@+id/matchFragment"
         android:title="Match"
