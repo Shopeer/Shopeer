@@ -4,9 +4,11 @@ const { IPv4 } = require("ipaddr.js")
 const app = express()
 
 
-const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
+const { MongoClient, ObjectId, Router } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
+
+console.log({ MongoClient, ObjectId, Router })
 
 // local vm
 const IP = '192.168.64.15';
