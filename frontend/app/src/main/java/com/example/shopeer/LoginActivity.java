@@ -22,6 +22,8 @@ public class LoginActivity extends AppCompatActivity {
     final static String TAG = "SignIn Activity";
     private GoogleSignInClient mGoogleSignInClient;
 
+    private boolean register;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 signIn();
+                register = false;
             }
         });
 
@@ -50,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 signIn();
+                register = true;
             }
         });
 
@@ -96,14 +100,30 @@ public class LoginActivity extends AppCompatActivity {
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        updateUI(account);
-
-        //TODO: go to main match page
+        if (account != null) {
+            updateUI(account);
+            // TODO: go to main activity, pass on user info if needed
+            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(mainIntent);
+        }
     }
+
 
     private void updateUI(GoogleSignInAccount account) {
         if (account == null) {
             Log.d(TAG, "There is no user logged in!");
+        }
+        else {
+            // TODO:get user info and call backend to register or login
+            if (register) {
+                // register user
+            }
+            else {
+                // login
+            }
+            // TODO: go to main activity, pass on user info if needed
+            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(mainIntent);
         }
     }
 }
