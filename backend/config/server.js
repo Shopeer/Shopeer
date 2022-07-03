@@ -4,11 +4,16 @@ const { IPv4 } = require("ipaddr.js")
 const app = express()
 
 
-const { MongoClient, ObjectId, Router } = require("mongodb")  // this is multiple return
+const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
-console.log({ MongoClient, ObjectId, Router })
+console.log({ MongoClient, ObjectId })
+
+// For routing profile.js
+const user = require('../user/profile.js');
+app.use('*', user);
+
 
 // local vm
 const IP = '192.168.64.15';
@@ -17,6 +22,7 @@ const PORT = 3000;
 // azure vm
 // const IP = "40.122.233.185";
 // const PORT = "8081";
+
 
 var server = null;
 
@@ -40,7 +46,6 @@ app.post("/", (req, res) => {
 // let obj_chat2 = {chatname: "test_chatname2", chathistory: null}
 
 
-
 //-------------------------------------------------------------------------------
 // Database Module: User Collection Submodule
 
@@ -49,16 +54,33 @@ app.post("/", (req, res) => {
 // Body: User gmail
 // Response: New user_id, new user id token
 
-app.post("/user/newuser", async (req, res) => {
-    try {
-        var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(req.body)
-        var objectId = req.body._id; 
-        res.status(200).send(objectId)
-    } catch (err) {
-        console.log(err)
-        res.send(400).send(err)
-    }
-})
+app.use('/user', user)
+
+// router.post("/user/register", async (req, res) => {
+//     try {
+//         // var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(req.body)
+        
+//         console.log(req.body)
+        
+//         var objectId = req.body._id; 
+//         res.status(200).send(objectId)
+//     } catch (err) {
+//         console.log(err)
+//         res.send(400).send(err)
+//     }
+// })
+
+
+// app.post("/user/newuser", async (req, res) => {
+//     try {
+//         var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(req.body)
+//         var objectId = req.body._id; 
+//         res.status(200).send(objectId)
+//     } catch (err) {
+//         console.log(err)
+//         res.send(400).send(err)
+//     }
+// })
 
 // Check authorization POST https://shopeer.com/userDB/auth
 // Checks authorization of user
