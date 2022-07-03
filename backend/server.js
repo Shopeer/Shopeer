@@ -57,40 +57,58 @@ app.post("/", (req, res) => {
 // Creates and adds a new user into the User Database along with a new user_id
 // Body: User gmail
 // Response: New user_id, new user id token
+
+
 // Check authorization POST https://shopeer.com/userDB/auth
 // Checks authorization of user
 // Body: User Id Token AND User details
 // Response: Pass/fail
+
+
 // Retrieve User GET https://shopeer.com/userDB?user_id=[id]
 // Retrieves user from User Database with user_id
 // Body: User Id Token AND User details
 // Response: Success/Fail
+
+
 // Retrieve Queried User List GET https://shopeer.com/userDB?searchQuery=[query] 
 // Retrieves list of users objects from User Database that match the  query parameter
 // Param: query
 // Body: User Id Token
 // Response: user object list
+
+
 // Add New Search POST https://shopeer.com/userDB/newSearch
 // Adds new search for the user in User Collection
 // Body: user_id, location, distance, activity, budget
 // Reponse: success/fail
+
+
 // Update Profile POST https://shopeer.com/userDB/updateProfile?user_id=[id]
 // Updates user object in the User Collection with the new profile information
 // Param: user_id
 // Body: user id token AND New profile info {profile_pic, name, bio}
 // Response: success/fail
+
+
 // Remove Peer DELETE https://shopeer.com/userDB/removePeer
 // Deletes specified peer from the peers list of the user
 // Body: user id token, user_id, peer_id
 // Response:success / fail
+
+
 // Add Sent Invitation POST https://shopeer.com/userDB/addInvite
 // Adds the invitation sent by the user in user’s “sent invitation” list and in peer’s “recieved invitation” list
 // Body: user id token, user_id, peer_id
 // Response:success / fail
+
+
 // Decline Invitation POST https://shopeer.com/userDB/declineInvite
 // Declines an invite from a peer by removing the invite from user's “recieved invitation” list and peer’s “sent invitation” list
 // Body: user id token, user_id, peer_id
 // Response:success / fail
+
+
 // Accept Invitation POST https://shopeer.com/userDB/acceptInvite
 // Accepts an invite from a peer by removing the invite from user's “received invitation” list and peer’s “sent invitation” list, and adding peer_id to “peers ids” list
 // Body: user id token, user_id, peer_id
@@ -116,11 +134,24 @@ app.post("/roomInsertOne", async (req, res) => {
     }
 })
 
-
+// TODO: in progress
 // Get All Chatrooms GET https://shopeer.com/roomDB
 // Gets all chat rooms that a particular user is in.
 // Body: User Id Token AND User details
 // Response: List of room ids
+
+app.get("/getAllRooms", async (req, res) => {
+    try {
+        var result_debug = await mongoClient.db("shopeer_database").collection("room_collection").find()
+        var objectId = req.body._id; 
+        res.status(200).send(result_debug)
+        console.log(result_debug)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
 
 // Post message POST  https://shopeer.com/roomDB/message?room_id=[room_id]
@@ -132,9 +163,7 @@ app.post("/roomInsertOne", async (req, res) => {
 app.post("/messageInsertOne", async (req, res) => {
     try {
         var result_debug = await mongoClient.db("shopeer_database").collection("room_collection").insertOne(req.body)
-        var objectId = req.body._id; 
-        res.status(200).send(objectId)
-        // console.log(result_debug)
+        res.status(200).send("Success")
     }
     catch (err) {
         console.log(err)
@@ -142,11 +171,26 @@ app.post("/messageInsertOne", async (req, res) => {
     }
 })
 
+// let date = new Date()
+// date = date.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})
+// let local_date = new Date(date)
+// let local_time = local_date.getHours() + ":" + local_date.getMinutes() + ":" + local_date.getSeconds();
+
+
 
 // Remove Chatroom DELETE https://shopeer.com/roomDB?room_id=[room_id]
-// Param: room_id
+// Param: room_id (passed as req.body)
 // Response: success/fail
-
+app.post("/roomDeleteOne", async (req, res) => {
+    try {
+        var result_debug = await mongoClient.db("shopeer_database").collection("room_collection").deleteOne(req.body)
+        res.status(200).send("Success")
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
 
 
