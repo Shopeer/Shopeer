@@ -9,17 +9,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
-    private ArrayList<PeerRoomObject> peerList;
+    private ArrayList<RoomObject> roomList;
 
-    public RecyclerAdapter(ArrayList<PeerRoomObject> peerList) {
-        this.peerList = peerList;
+    public RecyclerAdapter(ArrayList<RoomObject> peerList) {
+        this.roomList = peerList;
     }
 
     @NonNull
@@ -32,18 +29,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        PeerRoomObject peerRoomObject = peerList.get(position);
+        RoomObject roomObject = roomList.get(position);
 
-        holder.peerName.setText(peerRoomObject.getPeerName());
-        holder.peerProfilePic.setImageResource(peerRoomObject.getPeerProfilePic());
-        holder.lastMessage.setText(peerRoomObject.getLastMessage());
-        holder.timeofLM.setText(peerRoomObject.getTimeofLM());
+        holder.peerName.setText(roomObject.getRoomName());
+        holder.peerProfilePic.setImageResource(roomObject.getRoomProfilePic());
+        holder.lastMessage.setText(roomObject.getLastMessage());
+        holder.timeofLM.setText(roomObject.getTimeofLM());
 
     }
 
     @Override
     public int getItemCount() {
-        return peerList.size();
+        return roomList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

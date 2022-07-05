@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.sql.Time;
 import java.util.ArrayList;
 
 /**
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 public class RoomsFragment extends Fragment {
     final static String TAG = "RoomsFragment";
     RecyclerView recyclerView;
-    private ArrayList<PeerRoomObject> peerList;
+    private ArrayList<RoomObject> roomList;
 
 
     public RoomsFragment() {
@@ -52,19 +51,19 @@ public class RoomsFragment extends Fragment {
         View v =  inflater.inflate(R.layout.fragment_rooms, container, false);
 
         // initialize recycler view
-        peerList = new ArrayList<>();
+        roomList = new ArrayList<>();
         recyclerView = v.findViewById(R.id.recyclerView);
 
         // fetch data of peers and add to peerList
         for (int i=0; i < 20; i++) {
             String name = "Peer Number " + i;
-            peerList.add(new PeerRoomObject(name,
+            roomList.add(new RoomObject(name,
                     "Last Message sent by this peer",
                     "00:00",
                     R.drawable.temp_profile));
         }
 
-        RecyclerAdapter recyclerAdapter = new RecyclerAdapter(peerList);
+        RecyclerAdapter recyclerAdapter = new RecyclerAdapter(roomList);
         recyclerView.setAdapter(recyclerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
