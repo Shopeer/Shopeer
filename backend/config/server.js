@@ -10,9 +10,27 @@ const mongoClient = new MongoClient(uri)
 
 console.log({ MongoClient, ObjectId })
 
-// For routing profile.js
-const user = require('../user/profile.js');
-app.use('*', user);
+var server = null;
+
+app.use(express.json())
+
+app.get("/", (req, res) => {
+    res.send("Hello world\n")
+})
+app.post("/", (req, res) => {
+    res.send(req.body.text)
+})
+
+// Express Routers
+const user_profile_router = require('../user/profile.js');
+app.use('*', user_profile_router);
+
+const user_peers_router = require('../user/peers.js');
+app.use('*', user_peers_router);
+
+
+app.use('/user', user_profile_router)
+app.use('/peers', user_peers_router)
 
 
 // local vm
@@ -24,16 +42,7 @@ const PORT = 3000;
 // const PORT = "8081";
 
 
-var server = null;
 
-app.use(express.json())
-
-app.get("/", (req, res) => {
-    res.send("Hello world\n")
-})
-app.post("/", (req, res) => {
-    res.send(req.body.text)
-})
 
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
@@ -53,7 +62,7 @@ app.post("/", (req, res) => {
 // Body: User gmail
 // Response: New user_id, new user id token
 
-app.use('/user', user)
+
 
 // router.post("/user/register", async (req, res) => {
 //     try {

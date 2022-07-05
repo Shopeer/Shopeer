@@ -3,7 +3,7 @@ var express = require("express")
 const { IPv4 } = require("ipaddr.js")
 const app = express()
 
-const router = express.Router()
+const user_profile_router = express.Router()
 
 const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
@@ -18,7 +18,7 @@ const mongoClient = new MongoClient(uri)
 // Body: user id token
 // Response: User details (profile, bio, name)
 
-router.get("/get_profile", async (req, res) => {
+user_profile_router.get("/get_profile", async (req, res) => {
     // var profile_id = ObjectId(req.query._id)
     var profile_email = req.query.email
 
@@ -42,7 +42,7 @@ router.get("/get_profile", async (req, res) => {
 // Body: user id token AND New profile info {profile_pic, name, bio}
 // Response: success/fail
 
-router.put("/update_profile", async (req, res) => {
+user_profile_router.put("/update_profile", async (req, res) => {
     // var profile_id = ObjectId(req.query._id)
     var profile_email = req.query.email
 
@@ -69,7 +69,7 @@ router.put("/update_profile", async (req, res) => {
 // Body (Parameter): <user_email>
 // Response: success/fail
 
-router.delete("/delete_user", async (req, res) => {
+user_profile_router.delete("/delete_user", async (req, res) => {
     // var profile_id = ObjectId(req.query._id)
     var profile_email = req.query.email
 
@@ -89,8 +89,7 @@ router.delete("/delete_user", async (req, res) => {
 // Body (Parameter): {"name":<user_name>, "email":<user_email>}
 // Response: user_id
 
-router.post("/register", async (req, res) => {
-
+user_profile_router.post("/register", async (req, res) => {
 
     var profile = req.body
 
@@ -100,7 +99,7 @@ router.post("/register", async (req, res) => {
         var user_object = create_user_object(profile)
         
         var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(user_object)
-        var user_object_id = user_object._id
+        // var user_object_id = user_object._id
 
         res.status(200).send(user_object)
 
@@ -114,12 +113,12 @@ router.post("/register", async (req, res) => {
 function create_user_object(body) {
     var user_object = {name: body.name,
                         email: body.email,
-                        peers: null,
-                        invites: null,
-                        blocked: null}
+                        peers: [],
+                        invites: [],
+                        blocked: []}
     return user_object
 }
 
 
 
-module.exports = router;
+module.exports = user_profile_router;
