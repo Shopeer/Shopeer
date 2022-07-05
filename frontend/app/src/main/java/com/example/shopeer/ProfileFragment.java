@@ -18,10 +18,10 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class ProfileFragment extends Fragment {
-    final static String TAG = "ProfileActivity"; // good practice for debugging
-    private TextView profileName, profileBio;
-    private ImageView profilePic, cameraButton, editButton;
-    private String email, password;
+//    final static String TAG = "ProfileActivity"; // good practice for debugging
+//    private TextView profileName, profileBio;
+//    private ImageView profilePic, cameraButton, editButton;
+//    private String email, password;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -88,12 +88,12 @@ public class ProfileFragment extends Fragment {
 //            }
 //        });
 //
-//    }
-//
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        // Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.fragment_profile, container, false);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 }
