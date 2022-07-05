@@ -90,16 +90,12 @@ user_profile_router.delete("/delete_user", async (req, res) => {
 // Response: user_id
 
 user_profile_router.post("/register", async (req, res) => {
-
     var profile = req.body
-
     console.log(profile)
 
     try {
         var user_object = create_user_object(profile)
-        
         var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(user_object)
-        // var user_object_id = user_object._id
 
         res.status(200).send(user_object)
 
@@ -113,6 +109,7 @@ user_profile_router.post("/register", async (req, res) => {
 function create_user_object(body) {
     var user_object = {name: body.name,
                         email: body.email,
+                        searches: [],
                         peers: [],
                         invites: [],
                         blocked: []}
