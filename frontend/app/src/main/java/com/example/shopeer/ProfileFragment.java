@@ -1,8 +1,10 @@
 package com.example.shopeer;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -18,19 +20,12 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class ProfileFragment extends Fragment {
-//    final static String TAG = "ProfileActivity"; // good practice for debugging
-//    private TextView profileName, profileBio;
-//    private ImageView profilePic, cameraButton, editButton;
-//    private String email, password;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    final static String TAG = "ProfileFragment"; // good practice for debugging
+    private TextView profileName, profileBio;
+    private CardView profilePicCard;
+    private ImageView profilePic, cameraButton, editButton;
+    private String email, password;
+    private Uri imagepath;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -47,34 +42,27 @@ public class ProfileFragment extends Fragment {
     // TODO: Rename and change types and number of parameters
     public static ProfileFragment newInstance(String param1, String param2) {
         ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
 
-//        // get user info to five as token when calling backend API
-//
+        // get user info as token when calling backend API
+
 //        profileName = getView().findViewById(R.id.profileName_textView);
 //        profileBio = getView().findViewById(R.id.profileBio_textView);
 //        profilePic = getView().findViewById(R.id.profilePic_imageView);
+//        profilePicCard = getView().findViewById(R.id.cardView);
 //        cameraButton = getView().findViewById(R.id.camera_imageView);
 //        editButton = getView().findViewById(R.id.edit_imageView);
 //
-//        // make database instance
-//        // access the user info from database
-//        // use addValueEventListener, ref: https://www.youtube.com/watch?v=GuMwCuvGWx4
-//
-//        //initialize buttons
+        // make database instance
+        // access the user info from database
+        // use addValueEventListener, ref: https://www.youtube.com/watch?v=GuMwCuvGWx4
+
+        //initialize buttons
 //        cameraButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
