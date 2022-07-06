@@ -70,11 +70,17 @@ router.get("/all", async (req, res) => {
 // curl -X "PUT" -H "Content-Type: application/json" -d '{"email": "hello@gmail.com" }' localhost:8081/chat/room?room_id=62c4d5c76896713a30649546
 router.put("/", async (req, res) => {
     try {
-        await coll.updateOne(
+        var doc = await coll.updateOne(
             {_id: ObjectId(req.query.room_id)},
             {$addToSet: {"peerslist": req.body.email}}
         )
-        res.status(200).send("\n" + req.body.email + " added to group chat\n")
+        if (doc.matchedCount == 0) {
+            res.status(200).send("\nCould not find this room.\n")
+        } else if (doc.modifiedCount == 0) {
+            res.status(200).send("\n" + req.body.email + " is already a member of this room\n")
+        } else {
+            res.status(200).send("\n" + req.body.email + " added to room\n")
+        }
     } catch (err) {
         console.log(err)
         res.status(400).send(err)
@@ -82,7 +88,7 @@ router.put("/", async (req, res) => {
 })
 
 /**
- * Delete peer from group chat DELETE https://shopeer.com/chat/room?room_id=[room_id]
+ * Delete peer from group chat DELETE https://shopeer.com/chat/room/remove_user?room_id=[room_id]
  * Deletes peer from group
  * Body: peer email
  * Returns: success/fail
@@ -90,11 +96,18 @@ router.put("/", async (req, res) => {
 // curl -X "DELETE" -H "Content-Type: application/json" -d '{"email": "sally@gmail.com" }' localhost:8081/chat/room/remove_user?room_id=62c4d5c76896713a30649546
 router.delete("/remove_user", async (req, res) => {
     try {
-        await coll.updateOne(
+        var doc = await coll.updateOne(
             {_id: ObjectId(req.query.room_id)},
             {$pull: {"peerslist": req.body.email}}
         )
-        res.status(200).send("\n" + req.body.email + " removed from group chat\n")
+        if (doc.matchedCount == 0) {
+            res.status(200).send("\nCould not find this room.\n")
+        } else if (doc.modifiedCount == 0) {
+            res.status(200).send("\n" + req.body.email + " is not a member of this room\n")
+        } else {
+            res.status(200).send("\n" + req.body.email + " removed from room\n")
+        }
+        
     } catch (err) {
         console.log(err)
         res.status(400).send(err)
@@ -112,6 +125,7 @@ router.delete("/remove_user", async (req, res) => {
 //curl -X "POST" -H "Content-Type: application/json" -d '{"name": "room", "peerslist": ["nando@gmail.com","grace@gmail.com"], "chathistory": []}' localhost:8081/chat/room
 router.post("/", async (req, res) => {
     try {
+
         var doc = await coll.insertOne({
             "name": req.body.name,
             "peerslist": req.body.peerslist,
@@ -130,15 +144,21 @@ router.post("/", async (req, res) => {
  * Deletes the chatroom and its history from the Room Collection
  * Response:success / fail
  */
-// curl -X "DELETE" -H "Content-Type: application/json" -d '' localhost:8081/chat/room?room_id=62c4e3e977d2f0b77f2a9fcf
+// curl -X "DELETE" -H "Content-Type: application/json" -d '' localhost:8081/chat/room?room_id=62c4ac94ee79eff89f8ac0bc
  router.delete("/", async (req, res) => {
     try {
-        await coll.deleteOne({
+        var doc = await coll.deleteOne({
             _id: ObjectId(req.query.room_id)
         })
-        res.status(200).send("\nRoom deleted\n")
+        if (doc.deletedCount == 1) {
+            res.status(200).send("\nRoom deleted\n")
+        } else {
+            res.status(200).send("\nroom does not exist.\n")
+        }
+        
     } catch (err) {
         console.log(err)
         res.status(400).send(err)
     }
 })
+
