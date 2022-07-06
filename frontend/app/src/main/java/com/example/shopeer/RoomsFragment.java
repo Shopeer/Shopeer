@@ -1,11 +1,13 @@
 package com.example.shopeer;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +19,7 @@ import java.util.ArrayList;
  * Use the {@link RoomsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragment extends Fragment {
+public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoomListener{
     final static String TAG = "RoomsFragment";
     RecyclerView recyclerView;
     private ArrayList<RoomObject> roomList;
@@ -50,23 +52,34 @@ public class RoomsFragment extends Fragment {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_rooms, container, false);
 
-        // initialize recycler view
-        roomList = new ArrayList<>();
-        recyclerView = v.findViewById(R.id.recyclerView);
-
         // fetch data of peers and add to peerList
+        roomList = new ArrayList<>();
         for (int i=0; i < 20; i++) {
             String name = "Peer Number " + i;
-            roomList.add(new RoomObject(name,
+            roomList.add(new RoomObject(i, name,
                     "Last Message sent by this peer",
                     "00:00",
                     R.drawable.temp_profile));
         }
 
-        RecyclerAdapter recyclerAdapter = new RecyclerAdapter(roomList);
+        // initialize recycler view
+        recyclerView = v.findViewById(R.id.recyclerView);
+        RoomRecyclerAdapter recyclerAdapter = new RoomRecyclerAdapter(roomList, this);
         recyclerView.setAdapter(recyclerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         return v;
+    }
+
+    @Override
+    public void onRoomClick(int position) {
+        Log.d(TAG, "onRoomClick: clicked.");
+
+        // Redirect to new chat activity
+        Intent intent = new Intent(getActivity(), ChatActivity.class);
+        intent.putExtra("room_id", roomList.get(position).getRoomId());
+        intent.putExtra("room_name", roomList.get(position).getRoomName());
+        intent.putExtra("room_pic", roomList.get(position).getRoomProfilePic());
+        startActivity(intent);
     }
 }
