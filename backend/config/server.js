@@ -30,7 +30,7 @@ app.use('*', user_peers_router);
 
 
 app.use('/user', user_profile_router)
-app.use('/peers', user_peers_router)
+app.use('/user', user_peers_router)
 
 
 // local vm

@@ -14,17 +14,34 @@ const mongoClient = new MongoClient(uri)
 // Returns a list of all peers
 // Param: User Id
 // Response: List of peer objects {peer_id, name, bio, profile_picture}
-user_peers_router.get("/get_all_peers", async (req, res) => {
-    // var profile_id = ObjectId(req.query._id)
+user_peers_router.get("/peers", async (req, res) => {
     var profile_email = req.query.email
-
     try {
-        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:profile_id})
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
-        // var objectId = req.body._id; 
-        res.status(200).send("yes")
-        var temp_arry = await find_cursor.toArray()
-        console.log(temp_arry)
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+        res.status(200).send(find_cursor.peers)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
+
+// Add peer
+user_peers_router.post("/peers", async (req, res) => {
+    var profile_email = req.query.email
+    var target_peer_email = req.query.target_peer_email
+    try {
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+
+        if (find_cursor.peers.includes(target_peer_email)) {
+            console.log("Peer already in added")
+            res.status(200).send(find_cursor)
+        } else {
+            var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $push: { peers: target_peer_email } })
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+            res.status(200).send(find_cursor)
+        }
+
     }
     catch (err) {
         console.log(err)
@@ -37,17 +54,21 @@ user_peers_router.get("/get_all_peers", async (req, res) => {
 // Param: peer id to be removed
 // Body: User Id Token
 // Response: success/fail
-user_peers_router.get("/get_profile", async (req, res) => {
-    // var profile_id = ObjectId(req.query._id)
+user_peers_router.delete("/peers", async (req, res) => {
     var profile_email = req.query.email
-
+    var target_peer_email = req.query.target_peer_email
     try {
-        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:profile_id})
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
-        // var objectId = req.body._id; 
-        res.status(200).send("yes")
-        var temp_arry = await find_cursor.toArray()
-        console.log(temp_arry)
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+
+        if (find_cursor.peers.includes(target_peer_email)) {
+            var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+            res.status(200).send(find_cursor)
+        } else {
+            console.log("Peer already not in existence")
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+            res.status(200).send(find_cursor)
+        }
     }
     catch (err) {
         console.log(err)
@@ -55,22 +76,42 @@ user_peers_router.get("/get_profile", async (req, res) => {
     }
 })
 
+// Get Peers GET https://shopeer.com/user/blocked?user_id=[user_id]
+// Returns a list of blocked peers
+// Param: User email
+// Response: List of peer objects {peer_id, name, bio, profile_picture}
+user_peers_router.get("/blocked", async (req, res) => {
+    var profile_email = req.query.email
+    try {
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+        res.status(200).send(find_cursor.blocked)
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
+
+
 // Block Peer POST https://shopeer.com/user/peers/blocked?peer_id=[id]
 // Adds user to the blocked list, does not appear in peer list, suggested, or invitations
 // Param: peer id to be blocked
 // Body: User Id Token
 // Response: success fail
-user_peers_router.get("/get_profile", async (req, res) => {
-    // var profile_id = ObjectId(req.query._id)
+user_peers_router.post("/blocked", async (req, res) => {
     var profile_email = req.query.email
-
+    var target_peer_email = req.query.target_peer_email
     try {
-        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:profile_id})
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
-        // var objectId = req.body._id; 
-        res.status(200).send("yes")
-        var temp_arry = await find_cursor.toArray()
-        console.log(temp_arry)
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+
+        if (find_cursor.blocked.includes(target_peer_email)) {
+            console.log("Peer already in added")
+            res.status(200).send(find_cursor)
+        } else {
+            var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $push: { blocked: target_peer_email } })
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+            res.status(200).send(find_cursor)
+        }
     }
     catch (err) {
         console.log(err)
@@ -83,17 +124,22 @@ user_peers_router.get("/get_profile", async (req, res) => {
 // Param: peer id to be unblocked
 // Body: User Id Token
 // Response: success/ fail
-user_peers_router.get("/get_profile", async (req, res) => {
-    // var profile_id = ObjectId(req.query._id)
+user_peers_router.delete("/blocked", async (req, res) => {
     var profile_email = req.query.email
-
+    var target_peer_email = req.query.target_peer_email
     try {
-        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:profile_id})
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
-        // var objectId = req.body._id; 
-        res.status(200).send("yes")
-        var temp_arry = await find_cursor.toArray()
-        console.log(temp_arry)
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+
+        if (find_cursor.blocked.includes(target_peer_email)) {
+            var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $pull: { blocked: target_peer_email } })
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+            res.status(200).send(find_cursor)
+            // res.status(200).send("Success")
+        } else {
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+            res.status(200).send(find_cursor)
+            // res.status(200).send("Fail")
+        }
     }
     catch (err) {
         console.log(err)
@@ -106,90 +152,72 @@ user_peers_router.get("/get_profile", async (req, res) => {
 // Param: user id
 // Body: User Id Token
 // Response: list of peer ids
-user_peers_router.get("/get_profile", async (req, res) => {
-    // var profile_id = ObjectId(req.query._id)
+user_peers_router.get("/invitations", async (req, res) => {
     var profile_email = req.query.email
-
     try {
-        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:profile_id})
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
-        // var objectId = req.body._id; 
-        res.status(200).send("yes")
-        var temp_arry = await find_cursor.toArray()
-        console.log(temp_arry)
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+        res.status(200).send(find_cursor.invites)
     }
     catch (err) {
         console.log(err)
         res.send(400).send(err)
     }
 })
-
 
 // Send Peer Invitation POST https://shopeer/match/invitations?peer_id=[id]
 // Sends an invitation to the selected peer IF user is not in peer’s Blocked_users_id. The user’s invitation is stored in peer’s “recived invitations” list in the User Collection. 
 // Param: peer id to send the invitation to
 // Body: User Id Token
 // Response: success/ fail
-user_peers_router.get("/get_profile", async (req, res) => {
-    // var profile_id = ObjectId(req.query._id)
+user_peers_router.post("/invitations", async (req, res) => {
     var profile_email = req.query.email
-
+    var target_peer_email = req.query.target_peer_email
     try {
-        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:profile_id})
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
-        // var objectId = req.body._id; 
-        res.status(200).send("yes")
-        var temp_arry = await find_cursor.toArray()
-        console.log(temp_arry)
-    }
-    catch (err) {
-        console.log(err)
-        res.send(400).send(err)
-    }
-})
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
 
-// Accept/Decline Peer Invitation POST https://shopeer.com/match/invitations/accept?peer_id=[id]+accept=[true/false]
-// Accept: will move the peer from received_invitations_id to peers_id in User Database + move user from sent_invitations_id to peers_id of the peer + call New group chatDecline: remove peer from  received_invitations_id of current user + remove user from sent_invitations_id of peers
-// Param: peer_id AND accept / decline
-// Response: success / fail
-user_peers_router.get("/get_profile", async (req, res) => {
-    // var profile_id = ObjectId(req.query._id)
-    var profile_email = req.query.email
-
-    try {
-        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:profile_id})
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
-        // var objectId = req.body._id; 
-        res.status(200).send("yes")
-        var temp_arry = await find_cursor.toArray()
-        console.log(temp_arry)
-    }
-    catch (err) {
-        console.log(err)
-        res.send(400).send(err)
-    }
-})
-
-
-// Add peer
-user_peers_router.post("/add_peer", async (req, res) => {
-    var profile_email = req.query.email
-    var new_peer_email = req.query.new_peer_email
-    try {
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({email:profile_email})
-        
-        if (find_cursor.peers.includes(new_peer_email)){
+        if (find_cursor.invites.includes(target_peer_email)) {
             console.log("Peer already in added")
             res.status(200).send(find_cursor)
         } else {
-            var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({email:profile_email},{$push: {peers: new_peer_email}})
-            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({email:profile_email})
-            res.status(200).send(find_cursor)
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: target_peer_email })
+            if (find_cursor.invites.includes(profile_email)) {
+                var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $push: { peers: target_peer_email } })
+                var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: target_peer_email }, { $push: { peers: profile_email } })
+                
+                
+                var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
+                var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: target_peer_email }, { $pull: { invites: profile_email } })
+                
+                res.status(200).send("Success, both are now peers")
+            } else {
+                var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $push: { invites: target_peer_email } })
+                var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+                res.status(200).send(find_cursor)
+            }
         }
-        
-        
+    }
+    catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
+user_peers_router.delete("/invitations", async (req, res) => {
+    var profile_email = req.query.email
+    var target_peer_email = req.query.target_peer_email
+    try {
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
 
+        if (find_cursor.invites.includes(target_peer_email)) {
+            var debug_res = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+            res.status(200).send(find_cursor)
+            // res.status(200).send("Success")
+        } else {
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+            res.status(200).send(find_cursor)
+            // res.status(200).send("Fail")
+        }
     }
     catch (err) {
         console.log(err)
