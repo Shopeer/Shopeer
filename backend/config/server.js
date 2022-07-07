@@ -28,7 +28,9 @@ app.use('/user', user_profile_router)
 
 const user_peers_router = require('../user/peers.js');
 app.use('*', user_peers_router);
+
 app.use('/peers', user_peers_router)
+
 
 const searches_router = require('../match/searches.js');
 app.use('*', searches_router);
