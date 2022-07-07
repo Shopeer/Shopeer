@@ -29,16 +29,16 @@ app.use('/user', user_profile_router)
 const user_peers_router = require('../user/peers.js');
 app.use('*', user_peers_router);
 
-app.use('/peers', user_peers_router)
+app.use('/user', user_peers_router)
 
 
 const searches_router = require('../match/searches.js');
 app.use('*', searches_router);
-app.use('/searches', searches_router)
+app.use('/match', searches_router)
 
 const suggestions_algo_router = require('../match/suggestions_algo.js');
 app.use('*', suggestions_algo_router);
-app.use('/searches', suggestions_algo_router)
+app.use('/match', suggestions_algo_router)
 
 // local vm
 const IP = '192.168.64.15';

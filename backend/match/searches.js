@@ -16,7 +16,7 @@ const mongoClient = new MongoClient(uri)
 // Gets a list of all active_searches under the user from User Database
 // Body: User Id Token
 // Response: list of search ids
-searches_router.get("/get_all_searches", async (req, res) => {
+searches_router.get("/searches", async (req, res) => {
     var profile_email = req.query.email
     try {
         var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({email:profile_email})
@@ -37,7 +37,7 @@ searches_router.get("/get_all_searches", async (req, res) => {
 // Adds a new active search for suggested matches to User Database
 // Body: User Id Token, location, distance, activity, budget
 // Response: search id
-searches_router.put("/add_search", async (req, res) => {
+searches_router.put("/searches", async (req, res) => {
     console.log(req.query)
     var profile_email = req.query.email
     var search = req.query.search
@@ -68,7 +68,7 @@ searches_router.put("/add_search", async (req, res) => {
 // Param: search id
 // Body: User Id Token
 // Response: success/ fail
-searches_router.delete("/delete_search", async (req, res) => {
+searches_router.delete("/searches", async (req, res) => {
     var profile_email = req.query.email
     var search = req.query.search
     try {

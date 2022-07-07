@@ -55,55 +55,17 @@ user_profile_router.put("/profile", async (req, res) => {
     }
 })
 
-
-
-
-// Delete User DELETE https://shopeer.com/user/registration?user_id=[user_id]
-// Removes the user from User Database and clears all info regarding the user
-// Body (Parameter): <user_email>
-// Response: success/fail
-
-
-user_profile_router.delete("/delete_user", async (req, res) => {
-    // var profile_id = ObjectId(req.query._id)
-
-    var profile_email = req.query.email
-
-    try {
-        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
-        var delete_return = await mongoClient.db("shopeer_database").collection("user_collection").deleteOne({email:profile_email})
-        if (delete_return.deletedCount == 1){
-            res.status(200).send("User deleted")
-        } else {
-            res.status(200).send("User does not exist")
-        }
-        
-    } catch (err) {
-        console.log(err)
-        res.send(400).send(err)
-    }
-})
-
-
 // Register User POST https://shopeer.com/user/register
 // Body (Parameter): {"name":<user_name>, "email":<user_email>}
 // Response: user_id
 
 
-user_profile_router.post("/register", async (req, res) => {
+user_profile_router.post("/registration", async (req, res) => {
     var profile = req.body
-    console.log(profile)
-
-
     try {
-
         var user_object = create_user_object(profile)
         var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(user_object)
-
-
-
         res.status(200).send(user_object)
-
     } catch (err) {
         console.log(err)
         res.send(400).send(err)
@@ -114,6 +76,8 @@ user_profile_router.post("/register", async (req, res) => {
 function create_user_object(body) {
     var user_object = {name: body.name,
                         email: body.email,
+                        description: body.description,
+                        photo: body.photo,
                         searches: [],
                         peers: [],
                         invites: [],
@@ -121,6 +85,27 @@ function create_user_object(body) {
     return user_object
 }
 
+// Delete User DELETE https://shopeer.com/user/registration?user_id=[user_id]
+// Removes the user from User Database and clears all info regarding the user
+// Body (Parameter): <user_email>
+// Response: success/fail
+
+
+user_profile_router.delete("/registration", async (req, res) => {
+    var profile_email = req.query.email
+    try {
+        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
+        var delete_return = await mongoClient.db("shopeer_database").collection("user_collection").deleteOne({email:profile_email})
+        if (delete_return.deletedCount == 1){
+            res.status(200).send("User deleted")
+        } else {
+            res.status(200).send("User does not exist")
+        }
+    } catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
 
 
 
