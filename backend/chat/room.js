@@ -15,7 +15,7 @@ const coll = client.db("shopeer_database").collection("room_collection")
  * Get Chatrooms GET https://shopeer.com/chat/room/all
  * Gets an array of all chat rooms that a user is present in
  * Body: {"email": <user email>}
- * Response: array of room_ids
+ * Response: array of room_objects
  */
 // curl -X "GET" -H "Content-Type: application/json" -d '{"email": "gracemyzhang@gmail.com" }' localhost:8081/chat/room/all
 router.get("/all", async (req, res) => {
@@ -25,9 +25,10 @@ router.get("/all", async (req, res) => {
         })
         roomArr = []
         await roomsCursor.forEach(getRooms = (room) => {
-            roomArr.push(room._id)
+            // roomArr.push(room._id)
+            roomArr.push(room)
         })
-    console.log("\n User " + req.body.email + " is present in the following rooms: \n " + roomArr)
+    console.log(roomArr)
     res.status(200).send(roomArr)
     } catch (err) {
         console.log(err)
