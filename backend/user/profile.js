@@ -9,7 +9,6 @@ const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
-
 // Profile Submodule
 
 // Get Profile GET https://shopeer.com/user/profile?user_id=[user_id]
@@ -18,10 +17,7 @@ const mongoClient = new MongoClient(uri)
 // Body: user id token
 // Response: User details (profile, bio, name)
 
-
-user_profile_router.get("/get_profile", async (req, res) => {
-    // var profile_id = ObjectId(req.query._id)
-
+user_profile_router.get("/profile", async (req, res) => {
     var profile_email = req.query.email
     try {
         var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({email:profile_email})
@@ -39,9 +35,7 @@ user_profile_router.get("/get_profile", async (req, res) => {
 // Body: user id token AND New profile info {profile_pic, name, bio}
 // Response: success/fail
 
-
-user_profile_router.put("/update_profile", async (req, res) => {
-
+user_profile_router.put("/profile", async (req, res) => {
     // var profile_id = ObjectId(req.query._id)
     var profile_email = req.query.email
     var profile_name = req.query.name
@@ -60,6 +54,7 @@ user_profile_router.put("/update_profile", async (req, res) => {
         res.send(400).send(err)
     }
 })
+
 
 
 
