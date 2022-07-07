@@ -15,7 +15,15 @@ const coll = client.db("shopeer_database").collection("room_collection")
  * Get Chatrooms GET https://shopeer.com/chat/room/all
  * Gets an array of all chat rooms that a user is present in
  * Body: {"email": <user email>}
+<<<<<<< HEAD
+<<<<<<< HEAD
+ * Response: array of room_objects
+=======
  * Response: array of room_ids
+>>>>>>> 19de8ec... fixed message id
+=======
+ * Response: array of room_objects
+>>>>>>> ebc87f9... deleted empty file
  */
 // curl -X "GET" -H "Content-Type: application/json" -d '{"email": "gracemyzhang@gmail.com" }' localhost:8081/chat/room/all
 router.get("/all", async (req, res) => {
@@ -25,9 +33,10 @@ router.get("/all", async (req, res) => {
         })
         roomArr = []
         await roomsCursor.forEach(getRooms = (room) => {
-            roomArr.push(room._id)
+            // roomArr.push(room._id)
+            roomArr.push(room)
         })
-    console.log("\n User " + req.body.email + " is present in the following rooms: \n " + roomArr)
+
     res.status(200).send(roomArr)
     } catch (err) {
         console.log(err)
@@ -36,14 +45,17 @@ router.get("/all", async (req, res) => {
 })
 
 /**
- * Get Chatroom History GET https://shopeer.com/chat/room?room_id=[room_id]
+
+ * Get Chatroom History GET https://shopeer.com/chat/room/history?room_id=[room_id]
  * Gets the chat history of a specific chat room
  * Param: room_id
  * Body: none (M4: user email)
  * Response: array containing Message Objects
  */
 // curl -X "GET" -H "Content-Type: application/json" -d localhost:8081/chat/room?room_id=62c4bb1ba6c3f54d76bdf6f8
- router.get("/", async (req, res) => {
+
+
+ router.get("/history", async (req, res) => {
     try {
         var doc = await coll.findOne({ _id: ObjectId(req.query.room_id)})
         doc.chathistory.forEach(printMssgs = (mssg) => {
@@ -128,6 +140,7 @@ router.post("/", async (req, res) => {
 
         var doc = await coll.insertOne({
             "name": req.body.name,
+            // "picture": req.body.picture,
             "peerslist": req.body.peerslist,
             "chathistory": req.body.chathistory
         })
@@ -138,6 +151,28 @@ router.post("/", async (req, res) => {
         res.status(400).send(err)
     }
 })
+
+/**  
+ * Get chatroom summary GET https://shopeer.com/chat/room/summary?room_id=[room_id]
+ * Body: none
+ * Response: roomSummaryObject containing name, picture, and last message object
+*/
+//curl -X "GET" -H "Content-Type: application/json" -d '' localhost:8081/chat/room/summary?room_id=62c4bb1ba6c3f54d76bdf6f8
+router.get("/summary", async (req, res) => {
+    try {
+        var doc = await coll.findOne({ _id: ObjectId(req.query.room_id)})
+        var roomSummary = {
+            "name": doc.name,
+            //"picture": doc.picture,
+            "lastmessage": doc.chathistory[doc.chathistory.length-1]
+        }
+        res.status(200).send(roomSummary)
+    } catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
 
 /** 
  * Remove Chatroom DELETE https://shopeer.com/chat/room?room_id=[room_id]

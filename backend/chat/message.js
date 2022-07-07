@@ -15,7 +15,10 @@ const coll = client.db("shopeer_database").collection("room_collection")
  * Body:  sender email AND message text AND send time
  * Response: message id
 */
+
+
 //curl -X "POST" -H "Content-Type: application/json" -d '{"email": "nick@gmail.com", "text": "sup!", "time": "rn"}' localhost:8081/chat/message?room_id=62c4d5c76896713a30649546
+
 router.post("/", async (req, res) => {
     try {
         var mssgid = ObjectId();
