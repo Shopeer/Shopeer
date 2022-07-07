@@ -38,7 +38,7 @@ app.use('/searches', searches_router)
 
 const suggestions_algo_router = require('../match/suggestions_algo.js');
 app.use('*', suggestions_algo_router);
-app.use('/suggestions', suggestions_algo_router)
+app.use('/searches', suggestions_algo_router)
 
 // local vm
 const IP = '192.168.64.15';
