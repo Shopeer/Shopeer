@@ -40,6 +40,13 @@ const suggestions_algo_router = require('../match/suggestions_algo.js');
 app.use('*', suggestions_algo_router);
 app.use('/searches', suggestions_algo_router)
 
+const roomsRouter = require('../chat/room');
+app.use('/chat/room', roomsRouter)
+
+const mssgRouter = require('../chat/message');
+app.use('/chat/message', mssgRouter)
+
+
 // local vm
 const IP = '192.168.64.15';
 const PORT = 3000;
