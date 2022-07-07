@@ -173,6 +173,7 @@ router.get("/summary", async (req, res) => {
     }
 })
 
+
 /** 
  * Remove Chatroom DELETE https://shopeer.com/chat/room?room_id=[room_id]
  * Deletes the chatroom and its history from the Room Collection
