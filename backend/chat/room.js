@@ -37,14 +37,14 @@ router.get("/all", async (req, res) => {
 })
 
 /**
- * Get Chatroom History GET https://shopeer.com/chat/room?room_id=[room_id]
+ * Get Chatroom History GET https://shopeer.com/chat/room/history?room_id=[room_id]
  * Gets the chat history of a specific chat room
  * Param: room_id
  * Body: none (M4: user email)
  * Response: array containing Message Objects
  */
 // curl -X "GET" -H "Content-Type: application/json" -d localhost:8081/chat/room?room_id=62c4bb1ba6c3f54d76bdf6f8
- router.get("/", async (req, res) => {
+ router.get("/history", async (req, res) => {
     try {
         var doc = await coll.findOne({ _id: ObjectId(req.query.room_id)})
         doc.chathistory.forEach(printMssgs = (mssg) => {
@@ -129,11 +129,33 @@ router.post("/", async (req, res) => {
 
         var doc = await coll.insertOne({
             "name": req.body.name,
+            // "picture": req.body.picture,
             "peerslist": req.body.peerslist,
             "chathistory": req.body.chathistory
         })
         console.log("\n New chatroom " + req.body.name + " created with id " + doc.insertedId)
         res.status(200).send(doc.insertedId)
+    } catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
+/**  
+ * Get chatroom summary GET https://shopeer.com/chat/room/summary?room_id=[room_id]
+ * Body: none
+ * Response: roomSummaryObject containing name, picture, and last message object
+*/
+//curl -X "GET" -H "Content-Type: application/json" -d '' localhost:8081/chat/room/summary?room_id=62c4bb1ba6c3f54d76bdf6f8
+router.get("/summary", async (req, res) => {
+    try {
+        var doc = await coll.findOne({ _id: ObjectId(req.query.room_id)})
+        var roomSummary = {
+            "name": doc.name,
+            //"picture": doc.picture,
+            "lastmessage": doc.chathistory[doc.chathistory.length-1]
+        }
+        res.status(200).send(roomSummary)
     } catch (err) {
         console.log(err)
         res.status(400).send(err)
