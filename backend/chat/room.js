@@ -33,23 +33,10 @@ router.get("/all", async (req, res) => {
         })
         roomArr = []
         await roomsCursor.forEach(getRooms = (room) => {
-<<<<<<< HEAD
-<<<<<<< HEAD
             // roomArr.push(room._id)
             roomArr.push(room)
         })
-    console.log(roomArr)
-=======
-            roomArr.push(room._id)
-        })
-    console.log("\n User " + req.body.email + " is present in the following rooms: \n " + roomArr)
->>>>>>> 19de8ec... fixed message id
-=======
-            // roomArr.push(room._id)
-            roomArr.push(room)
-        })
-    console.log(roomArr)
->>>>>>> ebc87f9... deleted empty file
+
     res.status(200).send(roomArr)
     } catch (err) {
         console.log(err)
@@ -58,30 +45,17 @@ router.get("/all", async (req, res) => {
 })
 
 /**
-<<<<<<< HEAD
-<<<<<<< HEAD
+
  * Get Chatroom History GET https://shopeer.com/chat/room/history?room_id=[room_id]
-=======
- * Get Chatroom History GET https://shopeer.com/chat/room?room_id=[room_id]
->>>>>>> 19de8ec... fixed message id
-=======
- * Get Chatroom History GET https://shopeer.com/chat/room/history?room_id=[room_id]
->>>>>>> 2284192... added GET room_summary request
  * Gets the chat history of a specific chat room
  * Param: room_id
  * Body: none (M4: user email)
  * Response: array containing Message Objects
  */
 // curl -X "GET" -H "Content-Type: application/json" -d localhost:8081/chat/room?room_id=62c4bb1ba6c3f54d76bdf6f8
-<<<<<<< HEAD
-<<<<<<< HEAD
+
+
  router.get("/history", async (req, res) => {
-=======
- router.get("/", async (req, res) => {
->>>>>>> 19de8ec... fixed message id
-=======
- router.get("/history", async (req, res) => {
->>>>>>> 2284192... added GET room_summary request
     try {
         var doc = await coll.findOne({ _id: ObjectId(req.query.room_id)})
         doc.chathistory.forEach(printMssgs = (mssg) => {
@@ -166,14 +140,7 @@ router.post("/", async (req, res) => {
 
         var doc = await coll.insertOne({
             "name": req.body.name,
-<<<<<<< HEAD
-<<<<<<< HEAD
             // "picture": req.body.picture,
-=======
->>>>>>> 19de8ec... fixed message id
-=======
-            // "picture": req.body.picture,
->>>>>>> 2284192... added GET room_summary request
             "peerslist": req.body.peerslist,
             "chathistory": req.body.chathistory
         })
@@ -185,10 +152,6 @@ router.post("/", async (req, res) => {
     }
 })
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 2284192... added GET room_summary request
 /**  
  * Get chatroom summary GET https://shopeer.com/chat/room/summary?room_id=[room_id]
  * Body: none
@@ -210,11 +173,6 @@ router.get("/summary", async (req, res) => {
     }
 })
 
-<<<<<<< HEAD
-=======
->>>>>>> 19de8ec... fixed message id
-=======
->>>>>>> 2284192... added GET room_summary request
 /** 
  * Remove Chatroom DELETE https://shopeer.com/chat/room?room_id=[room_id]
  * Deletes the chatroom and its history from the Room Collection
