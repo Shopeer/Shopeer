@@ -50,6 +50,7 @@
         android:id="@+id/chat_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:orientation="vertical"
         android:padding="5dp"
         app:layout_constraintBottom_toTopOf="@+id/messageInput"
         app:layout_constraintStart_toStartOf="parent"

@@ -103,18 +103,21 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 enteredMessage = messageInput.getText().toString();
-                if(enteredMessage.isEmpty()) {
-                 finish();
-                }
-                Date date = new Date();
-                currenttime = simpleDateFormat.format(calendar.getTime());
-                ChatObject message = new ChatObject(enteredMessage, "senderEmail", date.getTime(), currenttime);
-                // send the message object to BE
+                if(!enteredMessage.isEmpty()) {
+                    Date date = new Date();
+                    currenttime = simpleDateFormat.format(calendar.getTime());
+                    ChatObject newMessage = new ChatObject(enteredMessage, "me", date.getTime(), currenttime);
+                    messagesList.add(newMessage);
+                    chatRecyclerAdapter.notifyDataSetChanged();
+                    recyclerView.smoothScrollToPosition(messagesList.size()-1);
+                    // send the message object to BE
 
-                messageInput.setText(null);
+
+                    messageInput.setText(null);
+                }
             }
         });
-    }
+    } // end of oncreate
 
     @Override
     protected void onStart() {
