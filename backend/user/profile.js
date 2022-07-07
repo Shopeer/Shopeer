@@ -18,17 +18,14 @@ const mongoClient = new MongoClient(uri)
 // Body: user id token
 // Response: User details (profile, bio, name)
 
+
 user_profile_router.get("/get_profile", async (req, res) => {
     // var profile_id = ObjectId(req.query._id)
-    var profile_email = req.query.email
 
+    var profile_email = req.query.email
     try {
-        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({_id:profile_id})
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
-        // var objectId = req.body._id; 
-        res.status(200).send("yes")
-        var temp_arry = await find_cursor.toArray()
-        console.log(temp_arry)
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({email:profile_email})
+        res.status(200).send(find_cursor)
     }
     catch (err) {
         console.log(err)
@@ -42,10 +39,11 @@ user_profile_router.get("/get_profile", async (req, res) => {
 // Body: user id token AND New profile info {profile_pic, name, bio}
 // Response: success/fail
 
+
 user_profile_router.put("/update_profile", async (req, res) => {
+
     // var profile_id = ObjectId(req.query._id)
     var profile_email = req.query.email
-
     var profile_name = req.query.name
     var profile_peers = req.query.peers
     var profile_invites = req.query.invites
@@ -53,8 +51,9 @@ user_profile_router.put("/update_profile", async (req, res) => {
 
     try {
         var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({email:profile_email}, {$set:{name:profile_name}})
-        
-        res.status(200).send(find_cursor)
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({email:profile_email})
+        // res.status(200).send(find_cursor)
+        res.status(200).send("Success")
     }
     catch (err) {
         console.log(err)
@@ -69,14 +68,21 @@ user_profile_router.put("/update_profile", async (req, res) => {
 // Body (Parameter): <user_email>
 // Response: success/fail
 
+
 user_profile_router.delete("/delete_user", async (req, res) => {
     // var profile_id = ObjectId(req.query._id)
+
     var profile_email = req.query.email
 
     try {
         // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
         var delete_return = await mongoClient.db("shopeer_database").collection("user_collection").deleteOne({email:profile_email})
-        res.status(200).send(delete_return)
+        if (delete_return.deletedCount == 1){
+            res.status(200).send("User deleted")
+        } else {
+            res.status(200).send("User does not exist")
+        }
+        
     } catch (err) {
         console.log(err)
         res.send(400).send(err)
@@ -84,10 +90,10 @@ user_profile_router.delete("/delete_user", async (req, res) => {
 })
 
 
-
 // Register User POST https://shopeer.com/user/register
 // Body (Parameter): {"name":<user_name>, "email":<user_email>}
 // Response: user_id
+
 
 user_profile_router.post("/register", async (req, res) => {
 
@@ -95,11 +101,13 @@ user_profile_router.post("/register", async (req, res) => {
 
     console.log(profile)
 
+
     try {
-        var user_object = create_user_object(profile)
-        
+        var user_object = create_user_object(profile_email)
         var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(user_object)
+
         // var user_object_id = user_object._id
+
 
         res.status(200).send(user_object)
 
@@ -121,4 +129,6 @@ function create_user_object(body) {
 
 
 
+
 module.exports = user_profile_router;
+
