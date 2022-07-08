@@ -48,12 +48,12 @@ app.use('/chat/message', mssgRouter)
 
 
 // local vm
-const IP = '192.168.64.15';
-const PORT = 3000;
+// const IP = '192.168.64.15';
+// const PORT = 3000;
 
 // azure vm
-// const IP = "40.122.233.185";
-// const PORT = "8081";
+const IP = "20.230.148.126";
+const PORT = "8080";
 
 
 
@@ -437,7 +437,7 @@ app.get("/server_time", async (req, res) => {
 async function run() {
   try {
       await mongoClient.connect()  // waits for sync op to finish
-      console.log("Successfully connected to the database")
+      console.log("Successfully connected to database")
       // var server = app.listen(8081, '0.0.0.0', function () {
       server = app.listen(PORT, function () {
           var host = server.address().address
