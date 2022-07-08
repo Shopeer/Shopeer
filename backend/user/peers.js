@@ -118,6 +118,8 @@ user_peers_router.post("/blocked", async (req, res) => {
             res.status(200).send(find_cursor)
         } else {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { blocked: target_peer_email } })
+            var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
+            var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
             var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(200).send(find_cursor)
         }
