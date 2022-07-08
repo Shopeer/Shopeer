@@ -56,8 +56,8 @@ public class ChatActivity extends AppCompatActivity {
 
     ArrayList<ChatObject> messagesList;
 
-    String url = "http://localhost:8081/";
-    //String url = "http://20.230.148.126:8080/";
+//    String url = "http://localhost:8081/";
+    String url = "http://20.230.148.126:8080/";
 
 
 
