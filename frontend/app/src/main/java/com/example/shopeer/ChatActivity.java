@@ -15,10 +15,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -28,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -57,7 +61,8 @@ public class ChatActivity extends AppCompatActivity {
     ArrayList<ChatObject> messagesList;
 
 //    String url = "http://localhost:8081/";
-    String url = "http://20.230.148.126:8080/";
+    private final String roomUrl = "http://20.230.148.126:8080/chat/room/history?room_id=";
+    private final String postUrl = "http://20.230.148.126:8080/chat/message?room_id=";
 
 
 
@@ -91,12 +96,20 @@ public class ChatActivity extends AppCompatActivity {
 //            Picasso.get().load(imgUri).into(roomPictureImageView);
         }
 
-        // fetch messages from BE
-        try {
-            fetchMessageHistory(roomId);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        messagesList = new ArrayList<>();
+
+        // initialize recycler view
+        recyclerView = findViewById(R.id.chat_recyclerView);
+        chatRecyclerAdapter = new ChatRecyclerAdapter(messagesList);
+        recyclerView.setAdapter(chatRecyclerAdapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        // fetch messages from BE when get notification from FCM
+        // Get notification from FCM
+        // if true:
+        fetchMessageHistory(roomId);
 
 //        Date date = new Date();
 //        String time = simpleDateFormat.format(calendar.getTime());
@@ -110,16 +123,6 @@ public class ChatActivity extends AppCompatActivity {
 //            }
 //        }
 
-        // initialize recycler view
-        recyclerView = findViewById(R.id.chat_recyclerView);
-        chatRecyclerAdapter = new ChatRecyclerAdapter(messagesList);
-        recyclerView.setAdapter(chatRecyclerAdapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setStackFromEnd(true);
-        recyclerView.setLayoutManager(linearLayoutManager);
-
-
-
         // set up "send message" button
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,13 +131,13 @@ public class ChatActivity extends AppCompatActivity {
                 if(!enteredMessage.isEmpty()) {
                     Date date = new Date();
                     currenttime = simpleDateFormat.format(calendar.getTime());
-                    ChatObject newMessage = new ChatObject(enteredMessage, "me", date.getTime(), currenttime);
-                    // send message to backend, FCM sends back
-                    messagesList.add(newMessage);
-                    chatRecyclerAdapter.notifyDataSetChanged();
-                    recyclerView.smoothScrollToPosition(messagesList.size()-1);
+                    ChatObject newMessage = new ChatObject(enteredMessage, MainActivity.email, date.getTime(), currenttime);
+//                    messagesList.add(newMessage);
+//                    chatRecyclerAdapter.notifyDataSetChanged();
+//                    recyclerView.smoothScrollToPosition(messagesList.size()-1);
+
                     // send the message object to BE
-                    //postNewMessage(newMessage);
+                    postNewMessage(newMessage, roomId);
 
 
                     messageInput.setText(null);
@@ -143,59 +146,86 @@ public class ChatActivity extends AppCompatActivity {
         });
     } // end of oncreate
 
-//    private void postNewMessage(ChatObject newMessage, String room_id) throws JSONException {
-//        JSONArray param= new JSONArray();
-//        param.put(new JSONObject().put("room_id", room_id));
-//        JSONArrayRequest jsonArrayRequest = new JsonArrayRequest
-//                (Request.Method.POST,
-//                        url + "chat/message",
-//                        param,)
-//    }
+    private void postNewMessage(ChatObject newMessage, String room_id) {
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            String url = postUrl + room_id;
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("email", newMessage.getSenderEmail());
+            jsonBody.put("text", newMessage.getText());
+            jsonBody.put("time", newMessage.getCurrenttime());
+            final String requestBody = jsonBody.toString();
+
+            StringRequest stringRequest = new StringRequest(Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    fetchMessageHistory(room_id);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "post message error" + error.toString());
+                }
+            })
+            {
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    try {
+                        return requestBody == null ? null : requestBody.getBytes("utf-8");
+                    } catch (UnsupportedEncodingException uee) {
+                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                        return null;
+                    }
+                }
+            };
+            requestQueue.add(stringRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     // fetch from BE
-    private void fetchMessageHistory(String room_id) throws JSONException {
-
-        JSONArray param= new JSONArray();
-        param.put(new JSONObject().put("room_id", room_id));
+    private void fetchMessageHistory(String room_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        String url = roomUrl + room_id;
+        Log.d(TAG, url);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                 (Request.Method.GET,
-                        url + "chat/room/history", param,
+                        url, null,
                         new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        ArrayList<ChatObject> chatArr = new ArrayList<>();
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
+                        try{
+                            if (response.length() == 0) {return;}
+                            for (int i = 0; i < response.length(); i++) {
                                 JSONObject obj = response.getJSONObject(i);
-                                // String mssg_id
                                 Date date = new Date();
                                 String email = obj.getString("email");
                                 String text = obj.getString("text");
                                 String time = obj.getString("time");
-                                chatArr.add(new ChatObject(text, email, date.getTime(), time));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                                messagesList.add(new ChatObject(text, email, date.getTime(), time));
                             }
+                            // notify change, scroll
+                            chatRecyclerAdapter.notifyDataSetChanged();
+                            recyclerView.smoothScrollToPosition(messagesList.size()-1);
+
+                            Log.d(TAG, "received message history");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-
-                        messagesList = chatArr;
-                        // notify change, scroll
-                        chatRecyclerAdapter.notifyDataSetChanged();
-                        recyclerView.smoothScrollToPosition(messagesList.size()-1);
-
-                        Log.d(TAG, "received message history");
-
                     }
                 }, new Response.ErrorListener() {
-
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-
+                        Log.d(TAG, "get message history: " + error.toString());
                     }
                 });
-        return;
-
+        requestQueue.add(jsonArrayRequest);
     }
 
     @Override

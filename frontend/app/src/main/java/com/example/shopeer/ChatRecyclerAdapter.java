@@ -57,7 +57,7 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         // if the message was sent by current user-> return ITEM_SEND, else return ITEM_RECEIVE
         ChatObject message = messagesList.get(position);
-        if ("me".equals(message.getSenderEmail())) {
+        if (MainActivity.email.equals(message.getSenderEmail())) {
             return ITEM_SEND;
         } else {
             return ITEM_RECEIVE;
