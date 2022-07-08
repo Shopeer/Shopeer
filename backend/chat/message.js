@@ -38,7 +38,7 @@ router.post("/", async (req, res) => {
             }
         )
         console.log("\n mssg from " + req.body.email + " added to group chat with id " + mssgid)
-        res.status(200).send(doc.insertedId)
+        res.status(200).send(mssgid)
     } catch (err) {
         console.log(err)
         res.status(400).send(err)
