@@ -21,6 +21,9 @@
             android:name=".ChatActivity"
             android:exported="false" />
         <activity
+            android:name=".EditSearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
