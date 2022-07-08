@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     final static String TAG = "SignIn Activity";
     private GoogleSignInClient mGoogleSignInClient;
 
-    final private String regisUrl = "http://20.230.148.126:8080/user/register";
+    final private String regisUrl = "http://20.230.148.126:8080/user/registration";
     final private String loginUrl = "http://20.230.148.126:8080/user/profile";
 
     private boolean register;
@@ -148,12 +148,13 @@ public class LoginActivity extends AppCompatActivity {
     private void registerUser(GoogleSignInAccount account) {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(this);
+            String url = regisUrl + "?email=" + account.getEmail() +"&" + "name=" + account.getDisplayName();
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("name", account.getDisplayName());
             jsonBody.put("email", account.getEmail());
             final String requestBody = jsonBody.toString();
 
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, regisUrl, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.d(TAG, "onResponse register: " + response);
