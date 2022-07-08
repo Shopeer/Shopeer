@@ -128,6 +128,45 @@ user_profile_router.delete("/registration", async (req, res) => {
 })
 
 
+// Register User POST https://shopeer.com/user/register
+// Body (Parameter): {"name":<user_name>, "email":<user_email>}
+// Response: user_id
+
+
+user_profile_router.post("/register", async (req, res) => {
+    var profile = req.body
+    console.log(profile)
+
+
+    try {
+
+        var user_object = create_user_object(profile)
+        var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(user_object)
+
+
+
+        res.status(200).send(user_object)
+
+    } catch (err) {
+        console.log(err)
+        res.send(400).send(err)
+    }
+})
+
+
+function create_user_object(body) {
+    var user_object = {name: body.name,
+                        email: body.email,
+                        FCM_token: body.FCM_token,
+                        searches: [],
+                        peers: [],
+                        invites: [],
+                        blocked: []}
+    return user_object
+}
+
+
+
 
 module.exports = user_profile_router;
 

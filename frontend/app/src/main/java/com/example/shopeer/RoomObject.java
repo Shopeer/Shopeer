@@ -2,16 +2,26 @@ package com.example.shopeer;
 
 public class RoomObject {
 
+    private String roomId;
     private String roomName;
     private String lastMessage;
     private String timeofLM;
     private int roomProfilePic;
 
-    public RoomObject(String peerName, String lastMessage, String timeofLM, int peerProfilePic) {
-        this.roomName = peerName;
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+
+    public RoomObject(String roomId, String roomName, String lastMessage, String timeofLM, int roomProfilePic) {
+        this.roomId = roomId;
+        this.roomName = roomName;
         this.lastMessage = lastMessage;
         this.timeofLM = timeofLM;
-        this.roomProfilePic = peerProfilePic;
+        this.roomProfilePic = roomProfilePic;
     }
 
     public String getRoomName() {

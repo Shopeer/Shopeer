@@ -3,11 +3,21 @@ package com.example.shopeer;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -15,12 +25,20 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+
 public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private Button registerButton;
-    private int RC_SIGN_IN;
+    private int RC_SIGN_IN=1;
     final static String TAG = "SignIn Activity";
     private GoogleSignInClient mGoogleSignInClient;
+
+    final private String regisUrl = "http://20.230.148.126:8080/user/registration";
+    final private String loginUrl = "http://20.230.148.126:8080/user/profile";
 
     private boolean register;
 
@@ -103,8 +121,8 @@ public class LoginActivity extends AppCompatActivity {
         if (account != null) {
             updateUI(account);
             // TODO: go to main activity, pass on user info if needed
-            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(mainIntent);
+//            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+//            startActivity(mainIntent);
         }
     }
 
@@ -112,18 +130,102 @@ public class LoginActivity extends AppCompatActivity {
     private void updateUI(GoogleSignInAccount account) {
         if (account == null) {
             Log.d(TAG, "There is no user logged in!");
+
+
         }
         else {
             // TODO:get user info and call backend to register or login
             if (register) {
-                // register user
+                registerUser(account);
             }
             else {
-                // login
+                loginUser(account);
             }
             // TODO: go to main activity, pass on user info if needed
-            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(mainIntent);
+//            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+//            startActivity(mainIntent);
+        }
+    }
+
+    private void registerUser(GoogleSignInAccount account) {
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            String url = regisUrl + "?email=" + account.getEmail() +"&" + "name=" + account.getDisplayName();
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("name", account.getDisplayName());
+            jsonBody.put("email", account.getEmail());
+            final String requestBody = jsonBody.toString();
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.d(TAG, "onResponse register: " + response);
+                    // redirect to MainActivity
+                    Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                    mainIntent.putExtra("name", account.getDisplayName());
+                    mainIntent.putExtra("email", account.getEmail());
+                    mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
+                    mainIntent.putExtra("register", "yes");
+                    startActivity(mainIntent);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "onErrorResponse register: " + error.toString());
+                }
+            }) {
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    try {
+                        return requestBody == null ? null : requestBody.getBytes("utf-8");
+                    } catch (UnsupportedEncodingException uee) {
+                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                        return null;
+                    }
+                }
+            };
+            requestQueue.add(stringRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loginUser(GoogleSignInAccount account) {
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            String url = loginUrl + "?email=" + account.getEmail();
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.d(TAG, "onResponse login: " + response);
+                    if ("".equals(response)) {
+                        Log.d(TAG, "No user registered");
+                        Toast.makeText(LoginActivity.this, "No user found, please Register", Toast.LENGTH_LONG).show();
+                    } else {
+                        // redirect to MainActivity
+                        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                        mainIntent.putExtra("name", account.getDisplayName());
+                        mainIntent.putExtra("email", account.getEmail());
+                        mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
+                        Log.d(TAG, "onResponse: " + account.getPhotoUrl().toString());
+                        startActivity(mainIntent);
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "onErrorResponse login: " + error.toString());
+                }
+            });
+            requestQueue.add(stringRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

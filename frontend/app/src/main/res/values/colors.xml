@@ -15,4 +15,5 @@
     <color name="chat_grey">#E6E6E6</color>
     <color name="button_grey">#565E70</color>
     <color name="unselected_blue">#9EDDF1</color>
+    <color name="textbox">#40000000</color>
 </resources>
