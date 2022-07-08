@@ -9,7 +9,7 @@ const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
-
+const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
 
 
 // Get Active searches GET https://shopeer.com/match/searches
@@ -37,10 +37,10 @@ searches_router.get("/searches", async (req, res) => {
 // Adds a new active search for suggested matches to User Database
 // Body: User Id Token, location, distance, activity, budget
 // Response: search id
-searches_router.put("/searches", async (req, res) => {
+searches_router.post("/searches", async (req, res) => {
     console.log(req.query)
     var profile_email = req.query.email
-    var search = req.query.search
+    var search = req.body.search
     try {
         var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({email:profile_email})
         // console.log(find_cursor)
