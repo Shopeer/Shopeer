@@ -25,7 +25,7 @@ user_profile_router.get("/profile", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -36,22 +36,32 @@ user_profile_router.get("/profile", async (req, res) => {
 // Response: success/fail
 
 user_profile_router.put("/profile", async (req, res) => {
-    // var profile_id = ObjectId(req.query._id)
     var profile_email = req.query.email
     var profile_name = req.query.name
-    var profile_peers = req.query.peers
-    var profile_invites = req.query.invites
-    var profile_blocked = req.query.blocked
+    var profile_description = req.query.description
+    var profile_photo = req.query.photo
 
     try {
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $set: { name: profile_name } })
         var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
-        // res.status(200).send(find_cursor)
-        res.status(200).send("Success")
+        if (profile_name) {
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $set: { name: profile_name } })
+        }
+        if (profile_email) {
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $set: { email: profile_email } })
+        }
+        if (profile_description) {
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $set: { description: profile_description } })
+        }
+        if (profile_photo) {
+            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
+        }
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+        res.status(200).send(find_cursor)
+        // res.status(200).send("Success")
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -74,7 +84,7 @@ user_profile_router.post("/registration", async (req, res) => {
 
     } catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -111,7 +121,7 @@ user_profile_router.delete("/registration", async (req, res) => {
         }
     } catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 

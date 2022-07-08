@@ -27,7 +27,7 @@ searches_router.get("/searches", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -57,7 +57,7 @@ searches_router.put("/searches", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -87,7 +87,7 @@ searches_router.delete("/searches", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 

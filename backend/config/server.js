@@ -81,7 +81,7 @@ const PORT = 3000;
 //         res.status(200).send(objectId)
 //     } catch (err) {
 //         console.log(err)
-//         res.send(400).send(err)
+//         res.status(400).send(err)
 //     }
 // })
 
@@ -93,7 +93,7 @@ const PORT = 3000;
 //         res.status(200).send(objectId)
 //     } catch (err) {
 //         console.log(err)
-//         res.send(400).send(err)
+//         res.status(400).send(err)
 //     }
 // })
 
@@ -120,7 +120,7 @@ app.get("/user/getuser", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -157,7 +157,7 @@ app.put("/user/updateprofile", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -180,7 +180,7 @@ app.delete("/roomDeleteOne", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -198,7 +198,7 @@ app.put("/addInvitation", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -216,7 +216,7 @@ app.put("/declineInvite", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -234,7 +234,7 @@ app.put("/acceptInvite", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -254,7 +254,7 @@ app.post("/roomInsertOne", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -282,7 +282,7 @@ app.get("/getAllRooms", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -298,7 +298,7 @@ app.get("/getOneRoom", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -316,7 +316,7 @@ app.post("/messageInsertOne", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -343,7 +343,7 @@ app.delete("/roomDeleteOne", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -356,7 +356,7 @@ app.put("/replaceOne", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -367,7 +367,7 @@ app.delete("/deleteOne", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -379,7 +379,7 @@ app.get("/find", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send(400).send(err)
+        res.status(400).send(err)
     }
 })
 
@@ -396,7 +396,7 @@ app.get("/test", async (req, res) => {
   }
   catch (err) {
       console.log(err)
-      res.send(400).send(err)
+      res.status(400).send(err)
   }
 })
 
@@ -408,7 +408,7 @@ app.get("/server_ip", async (req, res) => {
   }
   catch (err) {
       console.log(err)
-      res.send(400).send(err)
+      res.status(400).send(err)
   }
 })
 
@@ -423,7 +423,7 @@ app.get("/server_time", async (req, res) => {
   }
   catch (err) {
       console.log(err)
-      res.send(400).send(err)
+      res.status(400).send(err)
   }
 })
 
