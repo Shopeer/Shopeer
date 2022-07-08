@@ -9,7 +9,7 @@ const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
-const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
+const user_collection = user_collection
 
 // Profile Submodule
 
@@ -22,7 +22,7 @@ const user_collection = mongoClient.db("shopeer_database").collection("user_coll
 user_profile_router.get("/profile", async (req, res) => {
     var profile_email = req.query.email
     try {
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+        var find_cursor = await user_collection.findOne({ email: profile_email })
         res.status(200).send(find_cursor)
     }
     catch (err) {
@@ -44,20 +44,20 @@ user_profile_router.put("/profile", async (req, res) => {
     var profile_photo = req.query.photo
 
     try {
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+        var find_cursor = await user_collection.findOne({ email: profile_email })
         if (profile_name) {
-            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $set: { name: profile_name } })
+            var find_cursor = await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
         }
         if (profile_email) {
-            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $set: { email: profile_email } })
+            var find_cursor = await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
         }
         if (profile_description) {
-            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $set: { description: profile_description } })
+            var find_cursor = await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
         }
         if (profile_photo) {
-            var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
+            var find_cursor = await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
         }
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+        var find_cursor = await user_collection.findOne({ email: profile_email })
         res.status(200).send(find_cursor)
         // res.status(200).send("Success")
     }
@@ -75,12 +75,12 @@ user_profile_router.post("/registration", async (req, res) => {
     var profile = req.query
     try {
         profile_email = req.query.email
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({ email: profile_email })
+        var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor) {
             res.status(200).send("User already exists")
         } else {
             var user_object = create_user_object(profile)
-            var result_debug = await mongoClient.db("shopeer_database").collection("user_collection").insertOne(user_object)
+            var result_debug = await user_collection.insertOne(user_object)
             res.status(200).send(user_object)
         }
 
@@ -114,8 +114,8 @@ function create_user_object(body) {
 user_profile_router.delete("/registration", async (req, res) => {
     var profile_email = req.query.email
     try {
-        // var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email:profile_email})
-        var delete_return = await mongoClient.db("shopeer_database").collection("user_collection").deleteOne({ email: profile_email })
+        // var find_cursor = await user_collection.find({email:profile_email})
+        var delete_return = await user_collection.deleteOne({ email: profile_email })
         if (delete_return.deletedCount == 1) {
             res.status(200).send("User deleted")
         } else {

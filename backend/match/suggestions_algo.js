@@ -9,7 +9,7 @@ const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
-const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
+const user_collection = user_collection
 
 // Get Suggested Matches GET https://shopeer.com/match/suggestions?user_id=[id]
 // Returns a list of peer_ids based on the active searches of the current user taking into account the blocked list (let the database do most of the filtering) AND executes the match and recommendation algorithm to compute the peer_ids list 
@@ -20,12 +20,12 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
     var profile_email = req.query.email
     console.log(req.query)
     try {
-        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({email:profile_email})
+        var find_cursor = await user_collection.findOne({email:profile_email})
         console.log(find_cursor.searches)
         var target_searches = find_cursor.searches
 
 
-        var all_users_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email: { $ne: profile_email }})
+        var all_users_cursor = await user_collection.find({email: { $ne: profile_email }})
         
 
         var temp_arry = await all_users_cursor.toArray()
