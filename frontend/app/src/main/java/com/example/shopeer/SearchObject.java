@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class SearchObject {
 
+    private String searchName;
     String location;
     double lat;
     double lon;
@@ -11,7 +12,8 @@ public class SearchObject {
     long budget;
     ArrayList<String> activity;
 
-    public SearchObject(String location, double lat, double lon, long range, long budget, ArrayList<String> activity) {
+    public SearchObject(String searchName, String location, double lat, double lon, long range, long budget, ArrayList<String> activity) {
+        this.searchName = searchName;
         this.location = location;
         this.lat = lat;
         this.lon = lon;
@@ -19,5 +21,12 @@ public class SearchObject {
         this.activity = activity;
     }
 
+    public String getSearchName() {
+        return searchName;
+    }
 
+    @Override
+    public String toString() {
+        return this.searchName; // What to display in the Spinner list.
+    }
 }

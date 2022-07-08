@@ -1,26 +1,37 @@
 package com.example.shopeer;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MatchFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MatchFragment extends Fragment {
+public class MatchFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     /*
     // TODO: Rename parameter arguments, choose names that match
@@ -61,8 +72,11 @@ public class MatchFragment extends Fragment {
     ///////////////////////////////my stuff/////////////////////////////
     final static String TAG = "MatchFragment";
     RecyclerView rv;
-    private ArrayList<SearchObject> searches; // list of active searches
     private LinearLayoutManager layoutManager;
+
+    ImageButton addSearchButton;
+    ImageButton editSearchButton;
+    Spinner searchSpinner;
 
 
     @Override
@@ -76,10 +90,6 @@ public class MatchFragment extends Fragment {
         }
          */
 
-        //
-
-
-
     }
 
     // do graphical stuff here, always called after onCreate
@@ -88,6 +98,65 @@ public class MatchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_match, container, false);
+
+        // add search button
+        addSearchButton = v.findViewById(R.id.add_search_button);
+        addSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // doing a pop up for edit search
+                /*
+                View search_edit_view = LayoutInflater.from(container.getContext()).inflate(R.layout.search_edit_layout,  container, false);
+                int width = LinearLayout.LayoutParams.MATCH_PARENT;
+                int height = LinearLayout.LayoutParams.MATCH_PARENT;
+                boolean focusable = true; // lets taps outside the popup also dismiss it
+                final PopupWindow popupWindow = new PopupWindow(search_edit_view, width, height, focusable);
+
+                // show the popup window
+                // which view you pass in doesn't matter, it is only used for the window tolken
+                popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+                */
+
+                // call edit search activity
+                Intent editSearchIntent = new Intent(getActivity(), EditSearchActivity.class);
+                startActivity(editSearchIntent);
+
+            }
+        });
+
+        // edit search button
+        editSearchButton = v.findViewById(R.id.edit_search_button);
+        editSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // call edit search activity
+                Intent editSearchIntent = new Intent(getActivity(), EditSearchActivity.class);
+                startActivity(editSearchIntent);
+            }
+        });
+
+
+        searchSpinner = v.findViewById(R.id.search_spinner);
+
+        // fetch data of searches
+        List<SearchObject> searchList = new ArrayList<SearchObject>();
+        for (int i=0; i < 4; i++) {
+            String name = "Peer Number " + i;
+            ArrayList<String> activity = new ArrayList<String>();
+            activity.add("act" + i);
+            searchList.add(new SearchObject("search " + i, "location" + i, i, i, i,i, activity));
+        }
+        ArrayAdapter<SearchObject> adapter = new ArrayAdapter<SearchObject>(getActivity(), android.R.layout.simple_spinner_item, searchList);
+        adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item);
+
+        searchSpinner.setAdapter(adapter);
+
+        searchSpinner.setOnItemSelectedListener(this);
+
+
+
+
+        /////////////////////////////// profile card stuff ////////////////////////////////////////
 
         // layout manager
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
@@ -109,10 +178,20 @@ public class MatchFragment extends Fragment {
         return v;
     }
 
-//////////////////////////////////////////////////////////////////// start search stuff /////////////////////////////////////////////////////////////////////////
 
+    //OnItemSelectedListener interface
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        parent.getItemAtPosition(pos);
+    }
 
-//////////////////////////////////////////////////////////////////// start profile cards stuff //////////////////////////////////////////////////////////////////////
+    // OnItemSelectedListener interface
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
+
+    //////////////////////////////////////////////////////////////////// start profile cards stuff //////////////////////////////////////////////////////////////////////
     class ProfileCardRA extends RecyclerView.Adapter<ProfileCardRA.ProfileCardVH> {
         ArrayList<ProfileObject> data;
 
