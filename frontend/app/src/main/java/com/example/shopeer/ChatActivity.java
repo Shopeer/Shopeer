@@ -134,6 +134,7 @@ public class ChatActivity extends AppCompatActivity {
                     chatRecyclerAdapter.notifyDataSetChanged();
                     recyclerView.smoothScrollToPosition(messagesList.size()-1);
                     // send the message object to BE
+                    //postNewMessage(newMessage);
 
 
                     messageInput.setText(null);
@@ -141,6 +142,15 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     } // end of oncreate
+
+//    private void postNewMessage(ChatObject newMessage, String room_id) throws JSONException {
+//        JSONArray param= new JSONArray();
+//        param.put(new JSONObject().put("room_id", room_id));
+//        JSONArrayRequest jsonArrayRequest = new JsonArrayRequest
+//                (Request.Method.POST,
+//                        url + "chat/message",
+//                        param,)
+//    }
 
     // fetch from BE
     private void fetchMessageHistory(String room_id) throws JSONException {
