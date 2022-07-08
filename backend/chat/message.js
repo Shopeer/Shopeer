@@ -4,6 +4,7 @@ const uri = "mongodb://127.0.0.1:27017"
 const {MongoClient} = require("mongodb")
 const client = new MongoClient(uri)
 var ObjectId = require('mongodb').ObjectId;
+const { initializeApp } = require('firebase-admin/app');
 
 module.exports = router;
 const coll = client.db("shopeer_database").collection("room_collection")
