@@ -112,6 +112,8 @@ public class LoginActivity extends AppCompatActivity {
     private void updateUI(GoogleSignInAccount account) {
         if (account == null) {
             Log.d(TAG, "There is no user logged in!");
+
+
         }
         else {
             // TODO:get user info and call backend to register or login

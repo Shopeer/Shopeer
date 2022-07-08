@@ -114,6 +114,7 @@ user_profile_router.post("/register", async (req, res) => {
 function create_user_object(body) {
     var user_object = {name: body.name,
                         email: body.email,
+                        FCM_token: body.FCM_token,
                         searches: [],
                         peers: [],
                         invites: [],
