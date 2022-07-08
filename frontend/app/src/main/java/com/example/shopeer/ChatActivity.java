@@ -15,10 +15,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
@@ -31,7 +45,7 @@ public class ChatActivity extends AppCompatActivity {
     private String enteredMessage;
     Intent intent;
     String senderEmail;
-    int roomId;
+    String roomId;
     String roomName;
 
     RecyclerView recyclerView;
@@ -41,6 +55,9 @@ public class ChatActivity extends AppCompatActivity {
     SimpleDateFormat simpleDateFormat;
 
     ArrayList<ChatObject> messagesList;
+
+    String url = "http://localhost:8081/";
+    //String url = "http://20.230.148.126:8080/";
 
 
 
@@ -60,7 +77,7 @@ public class ChatActivity extends AppCompatActivity {
         simpleDateFormat = new SimpleDateFormat("hh:mm a");
         // set senderEmail
         Bundle extras = intent.getExtras();
-        roomId = extras.getInt("room_id");
+        roomId = extras.getString("room_id");
         roomName = extras.getString("room_name");
 
         // populate the room name and picture
@@ -75,18 +92,23 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         // fetch messages from BE
-        messagesList = new ArrayList<>();
-        Date date = new Date();
-        String time = simpleDateFormat.format(calendar.getTime());
-        for (int i=0; i < 20; i++) {
-            if (i%2==0) {
-                messagesList.add(new ChatObject("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
-                        "me", date.getTime(), time));
-            } else {
-                messagesList.add(new ChatObject("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
-                        "other", date.getTime(), time));
-            }
+        try {
+            fetchMessageHistory(roomId);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+//        Date date = new Date();
+//        String time = simpleDateFormat.format(calendar.getTime());
+//        for (int i=0; i < 20; i++) {
+//            if (i%2==0) {
+//                messagesList.add(new ChatObject("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
+//                        "me", date.getTime(), time));
+//            } else {
+//                messagesList.add(new ChatObject("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
+//                        "other", date.getTime(), time));
+//            }
+//        }
 
         // initialize recycler view
         recyclerView = findViewById(R.id.chat_recyclerView);
@@ -107,6 +129,7 @@ public class ChatActivity extends AppCompatActivity {
                     Date date = new Date();
                     currenttime = simpleDateFormat.format(calendar.getTime());
                     ChatObject newMessage = new ChatObject(enteredMessage, "me", date.getTime(), currenttime);
+                    // send message to backend, FCM sends back
                     messagesList.add(newMessage);
                     chatRecyclerAdapter.notifyDataSetChanged();
                     recyclerView.smoothScrollToPosition(messagesList.size()-1);
@@ -118,6 +141,52 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     } // end of oncreate
+
+    // fetch from BE
+    private void fetchMessageHistory(String room_id) throws JSONException {
+
+        JSONArray param= new JSONArray();
+        param.put(new JSONObject().put("room_id", room_id));
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
+                (Request.Method.GET,
+                        url + "chat/room/history", param,
+                        new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        ArrayList<ChatObject> chatArr = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                JSONObject obj = response.getJSONObject(i);
+                                // String mssg_id
+                                Date date = new Date();
+                                String email = obj.getString("email");
+                                String text = obj.getString("text");
+                                String time = obj.getString("time");
+                                chatArr.add(new ChatObject(text, email, date.getTime(), time));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        messagesList = chatArr;
+                        // notify change, scroll
+                        chatRecyclerAdapter.notifyDataSetChanged();
+                        recyclerView.smoothScrollToPosition(messagesList.size()-1);
+
+                        Log.d(TAG, "received message history");
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+
+                    }
+                });
+        return;
+
+    }
 
     @Override
     protected void onStart() {
