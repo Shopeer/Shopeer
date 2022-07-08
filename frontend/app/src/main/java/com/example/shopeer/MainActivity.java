@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         String isRegister = intent.getStringExtra("register");
         if (isRegister != null) {
             // redirect to profile page
+            navController.navigate(R.id.profileFragment);
         }
     }
 }
