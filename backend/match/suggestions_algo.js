@@ -20,28 +20,23 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
     var profile_email = req.query.email
     console.log(req.query)
     try {
-        var find_cursor = await user_collection.findOne({email:profile_email})
-        console.log(find_cursor.searches)
-        var target_searches = find_cursor.searches
+        var main_user_cursor = await user_collection.findOne({email:profile_email})
+        var target_searches = main_user_cursor.searches
 
+        var remaining_user_cursor = await user_collection.find({email: { $ne: profile_email }})
 
-        var all_users_cursor = await user_collection.find({email: { $ne: profile_email }})
-        
-
-        var temp_arry = await all_users_cursor.toArray()
-        // console.log(temp_arry)
-        // console.log(temp_arry.length)
+        var remaining_user_array = await remaining_user_cursor.toArray()
 
         var match_list = []
         
         console.log("----------")
-        for (let i = 0; i < temp_arry.length; i++){
-            var each_search = temp_arry[i].searches
-            var each_email = temp_arry[i].email
-            console.log(each_search)
+        for (let i = 0; i < remaining_user_array.length; i++){
+            var each_search_array = remaining_user_array[i].searches
+            var each_email = remaining_user_array[i].email
+            console.log(each_search_array)
             var each_score = 0;
-            for (let j = 0; j < each_search.length; j++){
-                if (target_searches.includes(each_search[j])){
+            for (let j = 0; j < each_search_array.length; j++){
+                if (target_searches.activity == each_search_array[j].activity){
                     each_score++
                 }
             }
