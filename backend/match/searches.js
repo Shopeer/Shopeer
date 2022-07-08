@@ -35,7 +35,7 @@ searches_router.get("/searches", async (req, res) => {
 
 // Add New Active Search POST https://shopeer.com/match/searches
 // Adds a new active search for suggested matches to User Database
-// Body: User Id Token, location, distance, activity, budget
+// Body: User Id Token, location, distance, search_name, budget
 // Response: search id
 searches_router.post("/searches", async (req, res) => {
     var profile_email = req.query.email
@@ -55,7 +55,7 @@ searches_router.post("/searches", async (req, res) => {
 
             // --- overwrite duplicate
             for (let i = 0; i < find_cursor.searches.length; i++) {
-                if (find_cursor.searches[i].activity == search_object.activity) {
+                if (find_cursor.searches[i].search_name == search_object.search_name) {
                     var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
                     var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
                     var find_cursor = await user_collection.findOne({ email: profile_email })
@@ -75,7 +75,7 @@ searches_router.post("/searches", async (req, res) => {
 
             // --- deny duplicate and overwriting
             // for (let i = 0; i < find_cursor.searches.length; i++) {
-            //     if (find_cursor.searches[i].activity == search_object.activity) {
+            //     if (find_cursor.searches[i].search_name == search_object.search_name) {
             //         console.log("Search already added")
             //         res.status(200).send("Search already added")
             //     } else {
@@ -95,6 +95,7 @@ searches_router.post("/searches", async (req, res) => {
 
 function create_search_object(body) {
     var ret_object = {
+        search_name: body.search_name,
         activity: body.activity,
         location: body.location,
         max_range: body.max_range,
@@ -117,8 +118,8 @@ searches_router.delete("/searches", async (req, res) => {
         console.log(search)
         var no_match_flag = 0
         for (let i = 0; i < find_cursor.searches.length; i++) {
-            if (find_cursor.searches[i].activity == search.activity) {
-                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: {activity: search.activity} } })
+            if (find_cursor.searches[i].search_name == search.search_name) {
+                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: {search_name: search.search_name} } })
                 var find_cursor = await user_collection.findOne({ email: profile_email })
                 res.status(200).send(find_cursor)
                 no_match_flag = 1
