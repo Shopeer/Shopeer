@@ -111,18 +111,24 @@ function create_search_object(body) {
 // Response: success/ fail
 searches_router.delete("/searches", async (req, res) => {
     var profile_email = req.query.email
-    var search = req.query.search
+    var search = req.body.search
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
-
-        if (find_cursor.searches.includes(search)) {
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: search } })
-            var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
-        } else {
+        console.log(search)
+        var no_match_flag = 0
+        for (let i = 0; i < find_cursor.searches.length; i++) {
+            if (find_cursor.searches[i].activity == search.activity) {
+                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: {activity: search.activity} } })
+                var find_cursor = await user_collection.findOne({ email: profile_email })
+                res.status(200).send(find_cursor)
+                no_match_flag = 1
+                break
+            }
+        }
+        if (!no_match_flag) {
             // var debug_res = await user_collection.updateOne({email:profile_email},{ $pull: { searches: { $match: search } } } )
             var find_cursor = await user_collection.findOne({ email: profile_email })
-            console.log("Search already deleted")
+            console.log("Search not in existence")
             res.status(200).send(find_cursor)
         }
     }
