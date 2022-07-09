@@ -9,7 +9,6 @@ const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
-const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
 
 // Get Suggested Matches GET https://shopeer.com/match/suggestions?user_id=[id]
 // Returns a list of peer_ids based on the active searches of the current user taking into account the blocked list (let the database do most of the filtering) AND executes the match and recommendation algorithm to compute the peer_ids list 
@@ -20,23 +19,28 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
     var profile_email = req.query.email
     console.log(req.query)
     try {
-        var main_user_cursor = await user_collection.findOne({email:profile_email})
-        var target_searches = main_user_cursor.searches
+        var find_cursor = await mongoClient.db("shopeer_database").collection("user_collection").findOne({email:profile_email})
+        console.log(find_cursor.searches)
+        var target_searches = find_cursor.searches
 
-        var remaining_user_cursor = await user_collection.find({email: { $ne: profile_email }})
 
-        var remaining_user_array = await remaining_user_cursor.toArray()
+        var all_users_cursor = await mongoClient.db("shopeer_database").collection("user_collection").find({email: { $ne: profile_email }})
+        
+
+        var temp_arry = await all_users_cursor.toArray()
+        // console.log(temp_arry)
+        // console.log(temp_arry.length)
 
         var match_list = []
         
         console.log("----------")
-        for (let i = 0; i < remaining_user_array.length; i++){
-            var each_search_array = remaining_user_array[i].searches
-            var each_email = remaining_user_array[i].email
-            console.log(each_search_array)
+        for (let i = 0; i < temp_arry.length; i++){
+            var each_search = temp_arry[i].searches
+            var each_email = temp_arry[i].email
+            console.log(each_search)
             var each_score = 0;
-            for (let j = 0; j < each_search_array.length; j++){
-                if (target_searches.activity == each_search_array[j].activity){
+            for (let j = 0; j < each_search.length; j++){
+                if (target_searches.includes(each_search[j])){
                     each_score++
                 }
             }
@@ -66,7 +70,7 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(400).send(err)
+        res.send(400).send(err)
     }
 
 

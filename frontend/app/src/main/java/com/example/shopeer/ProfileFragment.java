@@ -13,17 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,8 +24,8 @@ public class ProfileFragment extends Fragment {
     private TextView profileName, profileBio;
     private CardView profilePicCard;
     private ImageView profilePic, cameraButton, editButton;
-
-    final private String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
+    private String email, password;
+    private Uri imagepath;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -46,10 +35,12 @@ public class ProfileFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
      * @return A new instance of fragment ProfileFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance() {
+    public static ProfileFragment newInstance(String param1, String param2) {
         ProfileFragment fragment = new ProfileFragment();
         return fragment;
     }
@@ -57,58 +48,20 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_profile, container, false);
-        init(v);
-        setUpdateProfile();
-        getProfileInfo();
-        return v;
-    }
+        // get user info as token when calling backend API
 
-    // Helper functions
-    private void init(View v) {
-        profileName = v.findViewById(R.id.profileName_textView);
-        profileBio = v.findViewById(R.id.profileBio_textView);
-        profilePic = v.findViewById(R.id.profilePic_imageView);
-        profilePicCard = v.findViewById(R.id.cardView);
-        cameraButton = v.findViewById(R.id.camera_imageView);
-        editButton = v.findViewById(R.id.edit_imageView);
-    }
+//        profileName = getView().findViewById(R.id.profileName_textView);
+//        profileBio = getView().findViewById(R.id.profileBio_textView);
+//        profilePic = getView().findViewById(R.id.profilePic_imageView);
+//        profilePicCard = getView().findViewById(R.id.cardView);
+//        cameraButton = getView().findViewById(R.id.camera_imageView);
+//        editButton = getView().findViewById(R.id.edit_imageView);
+//
+        // make database instance
+        // access the user info from database
+        // use addValueEventListener, ref: https://www.youtube.com/watch?v=GuMwCuvGWx4
 
-    private void getProfileInfo() {
-        try {
-            RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-            String url = profileUrl + MainActivity.email;
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d(TAG, "get profile " + response);
-                        try {
-                            JSONObject jsonResponse = new JSONObject(response);
-                            profileName.setText(jsonResponse.getString("name"));
-                            profileBio.setText(jsonResponse.getString("description"));
-                            profilePic.setImageResource(R.drawable.temp_profile);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse login: " + error.toString());
-                }
-            });
-            requestQueue.add(stringRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setUpdateProfile() {
         //initialize buttons
 //        cameraButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -116,13 +69,19 @@ public class ProfileFragment extends Fragment {
 //                Log.d(TAG, "Editing profile pic");
 //            }
 //        });
-        editButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Editing profile info");
-                Intent intent = new Intent(getContext(), updateProfileActivity.class);
-                startActivity(intent);
-            }
-        });
+//        editButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d(TAG, "Editing profile info");
+//            }
+//        });
+//
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 }

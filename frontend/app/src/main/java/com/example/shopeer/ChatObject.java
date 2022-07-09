@@ -1,7 +1,6 @@
 package com.example.shopeer;
 
 public class ChatObject {
-
     String text;
     String senderEmail;
     long timestamp;

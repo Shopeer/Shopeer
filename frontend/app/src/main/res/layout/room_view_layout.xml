@@ -53,10 +53,10 @@
             android:id="@+id/peerLastMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/peerCardView"
             android:layout_below="@id/peerName"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="1dp"
-            android:layout_toRightOf="@id/peerCardView"
             android:text="Last message sent by this peer"
             android:textSize="10sp" />
 

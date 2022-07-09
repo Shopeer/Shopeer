@@ -2,21 +2,21 @@ package com.example.shopeer;
 
 public class RoomObject {
 
-    private String roomId;
+    private int roomId;
     private String roomName;
     private String lastMessage;
     private String timeofLM;
     private int roomProfilePic;
 
-    public String getRoomId() {
+    public int getRoomId() {
         return roomId;
     }
 
-    public void setRoomId(String roomId) {
+    public void setRoomId(int roomId) {
         this.roomId = roomId;
     }
 
-    public RoomObject(String roomId, String roomName, String lastMessage, String timeofLM, int roomProfilePic) {
+    public RoomObject(int roomId, String roomName, String lastMessage, String timeofLM, int roomProfilePic) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.lastMessage = lastMessage;
