@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -91,6 +92,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     final static String TAG = "MatchFragment";
     private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
     private static final String suggestionUrl = "http://20.230.148.126:8080/match/suggestions?email=";
+    private static final String blockUrl = "http://20.230.148.126:8080/user/blocked?email=";
     private static String email;
 
     RecyclerView rv;
@@ -177,22 +179,23 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         ///////////////////// get searches ////////////////////////
 
-        ArrayList<SearchObject> s = getSearchList();
+
+        //ArrayList<SearchObject> s = getSearchList();
 
         searchSpinner = v.findViewById(R.id.search_spinner);
 
         // fetch data of searches
         //List<SearchObject> searchList = new ArrayList<SearchObject>();
-        for (int i=0; i < 4; i++) {
-            ArrayList<String> activity = new ArrayList<String>();
-            activity.add("entertainment");
-            searches.add(new SearchObject("search " + i, "location" + i, i, i, i,i, activity));
-        }
+        //for (int i=0; i < 4; i++) {
+        //    ArrayList<String> activity = new ArrayList<String>();
+        //    activity.add("entertainment");
+        //    searches.add(new SearchObject("search " + i, "location" + i, i, i, i,i, activity));
+        //}
 
         // convert hashset of searches to a list
-        ArrayList<SearchObject> searchList = new ArrayList<SearchObject>();
-        searchList.addAll(searches);
-        Collections.sort(searchList);
+        //ArrayList<SearchObject> searchList = new ArrayList<SearchObject>();
+        //searchList.addAll(searches);
+        //Collections.sort(searchList);
 
         //ArrayAdapter<SearchObject> adapter = new ArrayAdapter<SearchObject>(getActivity(), android.R.layout.simple_spinner_item, searchList);
         //ArrayAdapter<SearchObject> adapter = new ArrayAdapter<SearchObject>(getActivity(), android.R.layout.simple_spinner_item, this.searches);
@@ -214,6 +217,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         ArrayList<ProfileObject> peersList = new ArrayList<>(); // will be replaced with one in searchObject
         rv = v.findViewById(R.id.profile_cards_rv);
 
+        /*
         // fetch data of peers and add to peersList
         for (int i=0; i < 3; i++) {
             String name = "Peer Number " + i;
@@ -223,7 +227,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         ProfileCardRA ra = new ProfileCardRA(peersList);
         rv.setAdapter(ra);
         rv.setLayoutManager(layoutManager);
-
+        */
         return v;
     }
 
@@ -394,6 +398,45 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             //TODO: if user has received invite from this peer, .setVisibility(View.GONE) of friend_button, and View.VISIBLE of accept and decline, vice versa
             //TODO: deal with backend when buttons are clicked
 
+            // block button
+                holder.blockButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        blockPeer(po, holder);
+                    }
+                });
+
+
+        }
+
+        private void blockPeer(ProfileObject peer, ProfileCardVH holder) {
+            String url = blockUrl + email + "&target_peer_email=" + peer.getEmail();
+            Log.d(TAG, "onClick POST_block: " + url);
+            try {
+                //TODO: make sure it works
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+
+                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, "POST_block response: " + response);
+                        Toast.makeText(getContext(), "blocked " + peer.getEmail(), Toast.LENGTH_LONG).show();
+                        data.remove(holder.getBindingAdapterPosition()); // pass by ref, so will update this.suggestions also
+                        notifyItemRemoved(holder.getBindingAdapterPosition());
+                        notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse post_search: " + error.toString());
+                        Toast.makeText(getContext(), "error: could block " + peer.getEmail(), Toast.LENGTH_LONG).show();
+
+                    }
+                });
+                requestQueue.add(jsonObjReq);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
 
