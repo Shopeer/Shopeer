@@ -90,6 +90,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     ///////////////////////////////my stuff/////////////////////////////
     final static String TAG = "MatchFragment";
     private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
+    private static final String suggestionUrl = "http://20.230.148.126:8080/match/suggestions?email=";
     private static String email;
 
     RecyclerView rv;
@@ -102,6 +103,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     SearchObject currentSearch = null;
 
     ArrayList<SearchObject> searches = new ArrayList<SearchObject>();
+    ArrayList<ProfileObject> suggestions = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -288,7 +290,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         return null;
     }
 
-    public void setSearchSpinner() {
+    private void setSearchSpinner() {
         ArrayAdapter<SearchObject> adapter = new ArrayAdapter<SearchObject>(getActivity(), android.R.layout.simple_spinner_item, this.searches);
         adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item);
 
@@ -297,11 +299,70 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         searchSpinner.setOnItemSelectedListener(this);
     }
 
+    /**
+     * later, this can be specific for each search, but for now, same backend call any search selected
+     */
+    private void getSuggestions() {
+        String url = suggestionUrl + this.email;
+        Log.d(TAG, "GET suggestions: " + url);
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    Log.d(TAG, "GET suggestions response: " + response);
 
-    //OnItemSelectedListener interface
+                    suggestions.clear();
+                    // extract the info
+                    for (int i = 0; i < response.length(); i++) {
+                        // creating a new json object and
+                        // getting each object from our json array.
+                        try {
+                            // get each search object
+                            JSONArray responseArr = response.getJSONArray(i);
+
+                            String email = responseArr.getString(0);
+                            ProfileObject peer = new ProfileObject(email);
+
+                            suggestions.add(peer);
+
+                            Log.d(TAG, "suggestion: " + peer.getEmail());
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    // TODO: set up recycler
+                    setProfileCardRecycler();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "onErrorResponse GET suggestions: " + error.toString());
+                }
+            });
+            requestQueue.add(jsonArrayRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void setProfileCardRecycler() {
+        ProfileCardRA ra = new ProfileCardRA(this.suggestions);
+        rv.setAdapter(ra);
+        rv.setLayoutManager(layoutManager);
+    }
+
+
+    //OnItemSelectedListener interface for spinner
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         currentSearch = (SearchObject)parent.getItemAtPosition(pos);
+
+        // set suggestion list
+        // later, this can be specific for each search, but for now, same backend call any search selected
+        getSuggestions();
     }
 
     // OnItemSelectedListener interface
@@ -328,10 +389,11 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         @Override
         public void onBindViewHolder(@NonNull ProfileCardVH holder, int position) {
             ProfileObject po = data.get(position);
-            holder.peerName.setText(po.getName());
+            holder.peerName.setText(po.getEmail());
 
             //TODO: if user has received invite from this peer, .setVisibility(View.GONE) of friend_button, and View.VISIBLE of accept and decline, vice versa
             //TODO: deal with backend when buttons are clicked
+
         }
 
 

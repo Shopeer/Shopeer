@@ -33,6 +33,7 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -140,7 +141,17 @@ public class EditSearchActivity extends AppCompatActivity {
             oldSearchName = intent.getStringExtra("searchName");
             searchName.setText(oldSearchName);
 
-            searchLocation.setText(intent.getStringExtra("locationName"));
+            this.locationLat = intent.getDoubleExtra("lat", -1);
+            this.locationLon = intent.getDoubleExtra("lon", -1);
+
+            if (intent.getStringExtra("locationName").equals("")) {
+                // set to lat lon if no location name set
+                searchLocation.setText("lat: " + this.locationLat + "\nlon: " + this.locationLon);
+            }
+            else {
+                searchLocation.setText(intent.getStringExtra("locationName"));
+            }
+
             distanceNumber.setText(Integer.toString(intent.getIntExtra("range", 0)));
             budgetNumber.setText(Integer.toString(intent.getIntExtra("budget", 0)));
 
@@ -186,6 +197,7 @@ public class EditSearchActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else {
+                    /*
                     Log.d(TAG, "deleting a existing search " + oldSearchName);
                     String url = searchUrl + MainActivity.email;
                     Log.d(TAG, "onClick: " + url);
@@ -194,13 +206,16 @@ public class EditSearchActivity extends AppCompatActivity {
                         RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);
 
                         // deleting a search needs the search name to be passed via body
-                        JSONObject search_name = new JSONObject();
-                        search_name.put("search_name", oldSearchName);
                         JSONObject search = new JSONObject();
-                        search.put("search", search_name);
-                        Log.d(TAG, "delete_search request body: " + search);
+                        search.put("search_name", oldSearchName);
 
-                        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.DELETE, url, search, new Response.Listener<JSONObject>() {
+                        JSONObject body = new JSONObject();
+                        body.put("search", search);
+
+                        Log.d(TAG, "delete_search request body: " + body);
+
+
+                        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.DELETE, url, body, new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
                                 Log.d(TAG, "delete_search response: " + response);
@@ -220,6 +235,35 @@ public class EditSearchActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    */
+
+
+                    Log.d(TAG, "deleting a existing search " + oldSearchName);
+                    String url = searchUrl + MainActivity.email + "&search_name=" + oldSearchName;
+                    Log.d(TAG, "onClick: " + url);
+                    try {
+                        RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);
+                        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                Log.d(TAG, "delete_search response: " + response);
+                                Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
+                                intent.putExtra("email", MainActivity.email);
+                                startActivity(intent);
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.d(TAG, "onErrorResponse DELETE_search: " + error.toString());
+                            }
+                        });
+
+                        stringRequest.setRetryPolicy(new DefaultRetryPolicy(SERVER_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                        requestQueue.add(stringRequest);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
             }
@@ -283,7 +327,7 @@ public class EditSearchActivity extends AppCompatActivity {
 
                         JSONObject body = new JSONObject();
                         body.put("search", search);
-                        Log.d(TAG, "post_search request body: " + search);
+                        Log.d(TAG, "post_search request body: " + body);
 
                         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, body, new Response.Listener<JSONObject>() {
                             @Override
@@ -330,7 +374,7 @@ public class EditSearchActivity extends AppCompatActivity {
             activities.add("entertainment");
         }
         if (activityBulkBuyButton.isChecked()) {
-            activities.add("bulkbuy");
+            activities.add("bulk buy");
         }
 
         return activities;
