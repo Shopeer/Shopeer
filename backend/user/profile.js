@@ -101,6 +101,7 @@ function create_user_object(body) {
         searches: [],
         peers: [],
         invites: [],
+        received_invites: [],
         blocked: []
     }
     return user_object

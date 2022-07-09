@@ -117,9 +117,10 @@ user_peers_router.post("/blocked", async (req, res) => {
             console.log("Peer already in added")
             res.status(200).send(find_cursor)
         } else {
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { blocked: target_peer_email } })
+            
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
+            var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { blocked: target_peer_email } })
             var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(200).send(find_cursor)
         }
@@ -169,6 +170,9 @@ user_peers_router.get("/invitations", async (req, res) => {
     try {
         var array = []
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            throw "Error: Invalid email"
+        }
         for (let i = 0; i < find_cursor.invites.length; i++) {
             var return_cursor = await user_collection.findOne({ email: find_cursor.invites[i] })
             array.push(return_cursor)
@@ -181,11 +185,34 @@ user_peers_router.get("/invitations", async (req, res) => {
     }
 })
 
+// Get Received Invites 
+// Param: User email
+// Response: List of peer objects {peer_id, name, bio, profile_picture}
+user_peers_router.get("/invitations/received", async (req, res) => {
+    var profile_email = req.query.email
+    try {
+        var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            throw "Error: Invalid email"
+        }
+        ret_array = await get_object_array_from_email_array(find_cursor.received_invites)
+        console.log(ret_array)
+        res.status(200).send(ret_array)
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
 async function get_object_array_from_email_array(email_array) {
     // console.log(email_array)
     var array = []
     for (let i = 0; i < email_array.length; i++) {
         var return_cursor = await user_collection.findOne({ email: email_array[i] })
+        if (!return_cursor) {
+            throw "Error: Invalid email"
+        }
         // console.log(return_cursor)
         array.push(return_cursor)
     }
@@ -211,17 +238,21 @@ user_peers_router.post("/invitations", async (req, res) => {
             res.status(200).send(find_cursor)
         } else {
             var find_cursor = await user_collection.findOne({ email: target_peer_email })
+            if (!find_cursor) {
+                throw "Error: Invalid email"
+            }
             if (find_cursor.invites.includes(profile_email)) {
                 var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email } })
                 var debug_res = await user_collection.updateOne({ email: target_peer_email }, { $push: { peers: profile_email } })
-
-
                 var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
                 var debug_res = await user_collection.updateOne({ email: target_peer_email }, { $pull: { invites: profile_email } })
+                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { received_invites: target_peer_email } })
+                var debug_res = await user_collection.updateOne({ email: target_peer_email }, { $pull: { received_invites: profile_email } })
 
                 res.status(200).send("Success, both are now peers")
             } else {
                 var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { invites: target_peer_email } })
+                var debug_res = await user_collection.updateOne({ email: target_peer_email }, { $push: { received_invites: profile_email } })
                 var find_cursor = await user_collection.findOne({ email: profile_email })
                 res.status(200).send(find_cursor)
             }
