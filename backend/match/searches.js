@@ -40,7 +40,7 @@ searches_router.get("/searches", async (req, res) => {
 searches_router.post("/searches", async (req, res) => {
     var profile_email = req.query.email
     var search_object = create_search_object(req.body.search)
-    // console.log(search_object)
+    console.log(search_object)
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         // console.log(find_cursor)
@@ -49,26 +49,36 @@ searches_router.post("/searches", async (req, res) => {
 
         if (find_cursor.searches.length == 0) {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-            var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            var ret_cursor = await user_collection.findOne({ email: profile_email })
+            res.status(200).send(ret_cursor)
         } else {
+            console.log("I got here")
+            console.log(find_cursor.searches.length)
 
+            var no_duplicate_flag = 1
             // --- overwrite duplicate
             for (let i = 0; i < find_cursor.searches.length; i++) {
+                console.log(find_cursor.searches[i].search_name)
+                console.log(search_object.search_name)
+                console.log(find_cursor.searches[i].search_name == search_object.search_name)
+                console.log(i)
                 if (find_cursor.searches[i].search_name == search_object.search_name) {
-                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
+
+                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: {search_name: find_cursor.searches[i].search_name }} })
                     var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-                    var find_cursor = await user_collection.findOne({ email: profile_email })
-                    // console.log(find_cursor)
+                    var ret_cursor = await user_collection.findOne({ email: profile_email })
+                    console.log(ret_cursor)
                     console.log("Overwrote prev search")
                     res.status(200).send("Overwrote prev search")
-                } else {
-                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-                    var find_cursor = await user_collection.findOne({ email: profile_email })
-                    console.log(find_cursor)
-                    // res.status(200).send(find_cursor)
-                    break
+                    no_duplicate_flag = 0;
                 }
+            }
+            if (no_duplicate_flag) {
+                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+                    var ret_cursor = await user_collection.findOne({ email: profile_email })
+                    console.log(ret_cursor)
+                    res.status(200).send(ret_cursor)
+                    // console.log("last if statement")
             }
 
 

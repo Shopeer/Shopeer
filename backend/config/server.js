@@ -43,12 +43,12 @@ app.use('*', suggestions_algo_router);
 app.use('/match', suggestions_algo_router)
 
 // local vm
-const IP = '192.168.64.15';
-const PORT = 3000;
+//const IP = '192.168.64.15';
+//const PORT = 3000;
 
 // azure vm
-// const IP = "20.230.148.126";
-// const PORT = "8080";
+const IP = "20.230.148.126";
+const PORT = "8000";
 
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
