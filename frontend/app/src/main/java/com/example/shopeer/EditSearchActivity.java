@@ -1,5 +1,6 @@
 package com.example.shopeer;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -21,11 +22,21 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,12 +45,12 @@ public class EditSearchActivity extends AppCompatActivity {
     private static final String TAG = "editSearchActivity";
     private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
     int SERVER_TIMEOUT_MS = 1000; // num ms wait for server
+    private static final String API_KEY = "AIzaSyCbVC78h8NLcGxWfe6poNdqjQ-BvoNOB4A"; // Sally's API key for Google Places
 
     private boolean isNewSearch;
 
     private EditText searchName;
     private TextView searchLocation;
-    private Button changeLocationButton;
     private EditText distanceNumber;
     private RadioButton activityGroceriesButton;
     private RadioButton activityEntertainmentButton;
@@ -49,6 +60,8 @@ public class EditSearchActivity extends AppCompatActivity {
     private Button saveButton;
 
     private String oldSearchName;
+    private double locationLat;
+    private double locationLon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,19 +71,55 @@ public class EditSearchActivity extends AppCompatActivity {
         Log.d(TAG, "starting editSearchActivity");
 
         init();
-
-        //TODO: request to update/create the new search in backend
-
+        initPlacesSearch();
         setDeleteButton();
         setSaveButton();
 
+    }
+
+    private void initPlacesSearch() {
+        // init the SDK
+        Places.initialize(getApplicationContext(), API_KEY);
+
+        PlacesClient placesClient = Places.createClient(this);
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // what kind of palce user will type in
+        //autocompleteFragment.setTypeFilter(TypeFilter.);
+
+        // biasing to improve predictions
+        // autocompleteFragment.setLocationBias(add_bounds);
+        autocompleteFragment.setCountry("CA"); // Canada
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                // TODO: Get info about the selected place.
+                Log.i(TAG, "Place: " + place.getName() + ", " + place.getLatLng());
+                searchLocation.setText(place.getName());
+                locationLat = place.getLatLng().latitude;
+                locationLon = place.getLatLng().longitude;
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
+            }
+        });
     }
 
     private void init() {
         // set up resources
         searchName = findViewById(R.id.search_name_text);
         searchLocation = findViewById(R.id.search_location_text);
-        changeLocationButton = findViewById(R.id.change_location_button);
         distanceNumber = findViewById(R.id.distance_number);
         budgetNumber = findViewById(R.id.budget_number);
 
@@ -113,8 +162,16 @@ public class EditSearchActivity extends AppCompatActivity {
         }
         else {
             Log.d(TAG, "creating a new search");
+            setDefaultLocation();
         }
 
+    }
+
+    private void setDefaultLocation(){
+        // defaults to north pole in beginning
+        searchLocation.setText("North Pole");
+        locationLat = 90;
+        locationLon = 135;
     }
 
     private void setDeleteButton() {
@@ -180,8 +237,8 @@ public class EditSearchActivity extends AppCompatActivity {
 
                 //TODO: update this location stuff
                 String locationInput = searchLocation.getText().toString();
-                double latInput = 49.3847923562497;
-                double lonInput = 49.3542784803249;
+                double latInput = locationLat;
+                double lonInput = locationLon;
 
                 int rangeInput = Integer.parseInt(distanceNumber.getText().toString());
 
