@@ -6,7 +6,7 @@ const client = new MongoClient(uri)
 var ObjectId = require('mongodb').ObjectId;
 var admin = require("firebase-admin");
 
-var serviceAccount = require("C:/Users/Grace/ExpressProjects/CPEN321/cpen-shopeer-firebase-adminsdk-i0ot8-ffcaa4fefb.json");
+var serviceAccount = require("../cpen-shopeer-firebase-adminsdk-i0ot8-ffcaa4fefb.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
