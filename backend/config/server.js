@@ -30,7 +30,6 @@ app.use('/user', user_profile_router)
 
 const user_peers_router = require('../user/peers.js');
 app.use('*', user_peers_router);
-
 app.use('/user', user_peers_router)
 
 
@@ -42,13 +41,19 @@ const suggestions_algo_router = require('../match/suggestions_algo.js');
 app.use('*', suggestions_algo_router);
 app.use('/match', suggestions_algo_router)
 
-// local vm
-const IP = '192.168.64.15';
-const PORT = 3000;
+const roomsRouter = require('../chat/room');
+app.use('/chat/room', roomsRouter)
+
+const mssgRouter = require('../chat/message');
+app.use('/chat/message', mssgRouter)
+
+// // local vm
+// const IP = '192.168.64.15';
+// const PORT = 3000;
 
 // azure vm
-// const IP = "20.230.148.126";
-// const PORT = "8080";
+const IP = "20.230.148.126";
+const PORT = "8080";
 
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
@@ -108,6 +113,7 @@ async function run() {
           var host = server.address().address
           var port = server.address().port
           console.log("Example app running at http://%s:%s", host, port)
+          console.log("test");
       })
   }
   catch (err) {
