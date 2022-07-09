@@ -93,6 +93,11 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
     private static final String suggestionUrl = "http://20.230.148.126:8080/match/suggestions?email=";
     private static final String blockUrl = "http://20.230.148.126:8080/user/blocked?email=";
+    private static final String invitationUrl = "http://20.230.148.126:8080/user/invitations?email="; // for invites I SEND
+    private static final String receivedInvitationUrl = "http://20.230.148.126:8080/user/invitations/received?email="; // to get recieved invites
+    private static final String peersUrl = "http://20.230.148.126:8080/user/peers?email=";
+    private static final String roomUrl = "http://20.230.148.126:8080/chat/room";
+
     private static String email;
 
     RecyclerView rv;
@@ -399,14 +404,285 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             //TODO: deal with backend when buttons are clicked
 
             // block button
-                holder.blockButton.setOnClickListener(new View.OnClickListener() {
+            holder.blockButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    blockPeer(po, holder);
+                }
+            });
+
+            // friend button
+            holder.friendButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    invitePeer(po, holder);
+                }
+            });
+
+            // unfriend , ie. redact the invitiation
+            holder.unfriendButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    deleteInvite(po, holder);
+                }
+            });
+
+            // accept
+            holder.acceptButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    acceptInvite(po, holder);
+                }
+            });
+
+            //decline
+            holder.declineButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    declineInvite(po, holder);
+                }
+            });
+                
+            // check if already recived an invite - decided which buttons to show
+            setButtonVisibility(po, holder);
+
+        }
+
+        private void setButtonVisibility(ProfileObject peer, ProfileCardVH holder) {
+            holder.acceptButton.setVisibility(View.GONE);
+            holder.declineButton.setVisibility(View.GONE);
+            holder.unfriendButton.setVisibility(View.GONE);
+            checkIfInviteSent(peer, holder);
+            checkIfInviteReceived(peer, holder);
+        }
+
+        /**
+         * if I received an invite, then show accept/decline buttons
+         * @param peer
+         * @param holder
+         */
+        private void checkIfInviteReceived(ProfileObject peer, ProfileCardVH holder) {
+            String url = receivedInvitationUrl + email;
+            Log.d(TAG, "onClick GET_received_invitation: " + url);
+            try {
+                //TODO: make sure it works
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+                JsonArrayRequest Req = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                     @Override
-                    public void onClick(View v) {
-                        blockPeer(po, holder);
+                    public void onResponse(JSONArray response) {
+                        Log.d(TAG, "GET_received_invitation response: " + response);
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                // get each search object
+                                JSONObject responseObj = response.getJSONObject(i);
+
+                                String sentEmail = responseObj.getString("email");
+
+                                if (sentEmail.equals(peer.getEmail())) {
+                                    // already received an invite
+                                    // make friend/unfriend invisible
+                                    holder.unfriendButton.setVisibility(View.GONE);
+                                    holder.friendButton.setVisibility(View.GONE);
+                                    holder.declineButton.setVisibility(View.VISIBLE);
+                                    holder.acceptButton.setVisibility(View.VISIBLE);
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse GET_received_invitation: " + error.toString());
+                        data.remove(holder.getBindingAdapterPosition()); // pass by ref, so will update this.suggestions also
+                        notifyItemRemoved(holder.getBindingAdapterPosition());
+                        notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
                     }
                 });
+                requestQueue.add(Req);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
+        /**
+         * if I already sent them an invite, then only show unfriendButton
+         * @param peer
+         * @param holder
+         */
+        private void checkIfInviteSent(ProfileObject peer, ProfileCardVH holder) {
+            String url = invitationUrl + email;
+            Log.d(TAG, "onClick GET_invitation: " + url);
+            try {
+                //TODO: make sure it works
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+                JsonArrayRequest Req = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d(TAG, "GET_invitation response: " + response);
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                // get each search object
+                                JSONObject responseObj = response.getJSONObject(i);
 
+                                String sentEmail = responseObj.getString("email");
+
+                                if (sentEmail.equals(peer.getEmail())) {
+                                    // already set them an invite
+                                    // make accept/decline, friend invisible
+                                    holder.acceptButton.setVisibility(View.GONE);
+                                    holder.declineButton.setVisibility(View.GONE);
+                                    holder.friendButton.setVisibility(View.GONE);
+                                    holder.unfriendButton.setVisibility(View.VISIBLE);
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse DELETE_invitation: " + error.toString());
+                        data.remove(holder.getBindingAdapterPosition()); // pass by ref, so will update this.suggestions also
+                        notifyItemRemoved(holder.getBindingAdapterPosition());
+                        notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
+                    }
+                });
+                requestQueue.add(Req);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void declineInvite(ProfileObject po, ProfileCardVH holder) {
+
+        }
+
+        private void acceptInvite(ProfileObject peer, ProfileCardVH holder) {
+            String url = peersUrl + email + "&target_peer_email=" + peer.getEmail();
+            Log.d(TAG, "onClick POST_peer: " + url);
+            try {
+                //TODO: make sure it works
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+
+                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, "POST_peer response: " + response);
+                        Toast.makeText(getContext(), "accepted invite from " + peer.getEmail(), Toast.LENGTH_LONG).show();
+
+                        // TODO: creates a new chat for them
+                        createChatroom(email, peer.getEmail(), holder);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse POST_peer: " + error.toString());
+                        Toast.makeText(getContext(), "error: could accept invite from " + peer.getEmail(), Toast.LENGTH_LONG).show();
+
+                    }
+                });
+                requestQueue.add(jsonObjReq);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void createChatroom(String myEmail, String peerEmail, ProfileCardVH holder) {
+            String url = roomUrl + email + "&target_peer_email=" + peerEmail;
+            Log.d(TAG, "onClick POST_create_room: " + url);
+            try {
+                //TODO: make sure it works
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+
+                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, "POST_create_room response: " + response);
+                        Toast.makeText(getContext(), "created new chatroom with " + peerEmail, Toast.LENGTH_LONG).show();
+
+                        data.remove(holder.getBindingAdapterPosition()); // pass by ref, so will update this.suggestions also
+                        notifyItemRemoved(holder.getBindingAdapterPosition());
+                        notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse DELETE_invitation: " + error.toString());
+                        Toast.makeText(getContext(), "error: could not create" + peerEmail, Toast.LENGTH_LONG).show();
+
+                    }
+                });
+                requestQueue.add(jsonObjReq);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void deleteInvite(ProfileObject peer, ProfileCardVH holder) {
+            String url = invitationUrl + email + "&target_peer_email=" + peer.getEmail();
+            Log.d(TAG, "onClick DELETE_invitation: " + url);
+            try {
+                //TODO: make sure it works
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+
+                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.DELETE, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, "DELETE_invitation response: " + response);
+                        Toast.makeText(getContext(), "redacted invitation to " + peer.getEmail(), Toast.LENGTH_LONG).show();
+
+                        // make unfriendButton visible
+                        holder.unfriendButton.setVisibility(View.GONE);
+                        holder.friendButton.setVisibility(View.VISIBLE);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse DELETE_invitation: " + error.toString());
+                        Toast.makeText(getContext(), "error: could not redact invite to" + peer.getEmail(), Toast.LENGTH_LONG).show();
+
+                    }
+                });
+                requestQueue.add(jsonObjReq);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void invitePeer(ProfileObject peer, ProfileCardVH holder) {
+            String url = invitationUrl + email + "&target_peer_email=" + peer.getEmail();
+            Log.d(TAG, "onClick POST_invitation: " + url);
+            try {
+                //TODO: make sure it works
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+
+                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, "POST_invitation response: " + response);
+                        Toast.makeText(getContext(), "sent invitation to " + peer.getEmail(), Toast.LENGTH_LONG).show();
+
+                        // make unfriendButton visible
+                        holder.unfriendButton.setVisibility(View.VISIBLE);
+                        holder.friendButton.setVisibility(View.GONE);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse POST_invitation: " + error.toString());
+                        Toast.makeText(getContext(), "error: could not send invite to" + peer.getEmail(), Toast.LENGTH_LONG).show();
+
+                    }
+                });
+                requestQueue.add(jsonObjReq);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         private void blockPeer(ProfileObject peer, ProfileCardVH holder) {
@@ -448,6 +724,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         class ProfileCardVH extends RecyclerView.ViewHolder {
             TextView peerName;
             Button friendButton;
+            Button unfriendButton;
             Button acceptButton;
             Button declineButton;
             Button blockButton;
@@ -457,6 +734,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                 peerName = itemView.findViewById(R.id.peer_name_text);
                 friendButton = itemView.findViewById(R.id.friend_button);
+                unfriendButton = itemView.findViewById(R.id.unfriend_button);
                 acceptButton = itemView.findViewById(R.id.accept_button);
                 declineButton = itemView.findViewById(R.id.decline_button);
                 blockButton = itemView.findViewById(R.id.block_button);
