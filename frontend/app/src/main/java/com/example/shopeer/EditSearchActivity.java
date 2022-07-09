@@ -13,20 +13,27 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class EditSearchActivity extends AppCompatActivity {
     private static final String TAG = "editSearchActivity";
     private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
+    int SERVER_TIMEOUT_MS = 1000; // num ms wait for server
 
     private boolean isNewSearch;
 
@@ -122,14 +129,24 @@ public class EditSearchActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else {
-                    String url = searchUrl + MainActivity.email + "&search=" + oldSearchName;
+                    Log.d(TAG, "deleting a existing search " + oldSearchName);
+                    String url = searchUrl + MainActivity.email;
                     Log.d(TAG, "onClick: " + url);
                     try {
+                        //TODO: make sure this works
                         RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);
-                        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
+
+                        // deleting a search needs the search name to be passed via body
+                        JSONObject search_name = new JSONObject();
+                        search_name.put("search_name", oldSearchName);
+                        JSONObject search = new JSONObject();
+                        search.put("search", search_name);
+                        Log.d(TAG, "delete_search request body: " + search);
+
+                        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.DELETE, url, search, new Response.Listener<JSONObject>() {
                             @Override
-                            public void onResponse(String response) {
-                                Log.d(TAG, "delete search " + response);
+                            public void onResponse(JSONObject response) {
+                                Log.d(TAG, "delete_search response: " + response);
                                 Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
                                 intent.putExtra("email", MainActivity.email);
                                 startActivity(intent);
@@ -137,10 +154,12 @@ public class EditSearchActivity extends AppCompatActivity {
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG, "onErrorResponse login: " + error.toString());
+                                Log.e(TAG, "onErrorResponse delete_search: " + error.toString());
+                                Toast.makeText(EditSearchActivity.this, "error: could not delete", Toast.LENGTH_LONG).show();
                             }
                         });
-                        requestQueue.add(stringRequest);
+                        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(SERVER_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                        requestQueue.add(jsonObjReq);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -157,37 +176,63 @@ public class EditSearchActivity extends AppCompatActivity {
                 // get inputs and do error checking
                 boolean canSave = true;
 
-                String name = searchName.getText().toString();
+                String nameInput = searchName.getText().toString();
 
                 //TODO: update this location stuff
-                String location = searchLocation.getText().toString();
-                double lat = 49.3847923562497;
-                double lon = 49.3542784803249;
+                String locationInput = searchLocation.getText().toString();
+                double latInput = 49.3847923562497;
+                double lonInput = 49.3542784803249;
 
-                String range = distanceNumber.getText().toString();
+                int rangeInput = Integer.parseInt(distanceNumber.getText().toString());
 
-                ArrayList<String> activities = getActivitySelection();
-                if (activities.isEmpty()) {
+                ArrayList<String> activitiesInput = getActivitySelection();
+                if (activitiesInput.isEmpty()) {
                     Toast.makeText(EditSearchActivity.this, "choose at least one activity", Toast.LENGTH_LONG).show();
                     canSave = false;
                 }
 
-                String budget = budgetNumber.getText().toString();
+                int budgetInput = Integer.parseInt(budgetNumber.getText().toString());
 
                 // send request
                 if (!canSave) {
                     Log.d(TAG, "bad input, cannot save yet");
                 }
                 else {
-                    String url = searchUrl + MainActivity.email + "&search=" + oldSearchName;
+                    String url = searchUrl + MainActivity.email + "&search=";
+                    if (!isNewSearch) {
+                        url += oldSearchName;
+                    }
                     Log.d(TAG, "onClick: " + url);
                     try {
                         //TODO: change to be for POST to search
                         RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);
-                        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
+
+                        // create json
+                        JSONObject search = new JSONObject();
+                        search.put("search_name", nameInput);
+
+                        JSONArray activity = new JSONArray(activitiesInput);
+                        search.put("activity",activity);
+
+                        JSONArray location = new JSONArray();
+                        location.put(latInput);
+                        location.put(lonInput);
+
+                        search.put("location", location);
+
+                        search.put("max_range", rangeInput);
+
+                        search.put("max_budget", budgetInput);
+
+                        JSONObject body = new JSONObject();
+                        body.put("search", search);
+                        Log.d(TAG, "post_search request body: " + search);
+
+                        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, body, new Response.Listener<JSONObject>() {
                             @Override
-                            public void onResponse(String response) {
-                                Log.d(TAG, "delete search " + response);
+                            public void onResponse(JSONObject response) {
+                                Log.d(TAG, "post_search response: " + response);
+                                Toast.makeText(EditSearchActivity.this, "saved " + nameInput + " search", Toast.LENGTH_LONG).show();
                                 Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
                                 intent.putExtra("email", MainActivity.email);
                                 startActivity(intent);
@@ -195,10 +240,13 @@ public class EditSearchActivity extends AppCompatActivity {
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG, "onErrorResponse login: " + error.toString());
+                                Log.e(TAG, "onErrorResponse post_search: " + error.toString());
+                                Toast.makeText(EditSearchActivity.this, "error: could not save search", Toast.LENGTH_LONG).show();
                             }
                         });
-                        requestQueue.add(stringRequest);
+
+                        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(SERVER_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                        requestQueue.add(jsonObjReq);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

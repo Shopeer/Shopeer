@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,20 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,6 +89,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
     ///////////////////////////////my stuff/////////////////////////////
     final static String TAG = "MatchFragment";
+    private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
+    private static String email;
+
     RecyclerView rv;
     private LinearLayoutManager layoutManager;
 
@@ -82,6 +100,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     Spinner searchSpinner;
 
     SearchObject currentSearch = null;
+
+    ArrayList<SearchObject> searches = new ArrayList<SearchObject>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,6 +113,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
          */
+
+        this.email = getActivity().getIntent().getStringExtra("email");
+        getSearchList();
 
     }
 
@@ -150,6 +173,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             }
         });
 
+        ///////////////////// get searches ////////////////////////
+
+        ArrayList<SearchObject> s = getSearchList();
 
         searchSpinner = v.findViewById(R.id.search_spinner);
 
@@ -166,12 +192,13 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         searchList.addAll(searches);
         Collections.sort(searchList);
 
-        ArrayAdapter<SearchObject> adapter = new ArrayAdapter<SearchObject>(getActivity(), android.R.layout.simple_spinner_item, searchList);
-        adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item);
+        //ArrayAdapter<SearchObject> adapter = new ArrayAdapter<SearchObject>(getActivity(), android.R.layout.simple_spinner_item, searchList);
+        //ArrayAdapter<SearchObject> adapter = new ArrayAdapter<SearchObject>(getActivity(), android.R.layout.simple_spinner_item, this.searches);
+        //adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item);
 
-        searchSpinner.setAdapter(adapter);
+       // searchSpinner.setAdapter(adapter);
 
-        searchSpinner.setOnItemSelectedListener(this);
+       // searchSpinner.setOnItemSelectedListener(this);
 
 
 
@@ -196,6 +223,78 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         rv.setLayoutManager(layoutManager);
 
         return v;
+    }
+
+    private ArrayList<SearchObject> getSearchList() {
+        String url = searchUrl + this.email;
+        Log.d(TAG, "GET search: " + url);
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+            JsonArrayRequest stringRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    Log.d(TAG, "onResponse GET search: " + response);
+                    //TODO: get this info extracted somehow...
+                    searches.clear();
+
+                    for (int i = 0; i < response.length(); i++) {
+                        // creating a new json object and
+                        // getting each object from our json array.
+                        try {
+                            // get each search object
+                            JSONObject responseObj = response.getJSONObject(i);
+
+                            String search_name = responseObj.getString("search_name");
+
+                            JSONArray activity = responseObj.getJSONArray("activity");
+                            ArrayList<String> activities = new ArrayList<>();
+                            for (int j = 0; j < activity.length(); j++) {
+                                activities.add(activity.getString(j));
+                            }
+
+                            JSONArray location = responseObj.getJSONArray("location");
+                            double lon = location.getDouble(0);
+                            double lat = location.getDouble(1);
+
+                            int range = responseObj.getInt("max_range");
+
+                            int budget = responseObj.getInt("max_budget");
+
+                            SearchObject searchObject = new SearchObject(search_name, "", lat, lon, range, budget, activities);
+
+                            searches.add(searchObject);
+
+                            Log.d(TAG, "search: " + searchObject.toString());
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    for (SearchObject s : searches) {
+                        Log.d(TAG, "search: " + s.toString());
+                    }
+                    setSearchSpinner();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "onErrorResponse login: " + error.toString());
+                }
+            });
+            requestQueue.add(stringRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void setSearchSpinner() {
+        ArrayAdapter<SearchObject> adapter = new ArrayAdapter<SearchObject>(getActivity(), android.R.layout.simple_spinner_item, this.searches);
+        adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item);
+
+        searchSpinner.setAdapter(adapter);
+
+        searchSpinner.setOnItemSelectedListener(this);
     }
 
 
