@@ -25,11 +25,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -39,6 +41,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,16 +55,6 @@ import java.util.stream.Collectors;
  */
 public class MatchFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
-    /*
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-*/
     public MatchFragment() {
         // Required empty public constructor
     }
@@ -78,12 +71,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     // TODO: Rename and change types and number of parameters
     public static MatchFragment newInstance(String param1, String param2) {
         MatchFragment fragment = new MatchFragment();
-        /*
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        */
 
         return fragment;
     }
@@ -448,6 +435,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         }
 
+        //findRelativeAdapterPositionIn(Adapter<? extends RecyclerView.ViewHolder> adapter, RecyclerView.ViewHolder viewHolder, int localPosition)
+
         private void setButtonVisibility(ProfileObject peer, ProfileCardVH holder) {
             holder.acceptButton.setVisibility(View.GONE);
             holder.declineButton.setVisibility(View.GONE);
@@ -599,9 +588,25 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 //TODO: make sure it works
                 RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
 
-                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+                JSONObject body = new JSONObject();
+                body.put("name", peerEmail);
+
+                JSONArray peerslist = new JSONArray();
+                peerslist.put(myEmail);
+                peerslist.put(peerEmail);
+                body.put("peerslist", peerslist);
+
+                JSONArray chathistory = new JSONArray();
+                body.put("chathistory", chathistory);
+
+                final String reqBody = body.toString();
+
+                Log.d(TAG, "POST_create_room request body: " + body);
+
+                //JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url,body, new Response.Listener<JSONObject>() {
+                StringRequest jsonObjReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(String response) {
                         Log.d(TAG, "POST_create_room response: " + response);
                         Toast.makeText(getContext(), "created new chatroom with " + peerEmail, Toast.LENGTH_LONG).show();
 
@@ -612,11 +617,26 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, "onErrorResponse DELETE_invitation: " + error.toString());
-                        Toast.makeText(getContext(), "error: could not create" + peerEmail, Toast.LENGTH_LONG).show();
+                        Log.e(TAG, "onErrorResponse POST_create_room: " + error.toString());
 
                     }
-                });
+                })
+                {
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
+                    }
+
+                    @Override
+                    public byte[] getBody() throws AuthFailureError {
+                        try {
+                            return reqBody == null ? null : reqBody.getBytes("utf-8");
+                        } catch (UnsupportedEncodingException uee) {
+                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", reqBody, "utf-8");
+                            return null;
+                        }
+                    }
+                };
                 requestQueue.add(jsonObjReq);
             } catch (Exception e) {
                 e.printStackTrace();
