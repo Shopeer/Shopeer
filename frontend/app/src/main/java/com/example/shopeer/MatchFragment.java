@@ -24,7 +24,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -78,6 +81,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     ImageButton editSearchButton;
     Spinner searchSpinner;
 
+    SearchObject currentSearch = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +103,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_match, container, false);
 
+        HashSet<SearchObject> searches = ((MainActivity)getActivity()).searches;
+
         // add search button
         addSearchButton = v.findViewById(R.id.add_search_button);
         addSearchButton.setOnClickListener(new View.OnClickListener() {
@@ -119,6 +125,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                 // call edit search activity
                 Intent editSearchIntent = new Intent(getActivity(), EditSearchActivity.class);
+                editSearchIntent.putExtra("isNewSearch", true); // creating a search, no editing a existing one
                 startActivity(editSearchIntent);
 
             }
@@ -131,6 +138,14 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             public void onClick(View view) {
                 // call edit search activity
                 Intent editSearchIntent = new Intent(getActivity(), EditSearchActivity.class);
+                editSearchIntent.putExtra("isNewSearch", false);
+                editSearchIntent.putExtra("searchName", currentSearch.getSearchName());
+                editSearchIntent.putExtra("locationName", currentSearch.getLocation());
+                editSearchIntent.putExtra("lat", currentSearch.getLat());
+                editSearchIntent.putExtra("lon", currentSearch.getLon());
+                editSearchIntent.putExtra("range", currentSearch.getRange());
+                editSearchIntent.putExtra("activities", currentSearch.getActivities());
+                editSearchIntent.putExtra("budget", currentSearch.getBudget());
                 startActivity(editSearchIntent);
             }
         });
@@ -139,13 +154,18 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         searchSpinner = v.findViewById(R.id.search_spinner);
 
         // fetch data of searches
-        List<SearchObject> searchList = new ArrayList<SearchObject>();
+        //List<SearchObject> searchList = new ArrayList<SearchObject>();
         for (int i=0; i < 4; i++) {
-            String name = "Peer Number " + i;
             ArrayList<String> activity = new ArrayList<String>();
-            activity.add("act" + i);
-            searchList.add(new SearchObject("search " + i, "location" + i, i, i, i,i, activity));
+            activity.add("entertainment");
+            searches.add(new SearchObject("search " + i, "location" + i, i, i, i,i, activity));
         }
+
+        // convert hashset of searches to a list
+        ArrayList<SearchObject> searchList = new ArrayList<SearchObject>();
+        searchList.addAll(searches);
+        Collections.sort(searchList);
+
         ArrayAdapter<SearchObject> adapter = new ArrayAdapter<SearchObject>(getActivity(), android.R.layout.simple_spinner_item, searchList);
         adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item);
 
@@ -182,7 +202,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     //OnItemSelectedListener interface
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        parent.getItemAtPosition(pos);
+        currentSearch = (SearchObject)parent.getItemAtPosition(pos);
     }
 
     // OnItemSelectedListener interface

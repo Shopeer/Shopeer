@@ -15,11 +15,15 @@ import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     public static String email;
     public static Uri picture;
 
+    public HashSet<SearchObject> searches = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

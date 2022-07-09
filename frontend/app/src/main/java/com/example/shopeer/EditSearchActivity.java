@@ -83,6 +83,29 @@ public class EditSearchActivity extends AppCompatActivity {
             //TODO: set inputs as existing values from the intent data
             oldSearchName = intent.getStringExtra("searchName");
             searchName.setText(oldSearchName);
+
+            searchLocation.setText(intent.getStringExtra("locationName"));
+            distanceNumber.setText(Integer.toString(intent.getIntExtra("range", 0)));
+            budgetNumber.setText(Integer.toString(intent.getIntExtra("budget", 0)));
+
+            // show the activities
+            ArrayList<String> acts = intent.getStringArrayListExtra("activities");
+            for (String a : acts) {
+                if (a.equals("entertainment")) {
+                    activityEntertainmentButton.setChecked(true);
+                }
+                else if (a.equals("bulk buy")) {
+                    activityBulkBuyButton.setChecked(true);
+                }
+                else if (a.equals("groceries")) {
+                    activityGroceriesButton.setChecked(true);
+                }
+            }
+
+            Log.d(TAG, "opened " + oldSearchName + " for edit");
+        }
+        else {
+            Log.d(TAG, "creating a new search");
         }
 
     }
@@ -159,6 +182,7 @@ public class EditSearchActivity extends AppCompatActivity {
                     String url = searchUrl + MainActivity.email + "&search=" + oldSearchName;
                     Log.d(TAG, "onClick: " + url);
                     try {
+                        //TODO: change to be for POST to search
                         RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);
                         StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
                             @Override

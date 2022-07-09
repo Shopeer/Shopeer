@@ -115,6 +115,15 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        //////// delete later when server is up ///////
+        //Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+        //mainIntent.putExtra("name", "jojo");
+       // mainIntent.putExtra("email", "jojo@email.com");
+        //mainIntent.putExtra("pic_uri", "nice pic");
+       // startActivity(mainIntent);
+        //////////////////////////////////////////////
+
+
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
