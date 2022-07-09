@@ -4,7 +4,16 @@ const uri = "mongodb://127.0.0.1:27017"
 const {MongoClient} = require("mongodb")
 const client = new MongoClient(uri)
 var ObjectId = require('mongodb').ObjectId;
-const { initializeApp } = require('firebase-admin/app');
+var admin = require("firebase-admin");
+
+var serviceAccount = require("C:/Users/Grace/ExpressProjects/CPEN321/cpen-shopeer-firebase-adminsdk-i0ot8-ffcaa4fefb.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+ // databaseURL: "<your database URL here>"
+});
+
+
 
 module.exports = router;
 const coll = client.db("shopeer_database").collection("room_collection")
@@ -23,6 +32,10 @@ const coll = client.db("shopeer_database").collection("room_collection")
 router.post("/", async (req, res) => {
     try {
         var mssgid = ObjectId();
+        var FCM_token = req.body.FCM_token
+        var email = req.body.email
+        var text = req.body.text
+        var time = req.body.time
         var doc = await coll.updateOne(
             // searches for a document with the following fields
             {_id: ObjectId(req.query.room_id)},
@@ -31,13 +44,39 @@ router.post("/", async (req, res) => {
                 "chathistory": 
                     {
                         "mssg_id": mssgid,
-                        "email": req.body.email,
-                        "text": req.body.text,
-                        "time": req.body.time // frontend will send as long
+                        "email": email,
+                        "text": text,
+                        "time": time // frontend will send as long
                     }
                 }
             }
         )
+        
+
+        // FCM stuff  https://www.techotopia.com/index.php?title=Sending_Firebase_Cloud_Messages_from_a_Node.js_Server&mobileaction=toggle_view_mobile
+        var payload = {
+            notification: {
+              title: email,
+              body: text
+            },
+            data: {
+              mssgid: mssgid,
+              time: time
+            }
+          };
+          var options = {
+            priority: "normal",
+            timeToLive: 60 * 60
+          };
+        
+          admin.messaging().sendToDevice(FCM_token, payload, options)
+          .then(function(response) {
+            console.log("Successfully sent message:", response);
+          })
+          .catch(function(error) {
+            console.log("Error sending message:", error);
+          });
+        //
         console.log("\n mssg from " + req.body.email + " added to group chat with id " + mssgid)
         res.status(200).send(mssgid)
     } catch (err) {
