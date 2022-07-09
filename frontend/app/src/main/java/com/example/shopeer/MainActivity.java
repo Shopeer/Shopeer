@@ -17,11 +17,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.net.URI;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     public static String email;
-    public static Uri picture;
 
     public HashSet<SearchObject> searches = new HashSet<>();
 
@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         // get the user email
         Intent intent = getIntent();
         email = intent.getStringExtra("email");
-//        picture = Uri.parse(intent.getStringExtra("pic_uri"));
         Log.d(TAG, email);
 
         String isRegister = intent.getStringExtra("register");

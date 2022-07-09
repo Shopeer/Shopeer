@@ -163,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                     mainIntent.putExtra("name", account.getDisplayName());
                     mainIntent.putExtra("email", account.getEmail());
-                    mainIntent.putExtra("pic_uri", account.getPhotoUrl());
+                    mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
                     mainIntent.putExtra("register", "yes");
                     startActivity(mainIntent);
                 }
@@ -211,7 +211,8 @@ public class LoginActivity extends AppCompatActivity {
                         Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                         mainIntent.putExtra("name", account.getDisplayName());
                         mainIntent.putExtra("email", account.getEmail());
-                        mainIntent.putExtra("pic_uri", account.getPhotoUrl());
+                        mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
+                        Log.d(TAG, "onResponse: " + account.getPhotoUrl().toString());
                         startActivity(mainIntent);
                     }
                 }
