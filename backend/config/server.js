@@ -116,14 +116,16 @@ app.get("/match/searches", async (req, res) => {
 
         if (find_cursor != null) {
             var temp_arry = await find_cursor.searches
+            console.log(temp_arry)
+            res.status(200).send(temp_arry)
+
         }
         else {
-            res.status(400).send("User not found")
+            res.status(400).json({ response: 'User not found' });
         }
 
         
-        console.log(temp_arry)
-        res.status(200).send(temp_arry)
+        
     }
     catch (err) {
         console.log(err)
@@ -145,6 +147,11 @@ app.post("/match/searches", async (req, res) => {
     // console.log(search_object)
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (find_cursor == null) {
+            res.status(400).json({ response: 'User not found' })
+            return
+            
+        }
         // console.log(find_cursor)
         // res.status(200).send("ok")
         // console.log(find_cursor.searches.length)
