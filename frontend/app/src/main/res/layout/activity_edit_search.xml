@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditSearchActivity">
+
+    <RelativeLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/chat_grey"
+        android:padding="5dp">
+
+        <Button
+            android:id="@+id/delete_search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="delete" />
+
+        <Button
+            android:id="@+id/save_search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="save" />
+
+        <TableRow
+            android:id="@+id/searchName_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="search name: "
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/search_name_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="my search" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/location_row"
+            android:layout_below="@id/searchName_row">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="location: "
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/search_location_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="current location" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp" >
+
+                        <fragment android:id="@+id/autocomplete_fragment"
+                            android:layout_width="400dp"
+                            android:layout_height="match_parent"
+                            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                            />
+
+                    </androidx.cardview.widget.CardView>
+
+                </TableRow>
+            </LinearLayout>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/distance_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/location_row">
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="distance range (km):" />
+
+            <EditText
+                android:id="@+id/distance_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:text="10"/>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/activity_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/distance_row">
+
+            <CheckBox
+                android:id="@+id/activity_groceries_radioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="groceries" />
+
+            <CheckBox
+                android:id="@+id/activity_entertainment_radioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="entertainment" />
+            <CheckBox
+                android:id="@+id/activity_bulkBuy_radioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="bulk buy" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/budget_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/activity_row">
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Budget (CAD):" />
+
+            <EditText
+                android:id="@+id/budget_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:text="100"/>
+
+        </TableRow>
+
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
