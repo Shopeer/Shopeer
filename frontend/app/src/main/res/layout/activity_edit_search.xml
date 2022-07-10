@@ -7,22 +7,22 @@
     tools:context=".EditSearchActivity">
 
     <RelativeLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/chat_grey"
         android:padding="5dp">
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/delete_search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:text="delete"
             android:layout_alignParentRight="true"
-            />
+            android:layout_alignParentBottom="true"
+            android:text="delete" />
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/save_search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -41,7 +41,7 @@
                 android:textSize="14sp" />
 
             <EditText
-                android:id="@+id/searchName"
+                android:id="@+id/search_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -72,7 +72,7 @@
                         android:textSize="14sp" />
 
                     <TextView
-                        android:id="@+id/textView9"
+                        android:id="@+id/search_location_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="current location" />
@@ -81,12 +81,19 @@
                 <TableRow
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
-                    <Button
-                        android:id="@+id/button2"
+
+                    <androidx.cardview.widget.CardView
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="change location"
-                        />
+                        android:layout_height="30dp" >
+
+                        <fragment android:id="@+id/autocomplete_fragment"
+                            android:layout_width="400dp"
+                            android:layout_height="match_parent"
+                            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                            />
+
+                    </androidx.cardview.widget.CardView>
+
                 </TableRow>
             </LinearLayout>
 
@@ -105,7 +112,7 @@
                 android:text="distance range (km):" />
 
             <EditText
-                android:id="@+id/editTextNumber"
+                android:id="@+id/distance_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -120,19 +127,19 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/distance_row">
 
-            <RadioButton
-                android:id="@+id/radioButton"
+            <CheckBox
+                android:id="@+id/activity_groceries_radioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="groceries" />
 
-            <RadioButton
-                android:id="@+id/radioButton3"
+            <CheckBox
+                android:id="@+id/activity_entertainment_radioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="entertainment" />
-            <RadioButton
-                android:id="@+id/radioButton2"
+            <CheckBox
+                android:id="@+id/activity_bulkBuy_radioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="bulk buy" />
@@ -148,10 +155,10 @@
                 android:id="@+id/textView8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Budget:" />
+                android:text="Budget (CAD):" />
 
             <EditText
-                android:id="@+id/editTextNumber1"
+                android:id="@+id/budget_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
