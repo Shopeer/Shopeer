@@ -1,6 +1,7 @@
 package com.example.shopeer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -21,7 +22,7 @@ import java.io.UnsupportedEncodingException;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
-
+    final private String profileUrl = "http://20.230.148.126:8080/user/registration/FCM?email=";
 
 
     // [START on_new_token]
@@ -38,16 +39,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     // https://stackoverflow.com/questions/37787373/firebase-fcm-how-to-get-token
     public void onNewToken(String token) {
         Log.d(TAG, "Refreshed token: " + token);
-
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
         // FCM registration token to your app server.
-        sendRegistrationToServer(token);
         super.onNewToken(token);
         Log.e("newToken", token);
         getSharedPreferences("_", MODE_PRIVATE).edit().putString("fb", token).apply();
     }
-    // [END on_new_token]
 
     //
     @Override
@@ -55,20 +53,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // code from https://firebase.google.com/docs/cloud-messaging/android/receive
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
+        super.onMessageReceived(remoteMessage);
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             // payload should contain notification (title + body) and data (mssgid + time)
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
-
-//            if (/* Check if data needs to be processed by long running job */ true) {
-//                // For long-running tasks (10 seconds or more) use WorkManager.
-//                scheduleJob();
-//            } else {
-//                // Handle message within 10 seconds
-//                handleNow();
-//            }
         }
 
         // Check if message contains a notification payload.
@@ -80,21 +71,52 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // message, here is where that should be initiated. See sendNotification method below.
     }
 
-    /**
-     * Persist token to third-party servers.
-     *
-     * Modify this method to associate the user's FCM registration token with any
-     * server-side account maintained by your application.
-     *
-     * @param token The new token.
-     */
-    private void sendRegistrationToServer(String token) {
-        // Send token to your app server.
-        // token is currently sent to server by POSTing message
-    }
 
     public static String getToken(Context context) {
         return context.getSharedPreferences("_", MODE_PRIVATE).getString("fb", "empty");
     }
+
+//    private void updateProfileToken(String token) {
+//        // Updates the FCM token in the backend
+//        String url = profileUrl + MainActivity.email;
+//        try {
+//            RequestQueue requestQueue = Volley.newRequestQueue(getBaseContext());
+//            JSONObject jsonBody = new JSONObject();
+//            jsonBody.put("FCM_token", token);
+//            final String requestBody = jsonBody.toString();
+//
+//            StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+//                @Override
+//                public void onResponse(String response) {
+//                    Log.d(TAG, "update profile " + response);
+//                }
+//            }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    Log.d(TAG, "onErrorResponse login: " + error.toString());
+//                }
+//            })
+//            {
+//                @Override
+//                public String getBodyContentType() {
+//                    return "application/json; charset=utf-8";
+//                }
+//
+//                @Override
+//                public byte[] getBody() throws AuthFailureError {
+//                    try {
+//                        return requestBody == null ? null : requestBody.getBytes("utf-8");
+//                    } catch (UnsupportedEncodingException uee) {
+//                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+//                        return null;
+//                    }
+//                }
+//            };
+//            requestQueue.add(stringRequest);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+
 
 }

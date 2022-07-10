@@ -5,7 +5,10 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -52,8 +55,8 @@ public class ChatActivity extends AppCompatActivity {
     String roomId;
     String roomName;
 
-    RecyclerView recyclerView;
-    ChatRecyclerAdapter chatRecyclerAdapter;
+    public RecyclerView recyclerView;
+    public ChatRecyclerAdapter chatRecyclerAdapter;
     String currenttime;
     Calendar calendar;
     SimpleDateFormat simpleDateFormat;
@@ -111,18 +114,6 @@ public class ChatActivity extends AppCompatActivity {
         // if true:
         fetchMessageHistory(roomId);
 
-//        Date date = new Date();
-//        String time = simpleDateFormat.format(calendar.getTime());
-//        for (int i=0; i < 20; i++) {
-//            if (i%2==0) {
-//                messagesList.add(new ChatObject("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
-//                        "me", date.getTime(), time));
-//            } else {
-//                messagesList.add(new ChatObject("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
-//                        "other", date.getTime(), time));
-//            }
-//        }
-
         // set up "send message" button
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,11 +123,9 @@ public class ChatActivity extends AppCompatActivity {
                     Date date = new Date();
                     currenttime = simpleDateFormat.format(calendar.getTime());
                     ChatObject newMessage = new ChatObject(enteredMessage, MainActivity.email, date.getTime(), currenttime);
-//                    messagesList.add(newMessage);
-//                    chatRecyclerAdapter.notifyDataSetChanged();
-//                    recyclerView.smoothScrollToPosition(messagesList.size()-1);
 
                     // send the message object to BE
+                    Log.d(TAG, "sending message");
                     postNewMessage(newMessage, roomId);
 
 
@@ -148,6 +137,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void postNewMessage(ChatObject newMessage, String room_id) {
         try {
+            Log.d(TAG, "postNewMessage: " + MyFirebaseMessagingService.getToken(this));
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             String url = postUrl + room_id;
             JSONObject jsonBody = new JSONObject();
@@ -240,4 +230,34 @@ public class ChatActivity extends AppCompatActivity {
         super.onStop();
         chatRecyclerAdapter.notifyDataSetChanged();
     }
+
+    //register your activity onResume()
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.registerReceiver(mMessageReceiver, new IntentFilter(TAG));
+    }
+
+    //Must unregister onPause()
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(mMessageReceiver);
+    }
+
+
+    //This is the handler that will manager to process the broadcast intent
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // Extract data included in the Intent
+            String message = intent.getStringExtra("message");
+
+           // refresh chatview
+            chatRecyclerAdapter.notifyDataSetChanged();
+            recyclerView.smoothScrollToPosition(messagesList.size()-1);
+
+        }
+    };
 }
