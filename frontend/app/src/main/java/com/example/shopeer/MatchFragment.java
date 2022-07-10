@@ -561,7 +561,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         }
 
         private void declineInvite(ProfileObject po, ProfileCardVH holder) {
-
+            data.remove(holder.getBindingAdapterPosition()); // pass by ref, so will update this.suggestions also
+            notifyItemRemoved(holder.getBindingAdapterPosition());
+            notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
         }
 
         private void acceptInvite(ProfileObject peer, ProfileCardVH holder) {
