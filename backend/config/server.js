@@ -245,14 +245,17 @@ function create_search_object(body) {
 // Response: success/ fail
 app.delete("/match/searches", async (req, res) => {
     var profile_email = req.query.email
-    var search = req.body.search
+    var search = req.query.search
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            throw "Error: Invalid email"
+        }
         console.log(search)
         var no_match_flag = 0
         for (let i = 0; i < find_cursor.searches.length; i++) {
-            if (find_cursor.searches[i].search_name == search.search_name) {
-                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: {search_name: search.search_name} } })
+            if (find_cursor.searches[i].search_name == search) {
+                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: {search_name: search} } })
                 // var find_cursor = await user_collection.findOne({ email: profile_email })
                 res.json({ response: 'removed search' })
                 no_match_flag = 1
@@ -261,7 +264,7 @@ app.delete("/match/searches", async (req, res) => {
         }
         if (!no_match_flag) {
             // var debug_res = await user_collection.updateOne({email:profile_email},{ $pull: { searches: { $match: search } } } )
-            var find_cursor = await user_collection.findOne({ email: profile_email })
+            //var find_cursor = await user_collection.findOne({ email: profile_email })
             console.log("Search not in existence")
             //res.status(200).send(find_cursor)
             res.json({ response: 'search not found' })
