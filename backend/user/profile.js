@@ -1,3 +1,4 @@
+
 const http = require('http');
 var express = require("express")
 const { IPv4 } = require("ipaddr.js")
@@ -90,20 +91,22 @@ user_profile_router.post("/registration", async (req, res) => {
     }
 })
 
-
 function create_user_object(body) {
     var user_object = {
         name: body.name,
         email: body.email,
         description: body.description,
         photo: body.photo,
+        FCM_token: body.FCM_token,
         searches: [],
         peers: [],
         invites: [],
+        received_invites: [],
         blocked: []
     }
     return user_object
 }
+
 
 // Delete User DELETE https://shopeer.com/user/registration?user_id=[user_id]
 // Removes the user from User Database and clears all info regarding the user
@@ -155,3 +158,4 @@ user_profile_router.put("/registration/FCM", async (req, res) => {
 
 
 module.exports = user_profile_router;
+
