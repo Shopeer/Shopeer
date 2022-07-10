@@ -603,19 +603,19 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
 
                 JSONObject body = new JSONObject();
-                body.put("name", peerEmail);
+                body.put("name", peerEmail.split("@")[0]);
 
-                //JSONArray peerslist = new JSONArray();
-                //peerslist.put(myEmail);
-                //peerslist.put(peerEmail);
+                JSONArray peerslist = new JSONArray();
+                peerslist.put(myEmail);
+                peerslist.put(peerEmail);
 
-                ArrayList<String> peerslist = new ArrayList<>();
-                peerslist.add(myEmail);
-                peerslist.add(peerEmail);
+                //ArrayList<String> peerslist = new ArrayList<>();
+                //peerslist.add(myEmail);
+                //peerslist.add(peerEmail);
                 body.put("peerslist", peerslist);
 
-                //JSONArray chathistory = new JSONArray();
-                //body.put("chathistory", chathistory);
+                JSONArray chathistory = new JSONArray();
+                body.put("chathistory", chathistory);
 
                 final String reqBody = body.toString();
 
