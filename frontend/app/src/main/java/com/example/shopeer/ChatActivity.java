@@ -5,7 +5,10 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,10 +18,28 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Request.Method;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
@@ -31,16 +52,20 @@ public class ChatActivity extends AppCompatActivity {
     private String enteredMessage;
     Intent intent;
     String senderEmail;
-    int roomId;
+    String roomId;
     String roomName;
 
-    RecyclerView recyclerView;
-    ChatRecyclerAdapter chatRecyclerAdapter;
+    public RecyclerView recyclerView;
+    public ChatRecyclerAdapter chatRecyclerAdapter;
     String currenttime;
     Calendar calendar;
     SimpleDateFormat simpleDateFormat;
 
     ArrayList<ChatObject> messagesList;
+
+//    String url = "http://localhost:8081/";
+    private final String roomUrl = "http://20.230.148.126:8080/chat/room/history?room_id=";
+    private final String postUrl = "http://20.230.148.126:8080/chat/message?room_id=";
 
 
 
@@ -60,7 +85,7 @@ public class ChatActivity extends AppCompatActivity {
         simpleDateFormat = new SimpleDateFormat("hh:mm a");
         // set senderEmail
         Bundle extras = intent.getExtras();
-        roomId = extras.getInt("room_id");
+        roomId = extras.getString("room_id");
         roomName = extras.getString("room_name");
 
         // populate the room name and picture
@@ -74,19 +99,7 @@ public class ChatActivity extends AppCompatActivity {
 //            Picasso.get().load(imgUri).into(roomPictureImageView);
         }
 
-        // fetch messages from BE
         messagesList = new ArrayList<>();
-        Date date = new Date();
-        String time = simpleDateFormat.format(calendar.getTime());
-        for (int i=0; i < 20; i++) {
-            if (i%2==0) {
-                messagesList.add(new ChatObject("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
-                        "me", date.getTime(), time));
-            } else {
-                messagesList.add(new ChatObject("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod",
-                        "other", date.getTime(), time));
-            }
-        }
 
         // initialize recycler view
         recyclerView = findViewById(R.id.chat_recyclerView);
@@ -96,7 +109,10 @@ public class ChatActivity extends AppCompatActivity {
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-
+        // fetch messages from BE when get notification from FCM
+        // Get notification from FCM
+        // if true:
+        fetchMessageHistory(roomId);
 
         // set up "send message" button
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
@@ -106,11 +122,11 @@ public class ChatActivity extends AppCompatActivity {
                 if(!enteredMessage.isEmpty()) {
                     Date date = new Date();
                     currenttime = simpleDateFormat.format(calendar.getTime());
-                    ChatObject newMessage = new ChatObject(enteredMessage, "me", date.getTime(), currenttime);
-                    messagesList.add(newMessage);
-                    chatRecyclerAdapter.notifyDataSetChanged();
-                    recyclerView.smoothScrollToPosition(messagesList.size()-1);
+                    ChatObject newMessage = new ChatObject(enteredMessage, MainActivity.email, date.getTime(), currenttime);
+
                     // send the message object to BE
+                    Log.d(TAG, "sending message");
+                    postNewMessage(newMessage, roomId);
 
 
                     messageInput.setText(null);
@@ -118,6 +134,91 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     } // end of oncreate
+
+    private void postNewMessage(ChatObject newMessage, String room_id) {
+        try {
+            Log.d(TAG, "postNewMessage: " + MyFirebaseMessagingService.getToken(this));
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            String url = postUrl + room_id;
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("FCM_token", MyFirebaseMessagingService.getToken(this));
+            jsonBody.put("email", newMessage.getSenderEmail());
+            jsonBody.put("text", newMessage.getText());
+            jsonBody.put("time", newMessage.getCurrenttime());
+            final String requestBody = jsonBody.toString();
+
+            StringRequest stringRequest = new StringRequest(Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    fetchMessageHistory(room_id);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "post message error" + error.toString());
+                }
+            })
+            {
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    try {
+                        return requestBody == null ? null : requestBody.getBytes("utf-8");
+                    } catch (UnsupportedEncodingException uee) {
+                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                        return null;
+                    }
+                }
+            };
+            requestQueue.add(stringRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // fetch from BE
+    private void fetchMessageHistory(String room_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        String url = roomUrl + room_id;
+        Log.d(TAG, url);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
+                (Request.Method.GET,
+                        url, null,
+                        new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try{
+                            if (response.length() == 0) {return;}
+                            messagesList.clear();
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject obj = response.getJSONObject(i);
+                                Date date = new Date();
+                                String email = obj.getString("email");
+                                String text = obj.getString("text");
+                                String time = obj.getString("time");
+                                messagesList.add(new ChatObject(text, email, date.getTime(), time));
+                            }
+                            // notify change, scroll
+                            chatRecyclerAdapter.notifyDataSetChanged();
+                            recyclerView.smoothScrollToPosition(messagesList.size()-1);
+
+                            Log.d(TAG, "received message history");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, "get message history: " + error.toString());
+                    }
+                });
+        requestQueue.add(jsonArrayRequest);
+    }
 
     @Override
     protected void onStart() {
@@ -130,4 +231,34 @@ public class ChatActivity extends AppCompatActivity {
         super.onStop();
         chatRecyclerAdapter.notifyDataSetChanged();
     }
+
+    //register your activity onResume()
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.registerReceiver(mMessageReceiver, new IntentFilter(TAG));
+    }
+
+    //Must unregister onPause()
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(mMessageReceiver);
+    }
+
+
+    //This is the handler that will manager to process the broadcast intent
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // Extract data included in the Intent
+            String message = intent.getStringExtra("message");
+
+           // refresh chatview
+            chatRecyclerAdapter.notifyDataSetChanged();
+            recyclerView.smoothScrollToPosition(messagesList.size()-1);
+
+        }
+    };
 }

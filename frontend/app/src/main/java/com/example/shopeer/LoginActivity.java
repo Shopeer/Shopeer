@@ -115,6 +115,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
@@ -130,6 +131,8 @@ public class LoginActivity extends AppCompatActivity {
     private void updateUI(GoogleSignInAccount account) {
         if (account == null) {
             Log.d(TAG, "There is no user logged in!");
+
+
         }
         else {
             // TODO:get user info and call backend to register or login
@@ -162,7 +165,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                     mainIntent.putExtra("name", account.getDisplayName());
                     mainIntent.putExtra("email", account.getEmail());
-                    mainIntent.putExtra("pic_uri", account.getPhotoUrl());
+                    mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
                     mainIntent.putExtra("register", "yes");
                     startActivity(mainIntent);
                 }
@@ -210,7 +213,8 @@ public class LoginActivity extends AppCompatActivity {
                         Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                         mainIntent.putExtra("name", account.getDisplayName());
                         mainIntent.putExtra("email", account.getEmail());
-                        mainIntent.putExtra("pic_uri", account.getPhotoUrl());
+                        mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
+                        Log.d(TAG, "onResponse: " + account.getPhotoUrl().toString());
                         startActivity(mainIntent);
                     }
                 }

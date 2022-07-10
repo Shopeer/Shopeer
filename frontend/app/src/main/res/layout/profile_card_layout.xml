@@ -49,11 +49,10 @@
             android:id="@+id/decline_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/accept_button"
             android:layout_alignParentTop="true"
-            android:text="decline"
             android:layout_marginStart="10dp"
-            />
+            android:layout_toRightOf="@id/accept_button"
+            android:text="decline" />
 
         <Button
             android:id="@+id/block_button"
@@ -62,6 +61,15 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:text="block" />
+
+        <Button
+            android:id="@+id/unfriend_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/decline_button"
+            android:layout_marginStart="10dp"
+            android:layout_toRightOf="@id/friend_button"
+            android:text="remove invite" />
 
 
     </RelativeLayout>

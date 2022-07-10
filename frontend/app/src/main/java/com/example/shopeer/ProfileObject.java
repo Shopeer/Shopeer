@@ -2,13 +2,13 @@ package com.example.shopeer;
 
 public class ProfileObject {
 
-    private String name;
+    private String email;
 
-    public ProfileObject(String name) {
-        this.name = name;
+    public ProfileObject(String email) {
+        this.email = email;
     }
 
-    public String getName() {
-        return this.name;
+    public String getEmail() {
+        return this.email;
     }
 }
