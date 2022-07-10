@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "792098756894",
+    "project_id": "cpen-shopeer",
+    "storage_bucket": "cpen-shopeer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792098756894:android:af1e004bb0269cea35d10f",
+        "android_client_info": {
+          "package_name": "com.example.shopeer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792098756894-ifgb0d1i67hfuhpt7m54dn7b9jstg0re.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.shopeer",
+            "certificate_hash": "f7ed6210b4c36d52c9282743c4f9418bd7405b5d"
+          }
+        },
+        {
+          "client_id": "792098756894-k65jvk03nfaoh6826pdp4kc9prmgk3di.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.shopeer",
+            "certificate_hash": "206622df6368f3810270a42144a62bdf7bfccd3d"
+          }
+        },
+        {
+          "client_id": "792098756894-5hqk9jf1chiccasln7a9dbv9im1r8tng.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvN2T09H_B_DX2xVgkeB3RYMYUl7xS7h0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792098756894-5hqk9jf1chiccasln7a9dbv9im1r8tng.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
