@@ -122,7 +122,8 @@ function create_search_object(body) {
 // Response: success/ fail
 searches_router.delete("/searches", async (req, res) => {
     var profile_email = req.query.email
-    var search = req.body.search
+    // var search = req.body.search
+    var search = req.query
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         console.log(search)
