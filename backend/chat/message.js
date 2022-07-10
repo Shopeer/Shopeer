@@ -1,3 +1,4 @@
+
 const express = require('express');
 const router = express.Router();
 const uri = "mongodb://127.0.0.1:27017"
@@ -83,4 +84,5 @@ router.post("/", async (req, res) => {
         console.log(err)
         res.status(400).send(err)
     }
+
 })

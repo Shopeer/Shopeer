@@ -1,3 +1,4 @@
+
 const http = require('http');
 var express = require("express")
 const { IPv4 } = require("ipaddr.js")
@@ -70,6 +71,7 @@ user_profile_router.put("/profile", async (req, res) => {
 // Register User POST https://shopeer.com/user/register
 // Body (Parameter): {"name":<user_name>, "email":<user_email>}
 // Response: user_id
+<<<<<<< HEAD
 
 user_profile_router.post("/registration", async (req, res) => {
     var profile = req.query
@@ -89,6 +91,43 @@ user_profile_router.post("/registration", async (req, res) => {
         res.status(400).send(err)
     }
 })
+=======
+>>>>>>> be9-integratingchat
+
+user_profile_router.post("/registration", async (req, res) => {
+    var profile = req.query
+    try {
+        profile_email = req.query.email
+        var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (find_cursor) {
+            res.status(200).send("User already exists")
+        } else {
+            var user_object = create_user_object(profile)
+            var result_debug = await user_collection.insertOne(user_object)
+            res.status(200).send(user_object)
+        }
+
+    } catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
+function create_user_object(body) {
+    var user_object = {
+        name: body.name,
+        email: body.email,
+        description: body.description,
+        photo: body.photo,
+        FCM_token: body.FCM_token,
+        searches: [],
+        peers: [],
+        invites: [],
+        received_invites: [],
+        blocked: []
+    }
+    return user_object
+}
 
 
 function create_user_object(body) {
@@ -155,3 +194,4 @@ user_profile_router.put("/registration/FCM", async (req, res) => {
 
 
 module.exports = user_profile_router;
+

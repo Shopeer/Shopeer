@@ -8,6 +8,8 @@ const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
+const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
+
 console.log({ MongoClient, ObjectId })
 
 var server = null;
@@ -28,17 +30,16 @@ app.use('/user', user_profile_router)
 
 const user_peers_router = require('../user/peers.js');
 app.use('*', user_peers_router);
+app.use('/user', user_peers_router)
 
-app.use('/peers', user_peers_router)
 
-
-const searches_router = require('../match/searches.js');
+const searches_router = require('../match/searches');
 app.use('*', searches_router);
-app.use('/searches', searches_router)
+app.use('/match', searches_router)
 
 const suggestions_algo_router = require('../match/suggestions_algo.js');
 app.use('*', suggestions_algo_router);
-app.use('/searches', suggestions_algo_router)
+app.use('/match', suggestions_algo_router)
 
 const roomsRouter = require('../chat/room');
 app.use('/chat/room', roomsRouter)
@@ -46,9 +47,8 @@ app.use('/chat/room', roomsRouter)
 const mssgRouter = require('../chat/message');
 app.use('/chat/message', mssgRouter)
 
-
-// local vm
-// const IP = '192.168.64.15';
+// // local vm
+/// const IP = '192.168.64.15';
 // const PORT = 3000;
 
 // azure vm
@@ -62,11 +62,18 @@ const PORT = "8080";
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 
-// let obj_user1 = {username: "test_user1"}
-// let obj_user2 = {username: "test_user2"}
-// let obj_chat1 = {chatname: "test_chatname1", chathistory: null}
-// let obj_chat2 = {chatname: "test_chatname2", chathistory: null}
-
+// For debug only
+app.get("/test", async (req, res) => {
+  try {
+      const result_debug = await mongoClient.db("shopeer_database").collection("room_collection").find({}).toArray()
+      console.log(result_debug[0]["testkey"])
+      res.send(result_debug[0]["testkey"] + "\n");
+  }
+  catch (err) {
+      console.log(err)
+      res.status(400).send(err)
+  }
+})
 
 //-------------------------------------------------------------------------------
 // Database Module: User Collection Submodule
@@ -465,4 +472,3 @@ async function run() {
 }
 
 run()
-
