@@ -14,11 +14,13 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -36,6 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -199,7 +202,7 @@ public class EditSearchActivity extends AppCompatActivity {
                 else {
                     /*
                     Log.d(TAG, "deleting a existing search " + oldSearchName);
-                    String url = searchUrl + MainActivity.email;
+                    final String url = searchUrl + MainActivity.email;
                     Log.d(TAG, "onClick: " + url);
                     try {
                         //TODO: make sure this works
@@ -212,12 +215,14 @@ public class EditSearchActivity extends AppCompatActivity {
                         JSONObject body = new JSONObject();
                         body.put("search", search);
 
-                        Log.d(TAG, "delete_search request body: " + body);
+                        String reqBody = "{ \"search\":\n    {\n        \"search_name\": \"test\"\n    }\n}";//body.toString();
+
+                        Log.d(TAG, "delete_search request body: " + reqBody);
 
 
-                        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.DELETE, url, body, new Response.Listener<JSONObject>() {
+                        StringRequest jsonObjReq = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
                             @Override
-                            public void onResponse(JSONObject response) {
+                            public void onResponse(String response) {
                                 Log.d(TAG, "delete_search response: " + response);
                                 Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
                                 intent.putExtra("email", MainActivity.email);
@@ -229,8 +234,22 @@ public class EditSearchActivity extends AppCompatActivity {
                                 Log.e(TAG, "onErrorResponse delete_search: " + error.toString());
                                 Toast.makeText(EditSearchActivity.this, "error: could not delete", Toast.LENGTH_LONG).show();
                             }
-                        });
-                        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(SERVER_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                        })
+                        {
+                            @Override
+                            public String getBodyContentType() {
+                                return "application/json; charset=utf-8";
+                            }
+                            @Override
+                            public byte[] getBody() throws AuthFailureError {
+                                try {
+                                    return reqBody == null ? null : reqBody.getBytes("utf-8");
+                                } catch (UnsupportedEncodingException uee) {
+                                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", reqBody, "utf-8");
+                                    return null;
+                                }
+                            }
+                        };
                         requestQueue.add(jsonObjReq);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -265,7 +284,6 @@ public class EditSearchActivity extends AppCompatActivity {
                     }
 
                 }
-
             }
         });
     }

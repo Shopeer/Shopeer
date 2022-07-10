@@ -582,8 +582,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         }
 
         private void createChatroom(String myEmail, String peerEmail, ProfileCardVH holder) {
-            String url = roomUrl + email + "&target_peer_email=" + peerEmail;
-            Log.d(TAG, "onClick POST_create_room: " + url);
+            Log.d(TAG, "onClick POST_create_room: " + roomUrl);
             try {
                 //TODO: make sure it works
                 RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
@@ -591,20 +590,24 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 JSONObject body = new JSONObject();
                 body.put("name", peerEmail);
 
-                JSONArray peerslist = new JSONArray();
-                peerslist.put(myEmail);
-                peerslist.put(peerEmail);
+                //JSONArray peerslist = new JSONArray();
+                //peerslist.put(myEmail);
+                //peerslist.put(peerEmail);
+
+                ArrayList<String> peerslist = new ArrayList<>();
+                peerslist.add(myEmail);
+                peerslist.add(peerEmail);
                 body.put("peerslist", peerslist);
 
-                JSONArray chathistory = new JSONArray();
-                body.put("chathistory", chathistory);
+                //JSONArray chathistory = new JSONArray();
+                //body.put("chathistory", chathistory);
 
                 final String reqBody = body.toString();
 
-                Log.d(TAG, "POST_create_room request body: " + body);
+                Log.d(TAG, "POST_create_room request body: " + reqBody);
 
                 //JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url,body, new Response.Listener<JSONObject>() {
-                StringRequest jsonObjReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                StringRequest jsonObjReq = new StringRequest(Request.Method.POST, roomUrl, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, "POST_create_room response: " + response);
