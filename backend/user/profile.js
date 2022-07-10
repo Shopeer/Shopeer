@@ -71,6 +71,28 @@ user_profile_router.put("/profile", async (req, res) => {
 // Register User POST https://shopeer.com/user/register
 // Body (Parameter): {"name":<user_name>, "email":<user_email>}
 // Response: user_id
+<<<<<<< HEAD
+
+user_profile_router.post("/registration", async (req, res) => {
+    var profile = req.query
+    try {
+        profile_email = req.query.email
+        var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (find_cursor) {
+            res.status(200).send("User already exists")
+        } else {
+            var user_object = create_user_object(profile)
+            var result_debug = await user_collection.insertOne(user_object)
+            res.status(200).send(user_object)
+        }
+
+    } catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+=======
+>>>>>>> be9-integratingchat
 
 user_profile_router.post("/registration", async (req, res) => {
     var profile = req.query
@@ -91,7 +113,6 @@ user_profile_router.post("/registration", async (req, res) => {
     }
 })
 
-
 function create_user_object(body) {
     var user_object = {
         name: body.name,
@@ -103,6 +124,20 @@ function create_user_object(body) {
         peers: [],
         invites: [],
         received_invites: [],
+        blocked: []
+    }
+    return user_object
+}
+
+function create_user_object(body) {
+    var user_object = {
+        name: body.name,
+        email: body.email,
+        description: body.description,
+        photo: body.photo,
+        searches: [],
+        peers: [],
+        invites: [],
         blocked: []
     }
     return user_object
@@ -130,6 +165,32 @@ user_profile_router.delete("/registration", async (req, res) => {
     }
 })
 
+/**
+ * Add FCM token to user profile object PUT https://shopeer.com/user/registration/FCM?email=[email]
+ * Body: FCM_token
+ * Returns: success/fail
+ */
+//curl -X "PUT" -H "Content-Type: application/json" -d '{"FCM_token": "test token" }' localhost:8081/user/registration/FCM?email="hello@gmail.com"
+user_profile_router.put("/registration/FCM", async (req, res) => {
+    try {
+        var doc = await mongoClient.db("shopeer_database").collection("user_collection").updateOne(
+            {email:req.query.email}, 
+            {$set:{FCM_token:req.body.FCM_token}}
+        )
+        if (doc.matchedCount == 0) {
+            res.status(200).send("\nThis user does not exist yet.\n")
+        } else if (doc.modifiedCount == 0) {
+            res.status(200).send("\nFailed to update token\n")
+        } else {
+            res.status(200).send("\nUpdated user's token\n")
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
 
 
 module.exports = user_profile_router;
+

@@ -119,6 +119,92 @@ public class ChatActivity extends AppCompatActivity {
         });
     } // end of oncreate
 
+<<<<<<< HEAD
+=======
+    private void postNewMessage(ChatObject newMessage, String room_id) {
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            String url = postUrl + room_id;
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("FCM_token", MyFirebaseMessagingService.getToken(this));
+            jsonBody.put("email", newMessage.getSenderEmail());
+            jsonBody.put("text", newMessage.getText());
+            jsonBody.put("time", newMessage.getCurrenttime());
+            final String requestBody = jsonBody.toString();
+
+            StringRequest stringRequest = new StringRequest(Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    fetchMessageHistory(room_id);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "post message error" + error.toString());
+                }
+            })
+            {
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    try {
+                        return requestBody == null ? null : requestBody.getBytes("utf-8");
+                    } catch (UnsupportedEncodingException uee) {
+                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                        return null;
+                    }
+                }
+            };
+            requestQueue.add(stringRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // fetch from BE
+    private void fetchMessageHistory(String room_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        String url = roomUrl + room_id;
+        Log.d(TAG, url);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
+                (Request.Method.GET,
+                        url, null,
+                        new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try{
+                            if (response.length() == 0) {return;}
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject obj = response.getJSONObject(i);
+                                Date date = new Date();
+                                String email = obj.getString("email");
+                                String text = obj.getString("text");
+                                String time = obj.getString("time");
+                                messagesList.add(new ChatObject(text, email, date.getTime(), time));
+                            }
+                            // notify change, scroll
+                            chatRecyclerAdapter.notifyDataSetChanged();
+                            recyclerView.smoothScrollToPosition(messagesList.size()-1);
+
+                            Log.d(TAG, "received message history");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, "get message history: " + error.toString());
+                    }
+                });
+        requestQueue.add(jsonArrayRequest);
+    }
+
+>>>>>>> be9-integratingchat
     @Override
     protected void onStart() {
         super.onStart();
