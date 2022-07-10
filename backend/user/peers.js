@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const http = require('http');
 var express = require("express")
 const { IPv4 } = require("ipaddr.js")
