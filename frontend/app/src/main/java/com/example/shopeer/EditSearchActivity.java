@@ -108,9 +108,10 @@ public class EditSearchActivity extends AppCompatActivity {
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getLatLng());
-                searchLocation.setText(place.getName());
+                //searchLocation.setText(place.getName()); //TODO: uncomment this later when location name is in backend
                 locationLat = place.getLatLng().latitude;
                 locationLon = place.getLatLng().longitude;
+                searchLocation.setText("lat: " + locationLat + "\nlon: " + locationLon);
             }
 
             @Override
@@ -155,6 +156,9 @@ public class EditSearchActivity extends AppCompatActivity {
             else {
                 searchLocation.setText(intent.getStringExtra("locationName"));
             }
+            // TODO: for now, just make all locations as lat lon, delete this line when location name is added to backend
+            searchLocation.setText("lat: " + this.locationLat + "\nlon: " + this.locationLon);
+            //
 
             distanceNumber.setText(Integer.toString(intent.getIntExtra("range", 0)));
             budgetNumber.setText(Integer.toString(intent.getIntExtra("budget", 0)));
@@ -184,9 +188,10 @@ public class EditSearchActivity extends AppCompatActivity {
 
     private void setDefaultLocation(){
         // defaults to north pole in beginning
-        searchLocation.setText("North Pole");
+        //searchLocation.setText("North Pole");
         locationLat = 90;
         locationLon = 135;
+        searchLocation.setText("lat: " + this.locationLat + "\nlon: " + this.locationLon);
     }
 
     private void setDeleteButton() {
