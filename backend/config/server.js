@@ -139,6 +139,10 @@ app.get("/match/searches", async (req, res) => {
 // Adds a new active search for suggested matches to User Database
 // Body: User Id Token, location, distance, search_name, budget
 // Response: search id
+
+
+//  if the search param is empty, then create a new search, 
+// if it's not empty, use it to find that search object and replace it with the search in the body
 app.post("/match/searches", async (req, res) => {
     var profile_email = req.query.email
     var search_id = req.query.search
@@ -157,6 +161,7 @@ app.post("/match/searches", async (req, res) => {
         // console.log(find_cursor.searches.length)
 
         // if this email has no searches yet, push the search
+
         if (find_cursor.searches.length == 0) {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
             var find_cursor = await user_collection.findOne({ email: profile_email })
@@ -175,7 +180,7 @@ app.post("/match/searches", async (req, res) => {
                     return
                 }
                 
-                // if we need to modify the search name
+                // if we need to modify the search name, identify by search_id
                 else if (find_cursor.searches[i].search_name == search_id) {
                     var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
                     var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
@@ -183,7 +188,6 @@ app.post("/match/searches", async (req, res) => {
                     // console.log(find_cursor)
                     console.log("Overwrote prev search")
                     res.json({ response: 'overwrote prev search' });
-                    res.end()
                     return
                 }
 
