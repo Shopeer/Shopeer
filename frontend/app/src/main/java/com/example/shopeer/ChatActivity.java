@@ -193,6 +193,7 @@ public class ChatActivity extends AppCompatActivity {
                     public void onResponse(JSONArray response) {
                         try{
                             if (response.length() == 0) {return;}
+                            messagesList.clear();
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject obj = response.getJSONObject(i);
                                 Date date = new Date();
