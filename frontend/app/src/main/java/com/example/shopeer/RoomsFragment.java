@@ -12,7 +12,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +35,8 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
     final static String TAG = "RoomsFragment";
     RecyclerView recyclerView;
     private ArrayList<RoomObject> roomList;
+
+    private final String roomsUrl = "http://20.230.148.126:8080/chat/room/all?email=" + MainActivity.email;
 
 
     public RoomsFragment() {
@@ -52,23 +66,71 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_rooms, container, false);
 
-        // fetch data of peers and add to peerList
         roomList = new ArrayList<>();
-        for (int i=0; i < 20; i++) {
-            String name = "Peer Number " + i;
-            roomList.add(new RoomObject(i, name,
-                    "Last Message sent by this peer",
-                    "00:00",
-                    R.drawable.temp_profile));
-        }
+        // fetch data of peers and add to peerList
+        fetchAllRooms();
+        Log.d(TAG, roomList.toString());
 
-        // initialize recycler view
-        recyclerView = v.findViewById(R.id.recyclerView);
-        RoomRecyclerAdapter recyclerAdapter = new RoomRecyclerAdapter(roomList, this);
-        recyclerView.setAdapter(recyclerAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+//        // initialize recycler view
+//        recyclerView = v.findViewById(R.id.recyclerView);
+//        RoomRecyclerAdapter recyclerAdapter = new RoomRecyclerAdapter(roomList, this);
+//        recyclerView.setAdapter(recyclerAdapter);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+
+//        for (int i=0; i < 20; i++) {
+//            String name = "Peer Number " + i;
+//            roomList.add(new RoomObject(i, name,
+//                    "Last Message sent by this peer",
+//                    "00:00",
+//                    R.drawable.temp_profile));
+//        }
 
         return v;
+    }
+
+    private void fetchAllRooms() {
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
+                (Request.Method.GET,
+                        roomsUrl, null,
+                        new Response.Listener<JSONArray>() {
+                            @Override
+                            public void onResponse(JSONArray response) {
+                                try{
+                                    for (int i = 0; i < response.length(); i++) {
+                                        JSONObject obj = response.getJSONObject(i);
+                                        String name = obj.getString("name");
+                                        String roomId = obj.getString("_id");
+
+                                        JSONArray chatHist = obj.getJSONArray("chathistory");
+//                                        Log.d(TAG, chatHist.length() + " " + chatHist.toString());
+                                        String lastMessage = "Say Hi!";
+                                        String timeLM = "";
+                                        if (chatHist.length() >0) {
+                                            JSONObject lastMessageObj = chatHist.getJSONObject(chatHist.length() -1);
+                                            lastMessage = lastMessageObj.getString("text");
+                                            timeLM = lastMessageObj.getString("time");
+                                        }
+                                        roomList.add(new RoomObject(roomId, name, lastMessage, timeLM, R.drawable.temp_profile));
+                                    }
+                                    Log.d(TAG, "received rooms");
+                                    // initialize recycler view
+                                    recyclerView = getView().findViewById(R.id.recyclerView);
+                                    RoomRecyclerAdapter recyclerAdapter = new RoomRecyclerAdapter(roomList, RoomsFragment.this);
+                                    recyclerView.setAdapter(recyclerAdapter);
+                                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, "get rooms: " + error.toString());
+                    }
+                });
+        requestQueue.add(jsonArrayRequest);
     }
 
     @Override
