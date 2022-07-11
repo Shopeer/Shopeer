@@ -154,75 +154,36 @@ app.post("/match/searches", async (req, res) => {
         if (find_cursor == null) {
             res.status(400).json({ response: 'User not found' })
             return
-            
         }
-        // console.log(find_cursor)
-        // res.status(200).send("ok")
-        // console.log(find_cursor.searches.length)
 
         // if this email has no searches yet, push the search
-
         if (find_cursor.searches.length == 0) {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
             var find_cursor = await user_collection.findOne({ email: profile_email })
             res.json({ response: 'first search added!' });
             return
-        } else {
+        } 
 
-            // if this email has made searches, 
-            // --- overwrite duplicate
-            for (let i = 0; i < find_cursor.searches.length; i++) {
-
-                // if the search already exists
-                if (find_cursor.searches[i].search_name == newsearchname) {
-                    res.json({ response: 'search already exists' });
-            
-                    return
-                }
-                
-                // if we need to modify the search name, identify by search_id
-                else if (find_cursor.searches[i].search_name == search_id) {
-                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
-                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-                    var find_cursor = await user_collection.findOne({ email: profile_email })
-                    // console.log(find_cursor)
-                    console.log("Overwrote prev search")
-                    res.json({ response: 'overwrote prev search' });
-                    return
-                }
-
-                //  else {
-                //     var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-                //     // var find_cursor = await user_collection.findOne({ email: profile_email })
-                //     console.log(debug_res)
-                //     res.status(200).send("find_cursor")
-                //     break
-                // }
+        // otherwise, check if this is an existing search, in which case overwrite it:
+        for (let i = 0; i < find_cursor.searches.length; i++) {
+            if (find_cursor.searches[i].search_name == search_id) {
+                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
+                var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+                var find_cursor = await user_collection.findOne({ email: profile_email })
+                // console.log(find_cursor)
+                console.log("Overwrote prev search")
+                res.json({ response: 'overwrote prev search' });
+                return
             }
-
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-            // var find_cursor = await user_collection.findOne({ email: profile_email })
-            console.log(debug_res)
-            res.json({ response: 'added new search' });
-            return
-
-
-
-
-
-            // --- deny duplicate and overwriting
-            // for (let i = 0; i < find_cursor.searches.length; i++) {
-            //     if (find_cursor.searches[i].search_name == search_object.search_name) {
-            //         console.log("Search already added")
-            //         res.status(200).send("Search already added")
-            //     } else {
-            //         var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-            //         var find_cursor = await user_collection.findOne({ email: profile_email })
-            //         res.status(200).send(find_cursor)
-            //         break
-            //     }
-            // }
         }
+
+        // otherwise, add a new search
+        var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+        // var find_cursor = await user_collection.findOne({ email: profile_email })
+        console.log(debug_res)
+        res.json({ response: 'added new search' });
+        return
+        
     }
     catch (err) {
         console.log(err)
