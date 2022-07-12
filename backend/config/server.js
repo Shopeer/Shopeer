@@ -171,8 +171,8 @@ app.post("/match/searches", async (req, res) => {
             if (find_cursor.searches[i].search_name == search_id) {
                 var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i]} })
                 var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object} })
-                console.log("replaced existing search")
-                res.json({ response: 'replaced existing search' });
+                console.log("modified existing search")
+                res.json({ response: 'modified existing search' });
                 return
             }
             // we should not allow searches with duplicate names to exist
