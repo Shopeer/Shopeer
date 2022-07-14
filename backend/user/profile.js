@@ -13,21 +13,6 @@ const mongoClient = new MongoClient(uri)
 const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
 
 
-user_profile_router.get("/test", async (req, res) => {
-    try {
-        const result_debug = await mongoClient.db("shopeer_database").collection("room_collection").find({}).toArray()
-        console.log(result_debug[0]["testkey"])
-        res.send(result_debug[0]["testkey"] + "\n");
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
-})
-
-
-
-
 // Profile Submodule
 
 // Get Profile GET https://shopeer.com/user/profile?user_id=[user_id]
