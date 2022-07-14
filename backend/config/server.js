@@ -48,12 +48,12 @@ const mssgRouter = require('../chat/message');
 app.use('/chat/message', mssgRouter)
 
 // // local vm
-// const IP = '192.168.64.15';
-// const PORT = 3000;
+const IP = '192.168.64.15';
+const PORT = 3000;
 
 // azure vm
-const IP = "20.230.148.126";
-const PORT = "8080";
+// const IP = "20.230.148.126";
+// const PORT = "8080";
 
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
