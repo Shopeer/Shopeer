@@ -21,6 +21,7 @@ user_peers_router.get("/peers", async (req, res) => {
     try {
         var array = []
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {throw "user not found"}
         for (let i = 0; i < find_cursor.peers.length; i++) {
             var return_cursor = await user_collection.findOne({ email: find_cursor.peers[i] })
             array.push(return_cursor)
@@ -41,7 +42,7 @@ user_peers_router.post("/peers", async (req, res) => {
         var find_cursor = await user_collection.findOne({ email: profile_email })
 
         if (find_cursor.peers.includes(target_peer_email)) {
-            console.log("Peer already in added")
+            console.log("This user is already a peer")
             res.status(200).send(find_cursor)
         } else {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email } })
@@ -55,6 +56,7 @@ user_peers_router.post("/peers", async (req, res) => {
         res.status(400).send(err)
     }
 })
+
 
 // Remove Peer DELETE https://shopeer.com/user/peers?peer_id=[id]
 // Deletes the peer id from the peers_id of the user in UserDatabase
@@ -74,7 +76,7 @@ user_peers_router.delete("/peers", async (req, res) => {
         } else {
             console.log("Peer already not in existence")
             var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            res.status(404).send(find_cursor)
         }
     }
     catch (err) {
@@ -114,15 +116,15 @@ user_peers_router.post("/blocked", async (req, res) => {
         var find_cursor = await user_collection.findOne({ email: profile_email })
 
         if (find_cursor.blocked.includes(target_peer_email)) {
-            console.log("Peer already in added")
-            res.status(200).send(find_cursor)
+            console.log("Peer already in blocklist")
+            res.status(409).send(find_cursor)
         } else {
             
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { blocked: target_peer_email } })
             var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            res.status(201).send(find_cursor)
         }
     }
     catch (err) {
@@ -149,7 +151,7 @@ user_peers_router.delete("/blocked", async (req, res) => {
             // res.status(200).send("Success")
         } else {
             var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            res.status(404).send(find_cursor)
             // res.status(200).send("Fail")
         }
     }
@@ -220,6 +222,7 @@ async function get_object_array_from_email_array(email_array) {
     return array
 }
 
+
 // Send Peer Invitation POST https://shopeer/match/invitations?peer_id=[id]
 // Sends an invitation to the selected peer IF user is not in peer’s Blocked_users_id. The user’s invitation is stored in peer’s “recived invitations” list in the User Collection. 
 // Param: peer id to send the invitation to
@@ -234,8 +237,8 @@ user_peers_router.post("/invitations", async (req, res) => {
             throw "Error: Invalid email"
         }
         if (find_cursor.invites.includes(target_peer_email)) {
-            console.log("Peer already in added")
-            res.status(200).send(find_cursor)
+            console.log("This user is already in the peerlist")
+            res.status(409).send(find_cursor)
         } else {
             var find_cursor = await user_collection.findOne({ email: target_peer_email })
             if (!find_cursor) {
@@ -249,7 +252,7 @@ user_peers_router.post("/invitations", async (req, res) => {
                 var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { received_invites: target_peer_email } })
                 var debug_res = await user_collection.updateOne({ email: target_peer_email }, { $pull: { received_invites: profile_email } })
 
-                res.status(200).send("Success, both are now peers")
+                res.status(201).send("Success, both are now peers")
             } else {
                 var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { invites: target_peer_email } })
                 var debug_res = await user_collection.updateOne({ email: target_peer_email }, { $push: { received_invites: profile_email } })
@@ -277,7 +280,7 @@ user_peers_router.delete("/invitations", async (req, res) => {
             // res.status(200).send("Success")
         } else {
             var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            res.status(404).send(find_cursor)
             // res.status(200).send("Fail")
         }
     }

@@ -73,16 +73,18 @@ user_profile_router.put("/profile", async (req, res) => {
 // Response: user_id
 
 user_profile_router.post("/registration", async (req, res) => {
-    var profile = req.query
+    var profile = req.query 
     try {
         profile_email = req.query.email
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor) {
-            res.status(200).send("User already exists")
+            // 409 conflict
+            res.status(409).send("User already exists")
         } else {
             var user_object = create_user_object(profile)
             var result_debug = await user_collection.insertOne(user_object)
-            res.status(200).send(user_object)
+            // 201 success following post request
+            res.status(201).send(user_object)
         }
 
     } catch (err) {
@@ -122,7 +124,7 @@ user_profile_router.delete("/registration", async (req, res) => {
         if (delete_return.deletedCount == 1) {
             res.status(200).send("User deleted")
         } else {
-            res.status(200).send("User does not exist")
+            res.status(404).send("User does not exist")
         }
     } catch (err) {
         console.log(err)
