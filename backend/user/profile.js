@@ -12,6 +12,7 @@ const mongoClient = new MongoClient(uri)
 
 const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
 
+
 // Profile Submodule
 
 // Get Profile GET https://shopeer.com/user/profile?user_id=[user_id]
@@ -74,6 +75,7 @@ user_profile_router.put("/profile", async (req, res) => {
 
 user_profile_router.post("/registration", async (req, res) => {
     var profile = req.query
+    console.log(profile)
     try {
         profile_email = req.query.email
         var find_cursor = await user_collection.findOne({ email: profile_email })
@@ -139,8 +141,8 @@ user_profile_router.delete("/registration", async (req, res) => {
 user_profile_router.put("/registration/FCM", async (req, res) => {
     try {
         var doc = await mongoClient.db("shopeer_database").collection("user_collection").updateOne(
-            {email:req.query.email}, 
-            {$set:{FCM_token:req.body.FCM_token}}
+            { email: req.query.email },
+            { $set: { FCM_token: req.body.FCM_token } }
         )
         if (doc.matchedCount == 0) {
             res.status(200).send("\nThis user does not exist yet.\n")

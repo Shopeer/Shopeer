@@ -48,12 +48,12 @@ const mssgRouter = require('../chat/message');
 app.use('/chat/message', mssgRouter)
 
 // // local vm
-// const IP = '192.168.64.15';
-// const PORT = 3000;
+const IP = '192.168.64.15';
+const PORT = 3000;
 
 // azure vm
-const IP = "20.230.148.126";
-const PORT = "8080";
+// const IP = "20.230.148.126";
+// const PORT = "8080";
 
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
@@ -154,75 +154,52 @@ app.post("/match/searches", async (req, res) => {
         if (find_cursor == null) {
             res.status(400).json({ response: 'User not found' })
             return
-            
         }
-        // console.log(find_cursor)
-        // res.status(200).send("ok")
-        // console.log(find_cursor.searches.length)
 
         // if this email has no searches yet, push the search
-
         if (find_cursor.searches.length == 0) {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
             var find_cursor = await user_collection.findOne({ email: profile_email })
             res.json({ response: 'first search added!' });
+            console.log("um")
             return
-        } else {
+        } 
 
-            // if this email has made searches, 
-            // --- overwrite duplicate
-            for (let i = 0; i < find_cursor.searches.length; i++) {
-
-                // if the search already exists
-                if (find_cursor.searches[i].search_name == newsearchname) {
-                    res.json({ response: 'search already exists' });
-            
-                    return
-                }
-                
-                // if we need to modify the search name, identify by search_id
-                else if (find_cursor.searches[i].search_name == search_id) {
-                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
-                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-                    var find_cursor = await user_collection.findOne({ email: profile_email })
-                    // console.log(find_cursor)
-                    console.log("Overwrote prev search")
-                    res.json({ response: 'overwrote prev search' });
-                    return
-                }
-
-                //  else {
-                //     var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-                //     // var find_cursor = await user_collection.findOne({ email: profile_email })
-                //     console.log(debug_res)
-                //     res.status(200).send("find_cursor")
-                //     break
-                // }
+        // otherwise, check if this is an existing search, in which case overwrite it:
+        for (let i = 0; i < find_cursor.searches.length; i++) {
+            // update the searchname
+            if (find_cursor.searches[i].search_name == search_id) {
+                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i]} })
+                var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object} })
+                console.log("modified existing search")
+                res.json({ response: 'modified existing search' });
+                return
             }
+            // we should not allow searches with duplicate names to exist
+            else if (find_cursor.searches[i].search_name == newsearchname) {
+                res.json({ response: 'this search already exists!' });
+                return
+            }
+        }
 
+        // search_id in the parameters indicates whether or not we are expecting to find a match
+        // if search_id exists, we expect a match
+        // if search_id is null, we add a new search
+        if (search_id==null) {
+            // otherwise, add a new search
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
             // var find_cursor = await user_collection.findOne({ email: profile_email })
             console.log(debug_res)
             res.json({ response: 'added new search' });
-            return
 
+        } else {
+            res.json({ response: 'search not found' });
 
-
-
-
-            // --- deny duplicate and overwriting
-            // for (let i = 0; i < find_cursor.searches.length; i++) {
-            //     if (find_cursor.searches[i].search_name == search_object.search_name) {
-            //         console.log("Search already added")
-            //         res.status(200).send("Search already added")
-            //     } else {
-            //         var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-            //         var find_cursor = await user_collection.findOne({ email: profile_email })
-            //         res.status(200).send(find_cursor)
-            //         break
-            //     }
-            // }
         }
+
+       
+       
+        
     }
     catch (err) {
         console.log(err)
@@ -240,6 +217,18 @@ function create_search_object(body) {
     }
     return ret_object
 }
+
+// this function probably not really necessary
+// function is_equal(body1, body2) {
+//     if (body1.search_name.equals(body2.search_name) &&
+//         body1.activity.equals(body2.activity) &&
+//         body1.location.equals(body2.location) &&
+//         body1.max_range.equals(body2.max_range) &&
+//         body1.max_budget.equals(body2.max_budget) ) {
+//             return true
+//         }
+//     return false
+// }
 
 
 // Delete active search DELETE https://shopeer.com/match/searches?search_id=[id]
