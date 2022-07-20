@@ -5,15 +5,11 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +22,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -39,7 +34,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
@@ -49,9 +43,7 @@ public class ChatActivity extends AppCompatActivity {
     androidx.appcompat.widget.Toolbar chatToolbar;
     ImageView roomPictureImageView;
     TextView roomNameTextView;
-    private String enteredMessage;
     Intent intent;
-    String senderEmail;
     String roomId;
     String roomName;
 
@@ -123,7 +115,7 @@ public class ChatActivity extends AppCompatActivity {
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                enteredMessage = messageInput.getText().toString();
+                String enteredMessage = messageInput.getText().toString();
                 if(!enteredMessage.isEmpty()) {
                     Date date = new Date();
                     currenttime = simpleDateFormat.format(calendar.getTime());
@@ -232,33 +224,4 @@ public class ChatActivity extends AppCompatActivity {
         super.onStop();
         chatRecyclerAdapter.notifyDataSetChanged();
     }
-
-    //register your activity onResume()
-    @Override
-    public void onResume() {
-        super.onResume();
-        this.registerReceiver(mMessageReceiver, new IntentFilter(TAG));
-    }
-
-    //Must unregister onPause()
-    @Override
-    protected void onPause() {
-        super.onPause();
-        this.unregisterReceiver(mMessageReceiver);
-    }
-
-
-    //This is the handler that will manager to process the broadcast intent
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Extract data included in the Intent
-            String message = intent.getStringExtra("message");
-
-           // refresh chatview
-            chatRecyclerAdapter.notifyDataSetChanged();
-            recyclerView.smoothScrollToPosition(messagesList.size()-1);
-
-        }
-    };
 }

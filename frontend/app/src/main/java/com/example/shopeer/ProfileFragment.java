@@ -1,10 +1,8 @@
 package com.example.shopeer;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -13,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -32,9 +29,11 @@ import org.json.JSONObject;
  */
 public class ProfileFragment extends Fragment {
     final static String TAG = "ProfileFragment"; // good practice for debugging
-    private TextView profileName, profileBio;
-    private CardView profilePicCard;
-    private ImageView profilePic, cameraButton, editButton;
+    private TextView profileName;
+    private TextView profileBio;
+    private ImageView profilePic;
+//    private ImageView cameraButton;
+    private ImageView editButton;
 
     final private String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
 
@@ -74,8 +73,7 @@ public class ProfileFragment extends Fragment {
         profileName = v.findViewById(R.id.profileName_textView);
         profileBio = v.findViewById(R.id.profileBio_textView);
         profilePic = v.findViewById(R.id.profilePic_imageView);
-        profilePicCard = v.findViewById(R.id.cardView);
-        cameraButton = v.findViewById(R.id.camera_imageView);
+//        cameraButton = v.findViewById(R.id.camera_imageView);
         editButton = v.findViewById(R.id.edit_imageView);
     }
 
@@ -120,7 +118,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Editing profile info");
-                Intent intent = new Intent(getContext(), updateProfileActivity.class);
+                Intent intent = new Intent(getContext(), UpdateProfileActivity.class);
                 startActivity(intent);
             }
         });
