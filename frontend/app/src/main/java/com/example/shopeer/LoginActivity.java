@@ -3,7 +3,6 @@ package com.example.shopeer;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -58,7 +57,10 @@ public class LoginActivity extends AppCompatActivity {
 
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        setButtons();
+    }
 
+    public void setButtons() {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
                 register = true;
             }
         });
-
     }
 
     @Override
