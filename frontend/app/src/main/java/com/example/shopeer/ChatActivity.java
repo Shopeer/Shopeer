@@ -60,10 +60,7 @@ public class ChatActivity extends AppCompatActivity {
     String currenttime;
     Calendar calendar;
     SimpleDateFormat simpleDateFormat;
-
     ArrayList<ChatObject> messagesList;
-
-//    String url = "http://localhost:8081/";
     private final String roomUrl = "http://20.230.148.126:8080/chat/room/history?room_id=";
     private final String postUrl = "http://20.230.148.126:8080/chat/message?room_id=";
 
@@ -74,6 +71,16 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        init();
+        setRoomInfo();
+        setMessagesView();
+        // fetch messages from BE when there are any changes in BE
+        fetchMessageHistory(roomId);
+        setSendMessageButton();
+
+    }
+
+    private void init() {
         messageInput = findViewById(R.id.messageInput);
         sendMessageCardView = findViewById(R.id.sendMessageCardView);
         sendMessageButton = findViewById(R.id.sendMessageIcon);
@@ -83,13 +90,14 @@ public class ChatActivity extends AppCompatActivity {
         intent = getIntent();
         calendar = Calendar.getInstance();
         simpleDateFormat = new SimpleDateFormat("hh:mm a");
+    }
+
+    private void setRoomInfo() {
+        roomNameTextView.setText(roomName);
         // set senderEmail
         Bundle extras = intent.getExtras();
         roomId = extras.getString("room_id");
         roomName = extras.getString("room_name");
-
-        // populate the room name and picture
-        roomNameTextView.setText(roomName);
         int imgUri = extras.getInt("room_pic");
         if (imgUri==0) {
             Toast.makeText(getApplicationContext(), "null is received", Toast.LENGTH_SHORT).show();
@@ -98,9 +106,10 @@ public class ChatActivity extends AppCompatActivity {
             roomPictureImageView.setImageResource(R.drawable.temp_profile);
 //            Picasso.get().load(imgUri).into(roomPictureImageView);
         }
+    }
 
+    private void setMessagesView() {
         messagesList = new ArrayList<>();
-
         // initialize recycler view
         recyclerView = findViewById(R.id.chat_recyclerView);
         chatRecyclerAdapter = new ChatRecyclerAdapter(messagesList);
@@ -108,13 +117,9 @@ public class ChatActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
+    }
 
-        // fetch messages from BE when get notification from FCM
-        // Get notification from FCM
-        // if true:
-        fetchMessageHistory(roomId);
-
-        // set up "send message" button
+    private void setSendMessageButton() {
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,17 +128,14 @@ public class ChatActivity extends AppCompatActivity {
                     Date date = new Date();
                     currenttime = simpleDateFormat.format(calendar.getTime());
                     ChatObject newMessage = new ChatObject(enteredMessage, MainActivity.email, date.getTime(), currenttime);
-
-                    // send the message object to BE
                     Log.d(TAG, "sending message");
+                    // send the message object to BE
                     postNewMessage(newMessage, roomId);
-
-
                     messageInput.setText(null);
                 }
             }
         });
-    } // end of oncreate
+    }
 
     private void postNewMessage(ChatObject newMessage, String room_id) {
         try {
@@ -251,7 +253,6 @@ public class ChatActivity extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             // Extract data included in the Intent
             String message = intent.getStringExtra("message");
 
