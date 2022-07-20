@@ -152,7 +152,7 @@ app.post("/match/searches", async (req, res) => {
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor == null) {
-            res.status(400).json({ response: 'User not found' })
+            res.status(404).json({ response: 'User not found' })
             return
         }
 
@@ -160,8 +160,7 @@ app.post("/match/searches", async (req, res) => {
         if (find_cursor.searches.length == 0) {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
             var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.json({ response: 'first search added!' });
-            console.log("um")
+            res.status(201).json({ response: 'first search added!' });
             return
         } 
 
@@ -171,13 +170,13 @@ app.post("/match/searches", async (req, res) => {
             if (find_cursor.searches[i].search_name == search_id) {
                 var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i]} })
                 var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object} })
-                console.log("modified existing search")
-                res.json({ response: 'modified existing search' });
+                console.log("replaced existing search")
+                res.status(200).json({ response: 'replaced existing search' });
                 return
             }
             // we should not allow searches with duplicate names to exist
             else if (find_cursor.searches[i].search_name == newsearchname) {
-                res.json({ response: 'this search already exists!' });
+                res.status(409).json({ response: 'this search already exists!' });
                 return
             }
         }
@@ -190,10 +189,10 @@ app.post("/match/searches", async (req, res) => {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
             // var find_cursor = await user_collection.findOne({ email: profile_email })
             console.log(debug_res)
-            res.json({ response: 'added new search' });
+            res.status(201).json({ response: 'added new search' });
 
         } else {
-            res.json({ response: 'search not found' });
+            res.status(404).json({ response: 'search not found' });
 
         }
 
@@ -242,7 +241,7 @@ app.delete("/match/searches", async (req, res) => {
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (!find_cursor) {
-            throw "Error: Invalid email"
+            res.status(404).json({ response: 'user does not exist' })
         }
         console.log(search)
         var no_match_flag = 0
@@ -250,17 +249,17 @@ app.delete("/match/searches", async (req, res) => {
             if (find_cursor.searches[i].search_name == search) {
                 var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: {search_name: search} } })
                 // var find_cursor = await user_collection.findOne({ email: profile_email })
-                res.json({ response: 'removed search' })
+                res.status(200).json({ response: 'removed search' })
                 no_match_flag = 1
-                break
+                return
             }
         }
-        if (!no_match_flag) {
+        if (no_match_flag==0) {
             // var debug_res = await user_collection.updateOne({email:profile_email},{ $pull: { searches: { $match: search } } } )
             //var find_cursor = await user_collection.findOne({ email: profile_email })
             console.log("Search not in existence")
             //res.status(200).send(find_cursor)
-            res.json({ response: 'search not found' })
+            res.status(404).json({ response: 'search not found' })
         }
     }
     catch (err) {
