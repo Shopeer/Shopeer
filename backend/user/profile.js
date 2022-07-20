@@ -24,6 +24,10 @@ user_profile_router.get("/profile", async (req, res) => {
     var profile_email = req.query.email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
         res.status(200).send(find_cursor)
     }
     catch (err) {
@@ -46,6 +50,11 @@ user_profile_router.put("/profile", async (req, res) => {
 
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
+        res.status(200).send(find_cursor)
         if (profile_name) {
             var find_cursor = await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
         }
@@ -82,6 +91,10 @@ user_profile_router.post("/registration", async (req, res) => {
         } else {
             var user_object = create_user_object(profile)
             var result_debug = await user_collection.insertOne(user_object)
+            if (!result_debug) {
+                res.status(400).json({response: "Failed to register user."})
+                return
+            }
             res.status(200).send(user_object)
         }
 
@@ -119,10 +132,14 @@ user_profile_router.delete("/registration", async (req, res) => {
     try {
         // var find_cursor = await user_collection.find({email:profile_email})
         var delete_return = await user_collection.deleteOne({ email: profile_email })
-        if (delete_return.deletedCount == 1) {
+        if (!delete_return) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
+        if (delete_return.deletedCount > 0) {
             res.status(200).send("User deleted")
         } else {
-            res.status(200).send("User does not exist")
+            res.status(404).send("User does not exist")
         }
     } catch (err) {
         console.log(err)
