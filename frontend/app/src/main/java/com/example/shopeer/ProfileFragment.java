@@ -1,10 +1,8 @@
 package com.example.shopeer;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -13,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -121,7 +118,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Editing profile info");
-                Intent intent = new Intent(getContext(), updateProfileActivity.class);
+                Intent intent = new Intent(getContext(), UpdateProfileActivity.class);
                 startActivity(intent);
             }
         });

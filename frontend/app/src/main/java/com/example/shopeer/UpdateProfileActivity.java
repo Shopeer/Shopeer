@@ -20,9 +20,10 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class updateProfileActivity extends AppCompatActivity {
-    private static final String TAG = "updateProfileActivity";
-    private EditText nameInput, bioInput;
+public class UpdateProfileActivity extends AppCompatActivity {
+    private static final String TAG = "UpdateProfileActivity";
+    private EditText nameInput;
+    private EditText bioInput;
     private ImageView profilePic;
     private Button updateButton;
 
@@ -56,12 +57,12 @@ public class updateProfileActivity extends AppCompatActivity {
                         "&description=" + enteredBio;
                 Log.d(TAG, "onClick: " + url);
                 try {
-                    RequestQueue requestQueue = Volley.newRequestQueue(updateProfileActivity.this);
+                    RequestQueue requestQueue = Volley.newRequestQueue(UpdateProfileActivity.this);
                     StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             Log.d(TAG, "update profile " + response);
-                            Intent intent = new Intent(updateProfileActivity.this, MainActivity.class);
+                            Intent intent = new Intent(UpdateProfileActivity.this, MainActivity.class);
                             intent.putExtra("email", MainActivity.email);
                             intent.putExtra("register", "yes");
                             startActivity(intent);
