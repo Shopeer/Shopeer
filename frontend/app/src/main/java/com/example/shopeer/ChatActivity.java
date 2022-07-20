@@ -139,11 +139,10 @@ public class ChatActivity extends AppCompatActivity {
 
     private void postNewMessage(ChatObject newMessage, String room_id) {
         try {
-            Log.d(TAG, "postNewMessage: " + MyFirebaseMessagingService.getToken(this));
+            Log.d(TAG, "postNewMessage");
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             String url = postUrl + room_id;
             JSONObject jsonBody = new JSONObject();
-            jsonBody.put("FCM_token", MyFirebaseMessagingService.getToken(this));
             jsonBody.put("email", newMessage.getSenderEmail());
             jsonBody.put("text", newMessage.getText());
             jsonBody.put("time", newMessage.getCurrenttime());
