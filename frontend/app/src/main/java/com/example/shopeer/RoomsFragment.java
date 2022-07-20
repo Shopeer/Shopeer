@@ -65,27 +65,10 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_rooms, container, false);
-
         roomList = new ArrayList<>();
         // fetch data of peers and add to peerList
         fetchAllRooms();
         Log.d(TAG, roomList.toString());
-
-//        // initialize recycler view
-//        recyclerView = v.findViewById(R.id.recyclerView);
-//        RoomRecyclerAdapter recyclerAdapter = new RoomRecyclerAdapter(roomList, this);
-//        recyclerView.setAdapter(recyclerAdapter);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-
-//        for (int i=0; i < 20; i++) {
-//            String name = "Peer Number " + i;
-//            roomList.add(new RoomObject(i, name,
-//                    "Last Message sent by this peer",
-//                    "00:00",
-//                    R.drawable.temp_profile));
-//        }
-
         return v;
     }
 
@@ -104,7 +87,6 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                                         String roomId = obj.getString("_id");
 
                                         JSONArray chatHist = obj.getJSONArray("chathistory");
-//                                        Log.d(TAG, chatHist.length() + " " + chatHist.toString());
                                         String lastMessage = "Say Hi!";
                                         String timeLM = "";
                                         if (chatHist.length() >0) {
