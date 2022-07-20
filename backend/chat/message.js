@@ -56,7 +56,7 @@ router.post("/", async (req, res) => {
             res.status(404).json({response: "Room not found."})
             return
         }
-        if (doc.upsertedCount == 1) {
+        if (doc.upsertedCount === 1) {
             res.status(201).json({response: "Message successfully posted."})
 
         } 

@@ -81,9 +81,9 @@ router.put("/", async (req, res) => {
             {_id: ObjectId(req.query.room_id)},
             {$addToSet: {"peerslist": req.body.email}}
         )
-        if (doc.matchedCount == 0) {
+        if (doc.matchedCount === 0) {
             res.status(200).send("\nCould not find this room.\n")
-        } else if (doc.modifiedCount == 0) {
+        } else if (doc.modifiedCount === 0) {
             res.status(200).send("\n" + req.body.email + " is already a member of this room\n")
         } else {
             res.status(200).send("\n" + req.body.email + " added to room\n")
@@ -107,7 +107,7 @@ router.delete("/remove_user", async (req, res) => {
             {_id: ObjectId(req.query.room_id)},
             {$pull: {"peerslist": req.body.email}}
         )
-        if (doc.matchedCount == 0) {
+        if (doc.matchedCount === 0) {
             res.status(200).send("\nCould not find this room.\n")
         } else if (doc.modifiedCount == 0) {
             res.status(200).send("\n" + req.body.email + " is not a member of this room\n")
@@ -144,7 +144,7 @@ router.post("/", async (req, res) => {
             res.status(404).json({response: "Room not found."})
             return
         }
-        if (doc.insertedCount == 1) {
+        if (doc.insertedCount === 1) {
             res.status(201).send(doc)
 
         } 
