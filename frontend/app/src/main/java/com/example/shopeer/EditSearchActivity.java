@@ -75,7 +75,7 @@ public class EditSearchActivity extends AppCompatActivity {
         // init the SDK
         Places.initialize(getApplicationContext(), API_KEY);
 
-        PlacesClient placesClient = Places.createClient(this);
+        Places.createClient(this);
 
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
@@ -231,8 +231,9 @@ public class EditSearchActivity extends AppCompatActivity {
 
                 String nameInput = searchName.getText().toString();
 
-                //TODO: update this location stuff
-                String locationInput = searchLocation.getText().toString();
+                // TODO: integrate locationInput functionality later
+                // String locationInput = searchLocation.getText().toString();
+
                 double latInput = locationLat;
                 double lonInput = locationLon;
 
