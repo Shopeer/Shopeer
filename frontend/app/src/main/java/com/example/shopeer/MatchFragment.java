@@ -1,17 +1,14 @@
 package com.example.shopeer;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,27 +34,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class MatchFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     final static String TAG = "MatchFragment";
@@ -279,7 +257,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
     // OnItemSelectedListener interface
     @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {}
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        // required to implement OnItemSelectedListener interface
+    }
 
     class ProfileCardRA extends RecyclerView.Adapter<ProfileCardRA.ProfileCardVH> {
         ArrayList<ProfileObject> data;
@@ -297,47 +277,47 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         @Override
         public void onBindViewHolder(@NonNull ProfileCardVH holder, int position) {
-            ProfileObject po = data.get(position);
-            holder.peerName.setText(po.getEmail());
+            ProfileObject profileObject = data.get(position);
+            holder.peerName.setText(profileObject.getEmail());
 
             // setup button onClick handlers
             holder.blockButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    blockPeer(po, holder);
+                    blockPeer(profileObject, holder);
                 }
             });
 
             holder.friendButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    invitePeer(po, holder);
+                    invitePeer(profileObject, holder);
                 }
             });
 
             holder.unfriendButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    deleteInvite(po, holder);
+                    deleteInvite(profileObject, holder);
                 }
             });
 
             holder.acceptButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    acceptInvite(po, holder);
+                    acceptInvite(profileObject, holder);
                 }
             });
 
             holder.declineButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    declineInvite(po, holder);
+                    declineInvite(holder);
                 }
             });
 
             // set default button visibility
-            setButtonVisibility(po, holder);
+            setButtonVisibility(profileObject, holder);
         }
 
         private void setButtonVisibility(ProfileObject peer, ProfileCardVH holder) {
@@ -431,7 +411,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             }
         }
 
-        private void declineInvite(ProfileObject po, ProfileCardVH holder) {
+        private void declineInvite(ProfileCardVH holder) {
             data.remove(holder.getBindingAdapterPosition()); // pass by ref, this.suggestions also udpated
             notifyItemRemoved(holder.getBindingAdapterPosition());
             notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
