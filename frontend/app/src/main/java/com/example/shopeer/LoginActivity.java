@@ -109,6 +109,10 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    private void signOut() {
+        mGoogleSignInClient.signOut();
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -163,6 +167,8 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG, "onErrorResponse register: " + error.toString());
+                    signOut();
+
                 }
             }) {
                 @Override
@@ -211,6 +217,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG, "onErrorResponse login: " + error.toString());
+                    signOut();
                 }
             });
             requestQueue.add(stringRequest);
