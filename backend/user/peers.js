@@ -21,10 +21,14 @@ user_peers_router.get("/peers", async (req, res) => {
     try {
         var array = []
         var find_cursor = await user_collection.findOne({ email: profile_email })
+<<<<<<< HEAD
         if (!find_cursor) { 
             res.status(404).json({response: 'user does not exist'})
             return 
         }
+=======
+        if (!find_cursor) {throw "user not found"}
+>>>>>>> f9efd7f8ec611b93203351eb51a6bd7308f57a75
         for (let i = 0; i < find_cursor.peers.length; i++) {
             var return_cursor = await user_collection.findOne({ email: find_cursor.peers[i] })
             array.push(return_cursor)
