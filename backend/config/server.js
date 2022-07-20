@@ -1,6 +1,6 @@
-const http = require('http');
+require('http');
 var express = require("express")
-const { IPv4 } = require("ipaddr.js")
+// const { IPv4 } = require("ipaddr.js")
 const app = express()
 
 
@@ -74,7 +74,7 @@ app.get("/test", async (req, res) => {
 
 app.get("/server_ip", async (req, res) => {
   try {
-      server.address().address
+      var IP = server.address().address
       // res.status(400).send("Server IP: " + IP + "\n")
       res.send(IP)
   }
@@ -176,9 +176,8 @@ app.post("/match/searches", async (req, res) => {
                 
                 // if we need to modify the search name, identify by search_id
                 else if (find_cursor.searches[i].search_name == search_id) {
-                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
-                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-                    var find_cursor = await user_collection.findOne({ email: profile_email })
+                    await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
+                    await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
                     // console.log(find_cursor)
                     console.log("Overwrote prev search")
                     res.status(200).json({ response: 'overwrote prev search' });
@@ -194,7 +193,7 @@ app.post("/match/searches", async (req, res) => {
                 // }
             }
 
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+            //await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
             // var find_cursor = await user_collection.findOne({ email: profile_email })
             console.log(debug_res)
             res.status(201).json({ response: 'added new search' });
