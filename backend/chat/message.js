@@ -37,11 +37,7 @@ router.post("/", async (req, res) => {
         var email = req.body.email
         var text = req.body.text
         var time = req.body.time
-        var doc = await coll.updateOne(
-            // searches for a document with the following fields
-            {_id: ObjectId(req.query.room_id)},
-            //appends an object to the "chathistory" array
-            {$push: {
+        var doc = await coll.updateOne({ _id: ObjectId(req.query.room_id) },{$push: {
                 "chathistory": 
                     {
                         mssg_id,
@@ -51,6 +47,10 @@ router.post("/", async (req, res) => {
                     }
                 }
             }
+            // searches for a document with the following fields
+            
+            //appends an object to the "chathistory" array
+            
         )
         if (!doc) {
             res.status(404).json({response: "Room not found."})
