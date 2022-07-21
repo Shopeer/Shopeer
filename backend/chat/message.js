@@ -56,10 +56,14 @@ router.post("/", async (req, res) => {
             res.status(404).json({response: "Room not found."})
             return
         }
-        if (doc.upsertedCount === 1) {
+        console.log(doc)
+        if (doc.modifiedCount === 1) {
+            console.log(await coll.findOne({_id: ObjectId(req.query.room_id)}))
             res.status(201).json({response: "Message successfully posted."})
 
-        } 
+        } else {
+            res.status(400).send("failed")
+        }
         
 
         // FCM stuff  https://www.techotopia.com/index.php?title=Sending_Firebase_Cloud_Messages_from_a_Node.js_Server&mobileaction=toggle_view_mobile

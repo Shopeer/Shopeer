@@ -109,7 +109,7 @@ router.delete("/remove_user", async (req, res) => {
         )
         if (doc.matchedCount === 0) {
             res.status(200).send("\nCould not find this room.\n")
-        } else if (doc.modifiedCount == 0) {
+        } else if (doc.modifiedCount === 0) {
             res.status(200).send("\n" + req.body.email + " is not a member of this room\n")
         } else {
             res.status(200).send("\n" + req.body.email + " removed from room\n")
