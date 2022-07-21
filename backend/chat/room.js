@@ -139,8 +139,15 @@ router.post("/", async (req, res) => {
             "peerslist": req.body.peerslist,
             "chathistory": req.body.chathistory
         })
-        console.log("\n New chatroom " + req.body.name + " created with id " + doc.insertedId)
-        res.status(200).send(doc.insertedId)
+        // console.log("\n New chatroom " + req.body.name + " created with id " + doc.insertedId)
+        if (!doc) {
+            res.status(404).json({response: "Room not found."})
+            return
+        }
+        if (doc.insertedCount == 1) {
+            res.status(201).send(doc)
+
+        } 
     } catch (err) {
         console.log(err)
         res.status(400).send(err)
@@ -180,10 +187,14 @@ router.get("/summary", async (req, res) => {
         var doc = await coll.deleteOne({
             _id: ObjectId(req.query.room_id)
         })
-        if (doc.deletedCount == 1) {
+        if (!doc) {
+            res.status(404).json({response: "Room not found."})
+            return
+        }
+        if (doc.deletedCount > 0) {
             res.status(200).send("\nRoom deleted\n")
         } else {
-            res.status(200).send("\nroom does not exist.\n")
+            res.status(400).send("\nFailed to delete room.\n")
         }
         
     } catch (err) {

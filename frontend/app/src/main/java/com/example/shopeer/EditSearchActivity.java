@@ -5,46 +5,34 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+
 
 public class EditSearchActivity extends AppCompatActivity {
     private static final String TAG = "editSearchActivity";
@@ -86,17 +74,13 @@ public class EditSearchActivity extends AppCompatActivity {
         // init the SDK
         Places.initialize(getApplicationContext(), API_KEY);
 
-        PlacesClient placesClient = Places.createClient(this);
+        Places.createClient(this);
 
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
-        // what kind of palce user will type in
-        //autocompleteFragment.setTypeFilter(TypeFilter.);
-
         // biasing to improve predictions
-        // autocompleteFragment.setLocationBias(add_bounds);
         autocompleteFragment.setCountry("CA"); // Canada
 
         // Specify the types of place data to return.
@@ -156,9 +140,9 @@ public class EditSearchActivity extends AppCompatActivity {
             else {
                 searchLocation.setText(intent.getStringExtra("locationName"));
             }
-            // TODO: for now, just make all locations as lat lon, delete this line when location name is added to backend
+            // for now, just make all locations as lat lon, delete this line when location name is added to backend
             searchLocation.setText("lat: " + this.locationLat + "\nlon: " + this.locationLon);
-            //
+
 
             distanceNumber.setText(Integer.toString(intent.getIntExtra("range", 0)));
             budgetNumber.setText(Integer.toString(intent.getIntExtra("budget", 0)));
@@ -206,63 +190,6 @@ public class EditSearchActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else {
-                    /*
-                    Log.d(TAG, "deleting a existing search " + oldSearchName);
-                    final String url = searchUrl + MainActivity.email;
-                    Log.d(TAG, "onClick: " + url);
-                    try {
-                        //TODO: make sure this works
-                        RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);
-
-                        // deleting a search needs the search name to be passed via body
-                        JSONObject search = new JSONObject();
-                        search.put("search_name", oldSearchName);
-
-                        JSONObject body = new JSONObject();
-                        body.put("search", search);
-
-                        String reqBody = "{ \"search\":\n    {\n        \"search_name\": \"test\"\n    }\n}";//body.toString();
-
-                        Log.d(TAG, "delete_search request body: " + reqBody);
-
-
-                        StringRequest jsonObjReq = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                Log.d(TAG, "delete_search response: " + response);
-                                Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
-                                intent.putExtra("email", MainActivity.email);
-                                startActivity(intent);
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.e(TAG, "onErrorResponse delete_search: " + error.toString());
-                                Toast.makeText(EditSearchActivity.this, "error: could not delete", Toast.LENGTH_LONG).show();
-                            }
-                        })
-                        {
-                            @Override
-                            public String getBodyContentType() {
-                                return "application/json; charset=utf-8";
-                            }
-                            @Override
-                            public byte[] getBody() throws AuthFailureError {
-                                try {
-                                    return reqBody == null ? null : reqBody.getBytes("utf-8");
-                                } catch (UnsupportedEncodingException uee) {
-                                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", reqBody, "utf-8");
-                                    return null;
-                                }
-                            }
-                        };
-                        requestQueue.add(jsonObjReq);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    */
-
-
                     Log.d(TAG, "deleting a existing search " + oldSearchName);
                     String url = searchUrl + MainActivity.email + "&search=" + oldSearchName;
                     Log.d(TAG, "onClick: " + url);
@@ -303,8 +230,9 @@ public class EditSearchActivity extends AppCompatActivity {
 
                 String nameInput = searchName.getText().toString();
 
-                //TODO: update this location stuff
-                String locationInput = searchLocation.getText().toString();
+                // TODO: integrate locationInput functionality later
+                // String locationInput = searchLocation.getText().toString();
+
                 double latInput = locationLat;
                 double lonInput = locationLon;
 

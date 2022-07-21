@@ -3,7 +3,6 @@ package com.example.shopeer;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -58,7 +57,10 @@ public class LoginActivity extends AppCompatActivity {
 
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        setButtons();
+    }
 
+    public void setButtons() {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
                 register = true;
             }
         });
-
     }
 
     @Override
@@ -96,8 +97,6 @@ public class LoginActivity extends AppCompatActivity {
 
             // Signed in successfully, show authenticated UI.
             updateUI(account);
-
-
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
@@ -111,6 +110,10 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    private void signOut() {
+        mGoogleSignInClient.signOut();
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -121,9 +124,6 @@ public class LoginActivity extends AppCompatActivity {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
             updateUI(account);
-            // TODO: go to main activity, pass on user info if needed
-//            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-//            startActivity(mainIntent);
         }
     }
 
@@ -131,8 +131,6 @@ public class LoginActivity extends AppCompatActivity {
     private void updateUI(GoogleSignInAccount account) {
         if (account == null) {
             Log.d(TAG, "There is no user logged in!");
-
-
         }
         else {
             // TODO:get user info and call backend to register or login
@@ -142,9 +140,6 @@ public class LoginActivity extends AppCompatActivity {
             else {
                 loginUser(account);
             }
-            // TODO: go to main activity, pass on user info if needed
-//            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-//            startActivity(mainIntent);
         }
     }
 
@@ -165,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                     mainIntent.putExtra("name", account.getDisplayName());
                     mainIntent.putExtra("email", account.getEmail());
-                    mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
+                    //mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
                     mainIntent.putExtra("register", "yes");
                     startActivity(mainIntent);
                 }
@@ -173,13 +168,14 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG, "onErrorResponse register: " + error.toString());
+                    signOut();
+
                 }
             }) {
                 @Override
                 public String getBodyContentType() {
                     return "application/json; charset=utf-8";
                 }
-
 
                 @Override
                 public byte[] getBody() throws AuthFailureError {
@@ -213,8 +209,8 @@ public class LoginActivity extends AppCompatActivity {
                         Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                         mainIntent.putExtra("name", account.getDisplayName());
                         mainIntent.putExtra("email", account.getEmail());
-                        mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
-                        Log.d(TAG, "onResponse: " + account.getPhotoUrl().toString());
+                        //mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
+                        //Log.d(TAG, "onResponse: " + account.getPhotoUrl().toString());
                         startActivity(mainIntent);
                     }
                 }
@@ -222,6 +218,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG, "onErrorResponse login: " + error.toString());
+                    signOut();
                 }
             });
             requestQueue.add(stringRequest);

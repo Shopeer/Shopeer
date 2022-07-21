@@ -74,7 +74,7 @@ app.get("/test", async (req, res) => {
 
 app.get("/server_ip", async (req, res) => {
   try {
-      var host = server.address().address
+      server.address().address
       // res.status(400).send("Server IP: " + IP + "\n")
       res.send(IP)
   }
@@ -113,18 +113,13 @@ app.get("/match/searches", async (req, res) => {
     var profile_email = req.query.email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
-
-        if (find_cursor != null) {
-            var temp_arry = await find_cursor.searches
-            console.log(temp_arry)
-            res.status(200).send(temp_arry)
-
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
         }
-        else {
-            res.status(400).json({ response: 'User not found' });
-        }
-
-        
+        var temp_arry = await find_cursor.searches
+        console.log(temp_arry)
+        res.status(200).send(temp_arry)
         
     }
     catch (err) {
@@ -152,7 +147,7 @@ app.post("/match/searches", async (req, res) => {
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor == null) {
-            res.status(400).json({ response: 'User not found' })
+            res.status(404).json({ response: 'User not found' })
             return
             
         }
@@ -165,7 +160,7 @@ app.post("/match/searches", async (req, res) => {
         if (find_cursor.searches.length == 0) {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
             var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.json({ response: 'first search added!' });
+            res.status(201).json({ response: 'first search added!' });
             return
         } else {
 
@@ -175,8 +170,7 @@ app.post("/match/searches", async (req, res) => {
 
                 // if the search already exists
                 if (find_cursor.searches[i].search_name == newsearchname) {
-                    res.json({ response: 'search already exists' });
-            
+                    res.status(409).json({ response: 'search already exists' });
                     return
                 }
                 
@@ -187,7 +181,7 @@ app.post("/match/searches", async (req, res) => {
                     var find_cursor = await user_collection.findOne({ email: profile_email })
                     // console.log(find_cursor)
                     console.log("Overwrote prev search")
-                    res.json({ response: 'overwrote prev search' });
+                    res.status(200).json({ response: 'overwrote prev search' });
                     return
                 }
 
@@ -203,7 +197,7 @@ app.post("/match/searches", async (req, res) => {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
             // var find_cursor = await user_collection.findOne({ email: profile_email })
             console.log(debug_res)
-            res.json({ response: 'added new search' });
+            res.status(201).json({ response: 'added new search' });
             return
 
 
@@ -253,17 +247,18 @@ app.delete("/match/searches", async (req, res) => {
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (!find_cursor) {
-            throw "Error: Invalid email"
+            res.status(404).json({response: "User not found."})
+            return
         }
         console.log(search)
         var no_match_flag = 0
         for (let i = 0; i < find_cursor.searches.length; i++) {
             if (find_cursor.searches[i].search_name == search) {
-                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: {search_name: search} } })
+                await user_collection.updateOne({ email: profile_email }, { $pull: { searches: {search_name: search} } })
                 // var find_cursor = await user_collection.findOne({ email: profile_email })
-                res.json({ response: 'removed search' })
+                res.status(200).json({ response: 'removed search' })
                 no_match_flag = 1
-                break
+                return
             }
         }
         if (!no_match_flag) {
@@ -271,7 +266,7 @@ app.delete("/match/searches", async (req, res) => {
             //var find_cursor = await user_collection.findOne({ email: profile_email })
             console.log("Search not in existence")
             //res.status(200).send(find_cursor)
-            res.json({ response: 'search not found' })
+            res.status(404).json({ response: 'search not found' })
         }
     }
     catch (err) {

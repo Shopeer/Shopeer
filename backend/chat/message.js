@@ -5,14 +5,14 @@ const uri = "mongodb://127.0.0.1:27017"
 const {MongoClient} = require("mongodb")
 const client = new MongoClient(uri)
 var ObjectId = require('mongodb').ObjectId;
-var admin = require("firebase-admin");
+// var admin = require("firebase-admin");
 
-var serviceAccount = require("../cpen-shopeer-firebase-adminsdk-i0ot8-ffcaa4fefb.json");
+// var serviceAccount = require("../cpen-shopeer-firebase-adminsdk-i0ot8-ffcaa4fefb.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
- // databaseURL: "<your database URL here>"
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+//  // databaseURL: "<your database URL here>"
+// });
 
 
 
@@ -33,7 +33,7 @@ const coll = client.db("shopeer_database").collection("room_collection")
 router.post("/", async (req, res) => {
     try {
         var mssgid = ObjectId();
-        var FCM_token = req.body.FCM_token
+        // var FCM_token = req.body.FCM_token
         var email = req.body.email
         var text = req.body.text
         var time = req.body.time
@@ -52,34 +52,42 @@ router.post("/", async (req, res) => {
                 }
             }
         )
+        if (!doc) {
+            res.status(404).json({response: "Room not found."})
+            return
+        }
+        if (doc.upsertedCount == 1) {
+            res.status(201).json({response: "Message successfully posted."})
+
+        } 
         
 
         // FCM stuff  https://www.techotopia.com/index.php?title=Sending_Firebase_Cloud_Messages_from_a_Node.js_Server&mobileaction=toggle_view_mobile
-        var payload = {
-            notification: {
-              title: email,
-              body: text
-            },
-            data: {
-              mssgid: mssgid,
-              time: time
-            }
-          };
-          var options = {
-            priority: "normal",
-            timeToLive: 60 * 60
-          };
+    //     var payload = {
+    //         notification: {
+    //           title: email,
+    //           body: text
+    //         },
+    //         data: {
+    //           mssgid: mssgid,
+    //           time: time
+    //         }
+    //       };
+    //       var options = {
+    //         priority: "normal",
+    //         timeToLive: 60 * 60
+    //       };
         
-          admin.messaging().sendToDevice(FCM_token, payload, options)
-          .then(function(response) {
-            console.log("Successfully sent message:", response);
-          })
-          .catch(function(error) {
-            console.log("Error sending message:", error);
-          });
-        //
-        console.log("\n mssg from " + req.body.email + " added to group chat with id " + mssgid)
-        res.status(200).send(mssgid)
+    //       admin.messaging().sendToDevice(FCM_token, payload, options)
+    //       .then(function(response) {
+    //         console.log("Successfully sent message:", response);
+    //       })
+    //       .catch(function(error) {
+    //         console.log("Error sending message:", error);
+    //       });
+    //     //
+    //     console.log("\n mssg from " + req.body.email + " added to group chat with id " + mssgid)
+    //     res.status(200).send(mssgid)
     } catch (err) {
         console.log(err)
         res.status(400).send(err)
