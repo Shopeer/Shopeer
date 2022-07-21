@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const uri = "mongodb://127.0.0.1:27017"
-const {MongoClient} = require("mongodb")
+const { MongoClient } = require("mongodb")
 const client = new MongoClient(uri)
 var ObjectId = require('mongodb').ObjectId;
 // var admin = require("firebase-admin");
@@ -37,61 +37,27 @@ router.post("/", async (req, res) => {
         var email = req.body.email
         var text = req.body.text
         var time = req.body.time
-        var doc = await coll.updateOne({ _id: ObjectId(req.query.room_id) },{$push: {
-                "chathistory": 
-                    {
-                        mssg_id,
-                        email,
-                        text,
-                        time // frontend will send as long
-                    }
+        var doc = await coll.updateOne({ _id: ObjectId(req.query.room_id) }, {
+            // searches for a document with the following fields
+            //appends an object to the "chathistory" array
+            $push: {
+                "chathistory": {
+                    mssg_id, email, text, time // frontend will send as long
                 }
             }
-            // searches for a document with the following fields
-            
-            //appends an object to the "chathistory" array
-            
-        )
+        })
         if (!doc) {
-            res.status(404).json({response: "Room not found."})
+            res.status(404).json({ response: "Room not found." })
             return
         }
         console.log(doc)
         if (doc.modifiedCount === 1) {
-            console.log(await coll.findOne({_id: ObjectId(req.query.room_id)}))
-            res.status(201).json({response: "Message successfully posted."})
+            console.log(await coll.findOne({ _id: ObjectId(req.query.room_id) }))
+            res.status(201).json({ response: "Message successfully posted." })
 
         } else {
             res.status(400).send("failed")
         }
-        
-
-        // FCM stuff  https://www.techotopia.com/index.php?title=Sending_Firebase_Cloud_Messages_from_a_Node.js_Server&mobileaction=toggle_view_mobile
-    //     var payload = {
-    //         notification: {
-    //           title: email,
-    //           body: text
-    //         },
-    //         data: {
-    //           mssgid: mssgid,
-    //           time: time
-    //         }
-    //       };
-    //       var options = {
-    //         priority: "normal",
-    //         timeToLive: 60 * 60
-    //       };
-        
-    //       admin.messaging().sendToDevice(FCM_token, payload, options)
-    //       .then(function(response) {
-    //         console.log("Successfully sent message:", response);
-    //       })
-    //       .catch(function(error) {
-    //         console.log("Error sending message:", error);
-    //       });
-    //     //
-    //     console.log("\n mssg from " + req.body.email + " added to group chat with id " + mssgid)
-    //     res.status(200).send(mssgid)
     } catch (err) {
         console.log(err)
         res.status(400).send(err)
