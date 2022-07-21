@@ -23,12 +23,7 @@ const coll = client.db("shopeer_database").collection("room_collection");
 router.get("/all", async (req, res) => {
   try {var roomsCursor = coll.find({peerslist: { $in: [req.query.email] },});
     roomArr = [];
-    await roomsCursor.forEach(
-      (getRooms = (room) => {
-        // roomArr.push(room._id)
-        roomArr.push(room);
-      })
-    );
+    await roomsCursor.forEach((getRooms = (room) => {roomArr.push(room);}));
 
     res.status(200).send(roomArr);
   } catch (err) {
