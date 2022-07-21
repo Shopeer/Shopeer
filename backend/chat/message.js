@@ -32,7 +32,7 @@ const coll = client.db("shopeer_database").collection("room_collection")
 
 router.post("/", async (req, res) => {
     try {
-        var mssgid = ObjectId();
+        var mssg_id = ObjectId();
         // var FCM_token = req.body.FCM_token
         var email = req.body.email
         var text = req.body.text
@@ -44,10 +44,10 @@ router.post("/", async (req, res) => {
             {$push: {
                 "chathistory": 
                     {
-                        "mssg_id": mssgid,
-                        "email": email,
-                        "text": text,
-                        "time": time // frontend will send as long
+                        mssg_id,
+                        email,
+                        text,
+                        time // frontend will send as long
                     }
                 }
             }

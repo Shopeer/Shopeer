@@ -55,6 +55,9 @@ app.use('/chat/message', mssgRouter)
 const IP = "20.230.148.126";
 const PORT = "8080";
 
+// grace
+// const IP = "206.116.227.202";
+// const PORT = "3000";
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
@@ -74,7 +77,7 @@ app.get("/test", async (req, res) => {
 
 app.get("/server_ip", async (req, res) => {
   try {
-      var IP = server.address().address
+      server.address().address
       // res.status(400).send("Server IP: " + IP + "\n")
       res.send(IP)
   }
