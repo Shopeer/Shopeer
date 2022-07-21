@@ -1,6 +1,6 @@
-const http = require('http');
+require('http');
 var express = require("express")
-const { IPv4 } = require("ipaddr.js")
+// const { IPv4 } = require("ipaddr.js")
 const app = express()
 
 
@@ -55,54 +55,14 @@ app.use('/chat/message', mssgRouter)
 const IP = "20.230.148.126";
 const PORT = "8080";
 
+// grace
+// const IP = "206.116.227.202";
+// const PORT = "3000";
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 
-// For debug only
-app.get("/test", async (req, res) => {
-  try {
-      const result_debug = await mongoClient.db("shopeer_database").collection("room_collection").find({}).toArray()
-      console.log(result_debug[0]["testkey"])
-      res.send(result_debug[0]["testkey"] + "\n");
-  }
-  catch (err) {
-      console.log(err)
-      res.status(400).send(err)
-  }
-})
 
-app.get("/server_ip", async (req, res) => {
-  try {
-      server.address().address
-      // res.status(400).send("Server IP: " + IP + "\n")
-      res.send(IP)
-  }
-  catch (err) {
-      console.log(err)
-      res.status(400).send(err)
-  }
-})
-
-
-// let date = new Date()
-// date = date.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})
-// let local_date = new Date(date)
-// let local_time = local_date.getHours() + ":" + local_date.getMinutes() + ":" + local_date.getSeconds();
-app.get("/server_time", async (req, res) => {
-  try {
-      let date = new Date()
-      date = date.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})
-
-      let local_date = new Date(date)
-      let local_time = local_date.getHours() + ":" + local_date.getMinutes() + ":" + local_date.getSeconds();
-      res.send(local_time + "\n")
-  }
-  catch (err) {
-      console.log(err)
-      res.status(400).send(err)
-  }
-})
 
 /////////////// match requests //////////////
 // Get Active searches GET https://shopeer.com/match/searches
@@ -176,9 +136,8 @@ app.post("/match/searches", async (req, res) => {
                 
                 // if we need to modify the search name, identify by search_id
                 else if (find_cursor.searches[i].search_name == search_id) {
-                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
-                    var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-                    var find_cursor = await user_collection.findOne({ email: profile_email })
+                    await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
+                    await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
                     // console.log(find_cursor)
                     console.log("Overwrote prev search")
                     res.status(200).json({ response: 'overwrote prev search' });
@@ -194,7 +153,7 @@ app.post("/match/searches", async (req, res) => {
                 // }
             }
 
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+            //await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
             // var find_cursor = await user_collection.findOne({ email: profile_email })
             console.log(debug_res)
             res.status(201).json({ response: 'added new search' });
