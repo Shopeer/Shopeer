@@ -18,17 +18,8 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <service
-            android:name=".MyFirebaseMessagingService"
-            android:exported="false"
-            android:stopWithTask="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
         <activity
-            android:name=".updateProfileActivity"
+            android:name=".UpdateProfileActivity"
             android:exported="false" />
         <activity
             android:name=".ChatActivity"

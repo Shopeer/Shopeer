@@ -1,7 +1,5 @@
 package com.example.shopeer;
 
-import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
-    private static final String TAG = "ChatRecyclerAdapter";
     private ArrayList<ChatObject> messagesList;
     private int ITEM_SEND = 1;
     private int ITEM_RECEIVE = 2;

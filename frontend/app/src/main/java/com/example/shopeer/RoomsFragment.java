@@ -24,7 +24,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,11 +36,6 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
     private ArrayList<RoomObject> roomList;
 
     private final String roomsUrl = "http://20.230.148.126:8080/chat/room/all?email=" + MainActivity.email;
-
-
-    public RoomsFragment() {
-        // Required empty public constructor
-    }
 
     /**
      * Use this factory method to create a new instance of
