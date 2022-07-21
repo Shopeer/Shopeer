@@ -31,7 +31,7 @@ const coll = client.db("shopeer_database").collection("room_collection")
 //curl -X "POST" -H "Content-Type: application/json" -d '{"email": "nick@gmail.com", "text": "sup!", "time": "rn"}' localhost:8081/chat/message?room_id=62c4d5c76896713a30649546
 
 router.post("/", async (req, res) => {
-    try {var mssg_id = ObjectId();
+    try {var mssg_id = ObjectId()
         // var FCM_token = req.body.FCM_token
         var email = req.body.email
         var text = req.body.text
