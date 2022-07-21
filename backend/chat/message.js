@@ -38,8 +38,7 @@ router.post("/", async (req, res) => {
         var time = req.body.time
         // searches for a document with the following fields
         //appends an object to the "chathistory" array
-        var doc = await coll.updateOne({ _id: ObjectId(req.query.room_id) }, {$push: {"chathistory": {mssg_id, email, text, time}}
-        })
+        var doc = await coll.updateOne({ _id: ObjectId(req.query.room_id) }, {$push: {"chathistory": {mssg_id, email, text, time}}})
         if (!doc) {
             res.status(404).json({ response: "Room not found." })
             return
