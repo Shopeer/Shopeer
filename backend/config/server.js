@@ -64,38 +64,6 @@ const PORT = "8080";
 
 
 
-app.get("/server_ip", async (req, res) => {
-  try {
-      server.address().address
-      // res.status(400).send("Server IP: " + IP + "\n")
-      res.send(IP)
-  }
-  catch (err) {
-      console.log(err)
-      res.status(400).send(err)
-  }
-})
-
-
-// let date = new Date()
-// date = date.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})
-// let local_date = new Date(date)
-// let local_time = local_date.getHours() + ":" + local_date.getMinutes() + ":" + local_date.getSeconds();
-app.get("/server_time", async (req, res) => {
-  try {
-      let date = new Date()
-      date = date.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})
-
-      let local_date = new Date(date)
-      let local_time = local_date.getHours() + ":" + local_date.getMinutes() + ":" + local_date.getSeconds();
-      res.send(local_time + "\n")
-  }
-  catch (err) {
-      console.log(err)
-      res.status(400).send(err)
-  }
-})
-
 /////////////// match requests //////////////
 // Get Active searches GET https://shopeer.com/match/searches
 // Gets a list of all active_searches under the user from User Database
