@@ -79,8 +79,7 @@ router.get("/history", async (req, res) => {
 router.put("/", async (req, res) => {
   try {
     var doc = await coll.updateOne(
-      { _id: ObjectId(req.query.room_id) },
-      { $addToSet: { peerslist: req.body.email } }
+      { _id: ObjectId(req.query.room_id) }, { $addToSet: { peerslist: req.body.email } }
     );
     if (doc.matchedCount === 0) {
       res.status(200).send("\nCould not find this room.\n");
@@ -107,8 +106,7 @@ router.put("/", async (req, res) => {
 router.delete("/remove_user", async (req, res) => {
   try {
     var doc = await coll.updateOne(
-      { _id: ObjectId(req.query.room_id) },
-      { $pull: { peerslist: req.body.email } }
+      { _id: ObjectId(req.query.room_id) }, { $pull: { peerslist: req.body.email } }
     );
     if (doc.matchedCount === 0) {
       res.status(200).send("\nCould not find this room.\n");
