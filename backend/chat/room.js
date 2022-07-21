@@ -21,9 +21,9 @@ const coll = client.db("shopeer_database").collection("room_collection");
  */
 // curl -X "GET" -H "Content-Type: application/json" -d '{"email": "gracemyzhang@gmail.com" }' localhost:8081/chat/room/all
 router.get("/all", async (req, res) => {
-  roomArr = []
+  var roomArr = []
   try {
-    var roomsCursor = coll.find({peerslist: { $in: [req.query.email] },})
+    let roomsCursor = coll.find({peerslist: { $in: [req.query.email] },})
     await roomsCursor.forEach((getRooms = (room) => {roomArr.push(room);}))
     res.status(200).send(roomArr)
   } catch (err) {
