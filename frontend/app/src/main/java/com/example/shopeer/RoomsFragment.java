@@ -37,11 +37,6 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
 
     private final String roomsUrl = "http://20.230.148.126:8080/chat/room/all?email=" + MainActivity.email;
 
-
-    public RoomsFragment() {
-        // Required empty public constructor
-    }
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.

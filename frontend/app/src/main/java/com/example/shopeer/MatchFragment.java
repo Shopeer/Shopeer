@@ -64,10 +64,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     ArrayList<SearchObject> searches = new ArrayList<SearchObject>();
     ArrayList<ProfileObject> suggestions = new ArrayList<>();
 
-    public MatchFragment() {
-        // Required empty public constructor
-    }
-
     public static MatchFragment newInstance() {
         MatchFragment fragment = new MatchFragment();
         return fragment;

@@ -148,7 +148,7 @@ public class ChatActivity extends AppCompatActivity {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "post message error" + error.toString());
+                    Log.d(TAG, "post message error " + error.toString());
                 }
             })
             {

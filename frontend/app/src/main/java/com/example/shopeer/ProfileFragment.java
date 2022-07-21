@@ -37,10 +37,6 @@ public class ProfileFragment extends Fragment {
 
     final private String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
 
-    public ProfileFragment() {
-        // Required empty public constructor
-    }
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -63,8 +59,8 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
         init(v);
-        setUpdateProfile();
         getProfileInfo();
+        setUpdateProfile();
         return v;
     }
 
@@ -81,6 +77,7 @@ public class ProfileFragment extends Fragment {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
             String url = profileUrl + MainActivity.email;
+            Log.d(TAG, "trying to get profile info " + url);
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
