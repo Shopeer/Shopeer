@@ -59,18 +59,7 @@ const PORT = "8080";
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 
-// For debug only
-app.get("/test", async (req, res) => {
-  try {
-      const result_debug = await mongoClient.db("shopeer_database").collection("room_collection").find({}).toArray()
-      console.log(result_debug[0]["testkey"])
-      res.send(result_debug[0]["testkey"] + "\n");
-  }
-  catch (err) {
-      console.log(err)
-      res.status(400).send(err)
-  }
-})
+
 
 app.get("/server_ip", async (req, res) => {
   try {
