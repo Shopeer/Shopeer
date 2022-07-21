@@ -33,9 +33,9 @@ app.use('*', user_peers_router);
 app.use('/user', user_peers_router)
 
 
-const searches_router = require('../match/searches');
-app.use('*', searches_router);
-app.use('/match', searches_router)
+// const searches_router = require('../match/searches');
+// app.use('*', searches_router);
+// app.use('/match', searches_router)
 
 const suggestions_algo_router = require('../match/suggestions_algo.js');
 app.use('*', suggestions_algo_router);
@@ -52,7 +52,7 @@ app.use('/chat/message', mssgRouter)
 // const PORT = 3000;
 
 // azure vm
-const IP = "20.230.148.126";
+// const IP = "20.230.148.126";
 const PORT = "8080";
 
 // grace
