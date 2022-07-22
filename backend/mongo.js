@@ -1,4 +1,3 @@
-var ObjectID = require('bson-objectid');
 
 module.exports = {
   "localhost:27017": {
