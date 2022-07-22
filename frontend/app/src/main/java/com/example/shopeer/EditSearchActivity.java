@@ -50,7 +50,7 @@ public class EditSearchActivity extends AppCompatActivity {
     private static final String TAG = "editSearchActivity";
     private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
     int SERVER_TIMEOUT_MS = 1000; // num ms wait for server
-    private static final String API_KEY = "AIzaSyCbVC78h8NLcGxWfe6poNdqjQ-BvoNOB4A"; // Sally's API key for Google Places
+    private static final String API_KEY = BuildConfig.GPLACES_API_KEY;
 
     private boolean isNewSearch;
 
