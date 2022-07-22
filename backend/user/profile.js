@@ -55,18 +55,18 @@ user_profile_router.put("/profile", async (req, res) => {
         }
         res.status(200).send(find_cursor)
         if (profile_name) {
-            var find_cursor = await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
+            await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
         }
         if (profile_email) {
-            var find_cursor = await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
+            await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
         }
         if (profile_description) {
-            var find_cursor = await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
+            await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
         }
         if (profile_photo) {
-            var find_cursor = await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
+            await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
         }
-        var find_cursor = await user_collection.findOne({ email: profile_email })
+        // var find_cursor = await user_collection.findOne({ email: profile_email })
         res.status(200).send(find_cursor)
         // res.status(200).send("Success")
     }
