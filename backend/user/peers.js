@@ -85,7 +85,7 @@ user_peers_router.delete("/peers", async (req, res) => {
             res.status(200).send(debug_res)
         } else {
             console.log("Peer already not in existence")
-            var find_cursor = await user_collection.findOne({ email: profile_email })
+            // var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(404).send(find_cursor)
         }
     }
