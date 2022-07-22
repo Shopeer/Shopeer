@@ -107,13 +107,20 @@ user_peers_router.get("/blocked", async (req, res) => {
             res.status(404).json({response: "User not found."})
             return
         }
+        console.log("block list is ")
+        console.log(find_cursor.blocked)
         ret_array = await get_object_array_from_email_array(find_cursor.blocked)
-        console.log(ret_array)
+        // console.log(ret_array)
         if (!ret_array) {
             res.status(400).json({response: "Failed to get blocked list."})
             return
         }
-        res.status(200).send(ret_array)
+        if (ret_array.length > 0 ) {
+            res.status(200).send(ret_array)
+        } else {
+            res.status(404).send("could not find specified emails")
+        }
+        
     }
     catch (err) {
         console.log(err)
@@ -145,7 +152,7 @@ user_peers_router.post("/blocked", async (req, res) => {
             await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
             await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
             await user_collection.updateOne({ email: profile_email }, { $push: { blocked: target_peer_email } })
-            res.status(201).send(find_cursor)
+            res.status(201).send(await user_collection.findOne({ email: profile_email }))
         }
     }
     catch (err) {
@@ -229,6 +236,12 @@ user_peers_router.get("/invitations/received", async (req, res) => {
             res.status(400).json({response: "Failed to get received invitations."})
             return
         }
+        if (ret_array.length > 0 ) {
+            res.status(200).send(ret_array)
+        } else {
+            res.status(404).send("could not find specified emails")
+        }
+
         console.log(ret_array)
         res.status(200).send(ret_array)
     }
@@ -249,9 +262,15 @@ async function get_object_array_from_email_array(email_array) {
     //     // console.log(return_cursor)
     //     array.push(return_cursor)
     // }
-    var return_cursor = await user_collection.find({ email: { $in: email_array } })
-    console.log(return_cursor)
-    return return_cursor.toArray()
+
+    var return_arr = await user_collection.find({ email: { $in: email_array } }).toArray()
+
+    
+    console.log(return_arr)
+    if (!return_arr) {
+        throw "Error: invalid email"
+    }
+    return return_arr
 }
 
 // Send Peer Invitation POST https://shopeer/match/invitations?peer_id=[id]
