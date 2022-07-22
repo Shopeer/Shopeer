@@ -43,10 +43,11 @@ router.get("/all", async (req, res) => {
 // curl -X "GET" -H "Content-Type: application/json" -d localhost:8081/chat/room?room_id=62c4bb1ba6c3f54d76bdf6f8
 
 router.get("/history", async (req, res) => {
+  var doc = null
   try {
     // gets message history of a particular room
     // consider some form of authentication?
-    let doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
+    doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
     doc.chathistory.forEach(
       (printMssgs = (mssg) => {
         console.log("Message: " + mssg.text);
