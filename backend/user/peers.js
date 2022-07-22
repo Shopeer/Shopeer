@@ -53,7 +53,7 @@ user_peers_router.post("/peers", async (req, res) => {
             res.status(409).send(find_cursor)
         } else {
             await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email } })
-            var find_cursor = await user_collection.findOne({ email: profile_email })
+            // var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(200).send(find_cursor)
         }
 
@@ -272,10 +272,10 @@ user_peers_router.post("/invitations", async (req, res) => {
             res.status(409).send(find_cursor)
         } else {
             var find_cursor = await user_collection.findOne({ email: target_peer_email })
-            if (!find_cursor) {
-                res.status(404).json({response: "User not found."})
-                return
-            }
+            // if (!find_cursor) {
+            //     res.status(404).json({response: "User not found."})
+            //     return
+            // }
             if (find_cursor.invites.includes(profile_email)) {
                 await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email } })
                 await user_collection.updateOne({ email: target_peer_email }, { $push: { peers: profile_email } })

@@ -119,7 +119,7 @@ app.post("/match/searches", async (req, res) => {
 
         if (find_cursor.searches.length == 0) {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-            var find_cursor = await user_collection.findOne({ email: profile_email })
+            // var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(201).json({ response: 'first search added!' });
             return
         } else {

@@ -57,7 +57,7 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
         }
 
         const array = match_list
-        customSlice = array => array.slice(0, 1),
+        customSlice = array => array.slice(0, 1)
         result = array.map(customSlice);
 
         console.log(result)
