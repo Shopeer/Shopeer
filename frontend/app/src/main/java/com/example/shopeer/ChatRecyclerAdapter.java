@@ -20,6 +20,9 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
     private int ITEM_SEND = 1;
     private int ITEM_RECEIVE = 2;
 
+    TextView textViewMessage;
+    TextView messageTime;
+
     public ChatRecyclerAdapter(ArrayList<ChatObject> messagesList) {
         this.messagesList = messagesList;
     }
@@ -43,13 +46,11 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
 
         ChatObject message = messagesList.get(position);
         if(holder.getClass() == SenderViewHolder.class) {
-            SenderViewHolder viewHolder = (SenderViewHolder) holder;
-            viewHolder.textViewMessage.setText(message.getText());
-            viewHolder.messageTime.setText(message.getCurrenttime());
+            textViewMessage.setText(message.getText());
+            messageTime.setText(message.getCurrenttime());
         } else {
-            ReceivedViewHolder viewHolder = (ReceivedViewHolder) holder;
-            viewHolder.textViewMessage.setText(message.getText());
-            viewHolder.messageTime.setText(message.getCurrenttime());
+            textViewMessage.setText(message.getText());
+            messageTime.setText(message.getCurrenttime());
         }
     }
 
@@ -72,8 +73,7 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
 
     // Helper class
     public class SenderViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewMessage;
-        TextView messageTime;
+
 
         public SenderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -83,8 +83,6 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
     }
 
     public class ReceivedViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewMessage;
-        TextView messageTime;
 
         public ReceivedViewHolder(@NonNull View itemView) {
             super(itemView);
