@@ -44,6 +44,7 @@ router.get("/all", async (req, res) => {
 
 router.get("/history", async (req, res) => {
   try {
+    // gets room history
     var doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
     doc.chathistory.forEach(
       (printMssgs = (mssg) => {
