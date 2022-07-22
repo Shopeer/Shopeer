@@ -3,6 +3,9 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+def localProperties = new Properties()
+localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+
 android {
     compileSdk 32
 
@@ -14,6 +17,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "GPLACES_API_KEY",localProperties['GPLACES_API_KEY']
     }
 
     buildTypes {
