@@ -72,8 +72,9 @@ router.get("/history", async (req, res) => {
 // we could insert only the email, or insert the entire user object. For now it inserts the email.
 // curl -X "PUT" -H "Content-Type: application/json" -d '{"email": "hello@gmail.com" }' localhost:8081/chat/room?room_id=62c4d5c76896713a30649546
 router.put("/", async (req, res) => {
+  var doc = null
   try {
-    var doc = await coll.updateOne(
+    doc = await coll.updateOne(
       { _id: ObjectId(req.query.room_id) }, { $addToSet: { peerslist: req.body.email } }
     );
     if (doc.matchedCount === 0) {
@@ -99,8 +100,9 @@ router.put("/", async (req, res) => {
  */
 // curl -X "DELETE" -H "Content-Type: application/json" -d '{"email": "sally@gmail.com" }' localhost:8081/chat/room/remove_user?room_id=62c4d5c76896713a30649546
 router.delete("/remove_user", async (req, res) => {
+  var doc = null
   try {
-    var doc = await coll.updateOne(
+    doc = await coll.updateOne(
       { _id: ObjectId(req.query.room_id) }, { $pull: { peerslist: req.body.email } }
     );
     if (doc.matchedCount === 0) {
@@ -127,8 +129,9 @@ router.delete("/remove_user", async (req, res) => {
 //curl -X "POST" -H "Content-Type: application/json" -d '{"name": "anotherRoom", "peerslist": ["nick@gmail.com", "hellbb@msn.com", "grace@gmail.com"], "chathistory": [{"123213": "hey", "text": "hello world", "time": "3pm"}, {"id": "14214", "text": "my message", "time": "5pm"}] }' localhost:8081/chat/room
 //curl -X "POST" -H "Content-Type: application/json" -d '{"name": "room", "peerslist": ["nando@gmail.com","grace@gmail.com"], "chathistory": []}' localhost:8081/chat/room
 router.post("/", async (req, res) => {
+  var doc = null
   try {
-    var doc = await coll.insertOne({
+    doc = await coll.insertOne({
       name: req.body.name,
       // "picture": req.body.picture,
       peerslist: req.body.peerslist,
@@ -155,8 +158,9 @@ router.post("/", async (req, res) => {
  */
 //curl -X "GET" -H "Content-Type: application/json" -d '' localhost:8081/chat/room/summary?room_id=62c4bb1ba6c3f54d76bdf6f8
 router.get("/summary", async (req, res) => {
+  var doc = null
   try {
-    var doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
+    doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
     var roomSummary = {
       name: doc.name,
       //"picture": doc.picture,
@@ -176,8 +180,9 @@ router.get("/summary", async (req, res) => {
  */
 // curl -X "DELETE" -H "Content-Type: application/json" -d '' localhost:8081/chat/room?room_id=62c4ac94ee79eff89f8ac0bc
 router.delete("/", async (req, res) => {
+  var doc = null
   try {
-    var doc = await coll.deleteOne({
+    doc = await coll.deleteOne({
       _id: ObjectId(req.query.room_id),
     });
     if (!doc) {
