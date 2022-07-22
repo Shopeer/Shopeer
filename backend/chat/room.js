@@ -44,7 +44,8 @@ router.get("/all", async (req, res) => {
 
 router.get("/history", async (req, res) => {
   try {
-    // gets room history
+    // gets message history of a particular room
+    // consider some form of authentication?
     var doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
     doc.chathistory.forEach(
       (printMssgs = (mssg) => {
