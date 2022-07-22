@@ -1,11 +1,11 @@
-const http = require('http');
+require('http');
 var express = require("express")
-const { IPv4 } = require("ipaddr.js")
-const app = express()
+express()
 
 const user_peers_router = express.Router()
 
-const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
+// const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
+const {MongoClient} = require("mongodb")
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
@@ -21,6 +21,10 @@ user_peers_router.get("/peers", async (req, res) => {
     try {
         var array = []
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
         for (let i = 0; i < find_cursor.peers.length; i++) {
             var return_cursor = await user_collection.findOne({ email: find_cursor.peers[i] })
             array.push(return_cursor)
@@ -39,13 +43,17 @@ user_peers_router.post("/peers", async (req, res) => {
     var target_peer_email = req.query.target_peer_email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
 
         if (find_cursor.peers.includes(target_peer_email)) {
             console.log("Peer already in added")
-            res.status(200).send(find_cursor)
+            res.status(409).send(find_cursor)
         } else {
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email } })
-            var find_cursor = await user_collection.findOne({ email: profile_email })
+            await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email } })
+            // var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(200).send(find_cursor)
         }
 
@@ -66,15 +74,19 @@ user_peers_router.delete("/peers", async (req, res) => {
     var target_peer_email = req.query.target_peer_email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
 
         if (find_cursor.peers.includes(target_peer_email)) {
             var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
-            var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            // var find_cursor = await user_collection.findOne({ email: profile_email })
+            res.status(200).send(debug_res)
         } else {
             console.log("Peer already not in existence")
-            var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            // var find_cursor = await user_collection.findOne({ email: profile_email })
+            res.status(404).send(find_cursor)
         }
     }
     catch (err) {
@@ -91,9 +103,24 @@ user_peers_router.get("/blocked", async (req, res) => {
     var profile_email = req.query.email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
+        console.log("block list is ")
+        console.log(find_cursor.blocked)
         ret_array = await get_object_array_from_email_array(find_cursor.blocked)
-        console.log(ret_array)
-        res.status(200).send(ret_array)
+        // console.log(ret_array)
+        if (!ret_array) {
+            res.status(400).json({response: "Failed to get blocked list."})
+            return
+        }
+        if (ret_array.length > 0 ) {
+            res.status(200).send(ret_array)
+        } else {
+            res.status(404).send("could not find specified emails")
+        }
+        
     }
     catch (err) {
         console.log(err)
@@ -112,17 +139,20 @@ user_peers_router.post("/blocked", async (req, res) => {
     var target_peer_email = req.query.target_peer_email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
 
         if (find_cursor.blocked.includes(target_peer_email)) {
             console.log("Peer already in added")
-            res.status(200).send(find_cursor)
+            res.status(409).send(find_cursor)
         } else {
             
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { blocked: target_peer_email } })
-            var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
+            await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
+            await user_collection.updateOne({ email: profile_email }, { $push: { blocked: target_peer_email } })
+            res.status(201).send(await user_collection.findOne({ email: profile_email }))
         }
     }
     catch (err) {
@@ -141,15 +171,19 @@ user_peers_router.delete("/blocked", async (req, res) => {
     var target_peer_email = req.query.target_peer_email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
 
         if (find_cursor.blocked.includes(target_peer_email)) {
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { blocked: target_peer_email } })
-            var find_cursor = await user_collection.findOne({ email: profile_email })
+            await user_collection.updateOne({ email: profile_email }, { $pull: { blocked: target_peer_email } })
+            await user_collection.findOne({ email: profile_email })
             res.status(200).send(find_cursor)
             // res.status(200).send("Success")
         } else {
-            var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            // var find_cursor = await user_collection.findOne({ email: profile_email })
+            res.status(404).send("Target peer is not in blocklist")
             // res.status(200).send("Fail")
         }
     }
@@ -171,7 +205,8 @@ user_peers_router.get("/invitations", async (req, res) => {
         var array = []
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (!find_cursor) {
-            throw "Error: Invalid email"
+            res.status(404).json({response: "User not found."})
+            return
         }
         for (let i = 0; i < find_cursor.invites.length; i++) {
             var return_cursor = await user_collection.findOne({ email: find_cursor.invites[i] })
@@ -193,9 +228,20 @@ user_peers_router.get("/invitations/received", async (req, res) => {
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (!find_cursor) {
-            throw "Error: Invalid email"
+            res.status(404).json({response: "User not found."})
+            return
         }
         ret_array = await get_object_array_from_email_array(find_cursor.received_invites)
+        if (!ret_array) {
+            res.status(400).json({response: "Failed to get received invitations."})
+            return
+        }
+        if (ret_array.length > 0 ) {
+            res.status(200).send(ret_array)
+        } else {
+            res.status(404).send("could not find specified emails")
+        }
+
         console.log(ret_array)
         res.status(200).send(ret_array)
     }
@@ -207,17 +253,24 @@ user_peers_router.get("/invitations/received", async (req, res) => {
 
 async function get_object_array_from_email_array(email_array) {
     // console.log(email_array)
-    var array = []
-    for (let i = 0; i < email_array.length; i++) {
-        var return_cursor = await user_collection.findOne({ email: email_array[i] })
-        if (!return_cursor) {
-            throw "Error: Invalid email"
-        }
-        // console.log(return_cursor)
-        array.push(return_cursor)
+    // var array = []
+    // for (let i = 0; i < email_array.length; i++) {
+    //     var return_cursor = await user_collection.findOne({ email: email_array[i] })
+    //     if (!return_cursor) {
+    //         throw "Error: Invalid email"
+    //     }
+    //     // console.log(return_cursor)
+    //     array.push(return_cursor)
+    // }
+
+    var return_arr = await user_collection.find({ email: { $in: email_array } }).toArray()
+
+    
+    console.log(return_arr)
+    if (!return_arr) {
+        throw "Error: invalid email"
     }
-    // console.log(array)
-    return array
+    return return_arr
 }
 
 // Send Peer Invitation POST https://shopeer/match/invitations?peer_id=[id]
@@ -231,29 +284,26 @@ user_peers_router.post("/invitations", async (req, res) => {
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (!find_cursor) {
-            throw "Error: Invalid email"
+            res.status(404).json({response: "User not found."})
+            return
         }
         if (find_cursor.invites.includes(target_peer_email)) {
             console.log("Peer already in added")
-            res.status(200).send(find_cursor)
+            res.status(409).send(find_cursor)
         } else {
-            var find_cursor = await user_collection.findOne({ email: target_peer_email })
-            if (!find_cursor) {
-                throw "Error: Invalid email"
-            }
-            if (find_cursor.invites.includes(profile_email)) {
-                var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email } })
-                var debug_res = await user_collection.updateOne({ email: target_peer_email }, { $push: { peers: profile_email } })
-                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
-                var debug_res = await user_collection.updateOne({ email: target_peer_email }, { $pull: { invites: profile_email } })
-                var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { received_invites: target_peer_email } })
-                var debug_res = await user_collection.updateOne({ email: target_peer_email }, { $pull: { received_invites: profile_email } })
-
-                res.status(200).send("Success, both are now peers")
+            var target_cursor = await user_collection.findOne({ email: target_peer_email })
+            // if (!find_cursor) {
+            //     res.status(404).json({response: "User not found."})
+            //     return
+            // }
+            if (target_cursor.invites.includes(profile_email)) {
+                await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email }, $pull: { invites: target_peer_email, received_invites: target_peer_email } })
+                await user_collection.updateOne({ email: target_peer_email }, { $push: { peers: profile_email }, $pull: { invites: profile_email, received_invites: profile_email } })
+                res.status(201).send("Success, both are now peers")
             } else {
-                var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { invites: target_peer_email } })
-                var debug_res = await user_collection.updateOne({ email: target_peer_email }, { $push: { received_invites: profile_email } })
-                var find_cursor = await user_collection.findOne({ email: profile_email })
+                await user_collection.updateOne({ email: profile_email }, { $push: { invites: target_peer_email } })
+                await user_collection.updateOne({ email: target_peer_email }, { $push: { received_invites: profile_email } })
+                // var find_cursor = await user_collection.findOne({ email: profile_email })
                 res.status(200).send(find_cursor)
             }
         }
@@ -269,15 +319,19 @@ user_peers_router.delete("/invitations", async (req, res) => {
     var target_peer_email = req.query.target_peer_email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
 
         if (find_cursor.invites.includes(target_peer_email)) {
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
-            var find_cursor = await user_collection.findOne({ email: profile_email })
+            await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
+            // var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(200).send(find_cursor)
             // res.status(200).send("Success")
         } else {
-            var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            //var find_cursor = await user_collection.findOne({ email: profile_email })
+            res.status(400).send(find_cursor)
             // res.status(200).send("Fail")
         }
     }

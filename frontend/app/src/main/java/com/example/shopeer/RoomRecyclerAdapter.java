@@ -12,8 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class RoomRecyclerAdapter extends RecyclerView.Adapter<RoomRecyclerAdapter.ViewHolder> {
-    private static String TAG = "RoomRecyclerAdaper";
-
     private ArrayList<RoomObject> roomList;
     private OnRoomListener mOnRoomListener;
 

@@ -33,10 +33,10 @@ user_profile_router.get("/profile", async (req, res) => {
 // Response: success/fail
 
 user_profile_router.put("/profile", async (req, res) => {
-  var profile_email = req.query.email
-  var profile_name = req.query.name
-  var profile_description = req.query.description
-  var profile_photo = req.query.photo
+  // var profile_email = req.query.email
+  // var profile_name = req.query.name
+  // var profile_description = req.query.description
+  // var profile_photo = req.query.photo
 
   if (req.query.email == "jimothy@gmail.com") {
     res
@@ -71,21 +71,22 @@ user_profile_router.post("/registration", async (req, res) => {
   }
 })
 
-function create_user_object(body) {
-  var user_object = {
-    name: body.name,
-    email: body.email,
-    description: body.description,
-    photo: body.photo,
-    FCM_token: body.FCM_token,
-    searches: [],
-    peers: [],
-    invites: [],
-    received_invites: [],
-    blocked: []
-  }
-  return user_object
-}
+// commented out as this function is not currently used
+// function create_user_object(body) {
+//   var user_object = {
+//     name: body.name,
+//     email: body.email,
+//     description: body.description,
+//     photo: body.photo,
+//     FCM_token: body.FCM_token,
+//     searches: [],
+//     peers: [],
+//     invites: [],
+//     received_invites: [],
+//     blocked: []
+//   }
+//   return user_object
+// }
 
 
 // Delete User DELETE https://shopeer.com/user/registration?user_id=[user_id]

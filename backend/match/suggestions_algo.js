@@ -1,11 +1,11 @@
-const http = require('http');
+require('http');
 var express = require("express")
-const { IPv4 } = require("ipaddr.js")
-const app = express()
+express()
 
 const suggestions_algo_router = express.Router()
 
-const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
+// const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
+const {MongoClient} = require("mongodb")
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
@@ -57,7 +57,7 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
         }
 
         const array = match_list
-        customSlice = array => array.slice(0, 1),
+        customSlice = array => array.slice(0, 1)
         result = array.map(customSlice);
 
         console.log(result)
