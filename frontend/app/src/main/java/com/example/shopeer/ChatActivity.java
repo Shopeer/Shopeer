@@ -81,7 +81,7 @@ public class ChatActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 try{
                     JSONObject jsonObject = new JSONObject(text);
-                    chatRecyclerAdapter.addItem(jsonObject);
+                    chatRecyclerAdapter.addItem(jsonObject, roomId);
                     recyclerView.smoothScrollToPosition(chatRecyclerAdapter.getItemCount()-1);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -145,7 +145,7 @@ public class ChatActivity extends AppCompatActivity {
                         jsonObject.put("room_id", roomId);
 
                         webSocket.send(jsonObject.toString());
-                        chatRecyclerAdapter.addItem(jsonObject);
+                        chatRecyclerAdapter.addItem(jsonObject, roomId);
                         recyclerView.smoothScrollToPosition(chatRecyclerAdapter.getItemCount()-1);
 
                     } catch(JSONException e) {

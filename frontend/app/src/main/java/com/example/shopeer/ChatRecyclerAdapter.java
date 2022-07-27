@@ -79,9 +79,15 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
         return messagesList.size();
     }
 
-    public void addItem (JSONObject jsonObject) {
-        messagesList.add(jsonObject);
-        notifyDataSetChanged();
+    public void addItem (JSONObject jsonObject, String roomId) {
+        try {
+            if (roomId.equals(jsonObject.getString("room_id"))) {
+                messagesList.add(jsonObject);
+                notifyDataSetChanged();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     // Helper classes
