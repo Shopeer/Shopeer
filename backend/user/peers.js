@@ -83,7 +83,7 @@ user_peers_router.delete("/peers", async (req, res) => {
             var profile = await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
             var target = await user_collection.updateOne({ email: target_peer_email }, { $pull: { peers: profile_email } })
             if (profile.modifiedCount === 1 && target.modifiedCount === 1) {
-                res.status(200).send([profile, target])
+                res.status(200).json({response: "Peers removed from each others' peerlists."})
 
             }
             
@@ -309,12 +309,12 @@ user_peers_router.post("/invitations", async (req, res) => {
             if (target_cursor.invites.includes(profile_email)) {
                 await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email }, $pull: { invites: target_peer_email, received_invites: target_peer_email } })
                 await user_collection.updateOne({ email: target_peer_email }, { $push: { peers: profile_email }, $pull: { invites: profile_email, received_invites: profile_email } })
-                res.status(201).send("Success, both are now peers")
+                res.status(201).json({response: "Success, both are now peers."})
             } else {
                 await user_collection.updateOne({ email: profile_email }, { $push: { invites: target_peer_email } })
                 await user_collection.updateOne({ email: target_peer_email }, { $push: { received_invites: profile_email } })
                 // var find_cursor = await user_collection.findOne({ email: profile_email })
-                res.status(200).send(find_cursor)
+                res.status(200).json({response: "Success, invitation sent."})
             }
         }
     }
@@ -337,11 +337,11 @@ user_peers_router.delete("/invitations", async (req, res) => {
         if (find_cursor.invites.includes(target_peer_email)) {
             await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
             // var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            res.status(200).send(await user_collection.findOne({ email: profile_email }))
             // res.status(200).send("Success")
         } else {
             //var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(400).send(find_cursor)
+            res.status(404).json({response: "Target user not found."})
             // res.status(200).send("Fail")
         }
     }
