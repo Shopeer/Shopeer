@@ -6,6 +6,7 @@
 
 const request = require('supertest');
 const express = require('express');
+
 const app = express()
 // reuse original application?
 const user_profile_router = require('../user/profile.js');
@@ -106,7 +107,7 @@ describe('Tests for Profile Submodule', function () {
   // });
 
   describe('Tests for Post /registration', function () {
-    
+
     it('POST /registration', async function () {
       const response = await request(app)
         .post('/user/registration')
