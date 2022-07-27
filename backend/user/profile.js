@@ -53,7 +53,7 @@ user_profile_router.put("/profile", async (req, res) => {
             res.status(404).json({response: "User not found."})
             return
         }
-        res.status(200).send(find_cursor)
+        //res.status(200).send(find_cursor)
         if (profile_name) {
             await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
         }
@@ -68,6 +68,7 @@ user_profile_router.put("/profile", async (req, res) => {
         }
         // var find_cursor = await user_collection.findOne({ email: profile_email })
         res.status(200).send(find_cursor)
+        
         // res.status(200).send("Success")
     }
     catch (err) {
@@ -86,7 +87,7 @@ user_profile_router.post("/registration", async (req, res) => {
         profile_email = req.query.email
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor) {
-            res.status(200).send("User already exists")
+            res.status(409).send("User already exists")
         } else {
             var user_object = create_user_object(profile)
             var result_debug = await user_collection.insertOne(user_object)
@@ -94,7 +95,7 @@ user_profile_router.post("/registration", async (req, res) => {
                 res.status(400).json({response: "Failed to register user."})
                 return
             }
-            res.status(200).send(user_object)
+            res.status(201).send(user_object)
         }
 
     } catch (err) {
