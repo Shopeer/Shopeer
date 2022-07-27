@@ -240,13 +240,7 @@ user_peers_router.get("/invitations/received", async (req, res) => {
             res.status(400).json({response: "Failed to get received invitations."})
             return
         }
-        if (ret_array.length > 0 ) {
-            res.status(200).send(ret_array)
-            return
-        } else {
-            res.status(404).send("could not find specified emails")
-            return
-        }
+        res.status(200).send(ret_array)
 
         // console.log(ret_array)
         // res.status(200).send(ret_array)
@@ -294,18 +288,20 @@ user_peers_router.post("/invitations", async (req, res) => {
             return
         }
         if (find_cursor.peers.includes(target_peer_email)) {
-            console.log("Already a peer")
-            res.status(409).send(find_cursor)
+            console.log("Target already in peerlist")
+            res.status(409).send({response: "Target already in peerlist."})
+            return
         }
         if (find_cursor.invites.includes(target_peer_email)) {
-            console.log("Peer already in added")
-            res.status(409).send(find_cursor)
+            console.log("Target already in invitation list")
+            res.status(409).send({response: "Target already in invitation list."})
+            
         } else {
             var target_cursor = await user_collection.findOne({ email: target_peer_email })
-            // if (!find_cursor) {
-            //     res.status(404).json({response: "User not found."})
-            //     return
-            // }
+            if (!target_cursor) {
+                res.status(404).json({response: "Target user not found."})
+                return
+            }
             if (target_cursor.invites.includes(profile_email)) {
                 await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email }, $pull: { invites: target_peer_email, received_invites: target_peer_email } })
                 await user_collection.updateOne({ email: target_peer_email }, { $push: { peers: profile_email }, $pull: { invites: profile_email, received_invites: profile_email } })
@@ -336,6 +332,7 @@ user_peers_router.delete("/invitations", async (req, res) => {
 
         if (find_cursor.invites.includes(target_peer_email)) {
             await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
+            await user_collection.updateOne({ email: target_peer_email }, { $pull: { received_invites: profile_email } })
             // var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(200).send(await user_collection.findOne({ email: profile_email }))
             // res.status(200).send("Success")
