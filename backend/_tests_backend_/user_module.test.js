@@ -6,7 +6,7 @@
 
 const request = require('supertest');
 const express = require('express');
-
+const validator = require('validator')
 const app = express()
 // reuse original application?
 const user_profile_router = require('../user/profile.js');
