@@ -15,6 +15,9 @@ import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+
+    public static String ROOM_ID = "1";
+    public static String PROFILE_ID = "2";
     public static String email;
 
     public HashSet<SearchObject> searches = new HashSet<>();
@@ -34,10 +37,13 @@ public class MainActivity extends AppCompatActivity {
         email = intent.getStringExtra("email");
         Log.d(TAG, email);
 
-        String isRegister = intent.getStringExtra("register");
+        String isRegister = intent.getStringExtra("page");
+        if (PROFILE_ID.equals(isRegister))
+            navController.navigate(R.id.profileFragment);
+        else if (ROOM_ID.equals(isRegister))
+            navController.navigate(R.id.roomsFragment);
         if (isRegister != null) {
             // redirect to profile page
-            navController.navigate(R.id.profileFragment);
         }
     }
 
