@@ -137,14 +137,15 @@ router.post("/", async (req, res) => {
       peerslist: req.body.peerslist,
       chathistory: req.body.chathistory,
     });
+    console.log(doc)
     // console.log("\n New chatroom " + req.body.name + " created with id " + doc.insertedId)
     if (!doc) {
       res.status(404).json({ response: "Room not found." });
       return;
     }
-    if (doc.insertedCount === 1) {
-      res.status(201).send(doc);
-    }
+
+    res.status(201).send(doc);
+    
   } catch (err) {
     console.log(err);
     res.status(400).send(err);
