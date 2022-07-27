@@ -3,6 +3,8 @@ const http = require("http");
 const PORT = 8000;
 
 const uri = "mongodb://127.0.0.1:27017";
+// Azure: "20.230.148.126"
+// Local: "127.0.0.1"
 const { MongoClient } = require("mongodb");
 const client = new MongoClient(uri);
 var ObjectId = require("mongodb").ObjectId;
@@ -26,11 +28,12 @@ wsServer.on("request", (req) => {
   // when new message is received from client
   connection.on("message", async (mes) => {
     // add the message to room_id
+    console.log(mes);
     var mssg_id = ObjectId();
-    var email = req.body.email;
-    var text = req.body.text;
-    var time = req.body.time;
-    var room_id = req.body.room_id;
+    var email = mes.utf8Data.email;
+    var text = mes.utf8Data.text;
+    var time = mes.utf8Data.time;
+    var room_id = mes.utf8Data.room_id;
 
     try {
       // searches for a document with the following fields
@@ -45,7 +48,7 @@ wsServer.on("request", (req) => {
       }
       console.log(doc);
       if (doc.modifiedCount === 1) {
-        console.log(await coll.findOne({ _id: ObjectId(req.query.room_id) }));
+        console.log(await coll.findOne({ _id: ObjectId(room_id) }));
         console.log("Message successfully posted.");
       } else {
         console.log("failed");
