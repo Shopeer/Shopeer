@@ -20,6 +20,8 @@ const user_collection = mongoClient.db("shopeer_database").collection("user_coll
 // Response: User details (profile, bio, name)
 
 user_profile_router.get("/profile", async (req, res) => {
+    console.log(req.query)
+    console.log(req.body)
     var profile_email = req.query.email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
@@ -81,9 +83,12 @@ user_profile_router.put("/profile", async (req, res) => {
 // Response: user_id
 
 user_profile_router.post("/registration", async (req, res) => {
+    console.log(req.query)
+    console.log(req.body)
     var profile = req.query
     try {
-        profile_email = req.query.email
+        // profile_email = req.query.email
+        profile_email = profile.email
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor) {
             res.status(200).send("User already exists")

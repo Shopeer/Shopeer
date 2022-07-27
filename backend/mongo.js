@@ -1,3 +1,4 @@
+var ObjectID = require('bson-objectid');
 
 module.exports = {
   "localhost:27017": {
@@ -18,7 +19,7 @@ module.exports = {
           }
         ]
       },
-      "shopeer_database": {
+      "undefined": {
         "collections": [
           {
             "name": "system.namespaces",
@@ -27,7 +28,7 @@ module.exports = {
                 "name": "system.indexes"
               },
               {
-                "name": "user_collection"
+                "name": "documents"
               }
             ]
           },
@@ -39,38 +40,22 @@ module.exports = {
                 "key": {
                   "_id": 1
                 },
-                "ns": "shopeer_database.user_collection",
+                "ns": "undefined.documents",
                 "name": "_id_",
                 "unique": true
               }
             ]
           },
           {
-            "name": "user_collection",
+            "name": "documents",
             "documents": [
               {
-                "a": 1,
-                "_id": ObjectID("62d0a194e1124d600621d44e")
+                "email": "jimothy@gmail.com",
+                "_id": ObjectID("62e0fdea3e75243635361764")
               },
               {
-                "a": 2,
-                "_id": ObjectID("62d0a194e1124d600621d44f")
-              },
-              {
-                "a": 3,
-                "_id": ObjectID("62d0a194e1124d600621d450")
-              },
-              {
-                "b": 1,
-                "_id": ObjectID("62d0a194e1124d600621d451")
-              },
-              {
-                "b": 2,
-                "_id": ObjectID("62d0a194e1124d600621d452")
-              },
-              {
-                "b": 3,
-                "_id": ObjectID("62d0a194e1124d600621d453")
+                "email": "timothy@gmail.com",
+                "_id": ObjectID("62e0fdea3e75243635361765")
               }
             ]
           }

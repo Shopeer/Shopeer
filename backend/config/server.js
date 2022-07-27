@@ -49,11 +49,11 @@ app.use('/chat/message', mssgRouter)
 
 // // local vm
 // const IP = '192.168.64.15';
-// const PORT = 3000;
+const PORT = 8080;
 
 // azure vm
 // const IP = "20.230.148.126";
-const PORT = "8080";
+// const PORT = "8080";
 
 // grace
 // const IP = "206.116.227.202";
