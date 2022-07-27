@@ -248,7 +248,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         currentSearch = (SearchObject)parent.getItemAtPosition(pos);
 
         // get and populate suggestion list for selected search
-        //getSuggestions();
+        getSuggestions();
     }
 
     // OnItemSelectedListener interface
@@ -275,12 +275,19 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         public void onBindViewHolder(@NonNull ProfileCardVH holder, int position) {
             ProfileObject profileObject = data.get(position);
             holder.peerName.setText(profileObject.getEmail());
-/*
+
             // setup button onClick handlers
             holder.blockButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     blockPeer(profileObject, holder);
+                }
+            });
+
+            holder.unblockButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    unblockPeer(profileObject, holder);
                 }
             });
 
@@ -298,34 +305,42 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 }
             });
 
+            /* // accepting/declining is deprecated
             holder.acceptButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    acceptInvite(profileObject, holder);
+                    //acceptInvite(profileObject, holder);
                 }
             });
 
             holder.declineButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    declineInvite(holder);
+                    //declineInvite(holder);
                 }
             });
+             */
 
             // set default button visibility
             setButtonVisibility(profileObject, holder);
 
- */
+
         }
 
         private void setButtonVisibility(ProfileObject peer, ProfileCardVH holder) {
-            holder.acceptButton.setVisibility(View.GONE);
-            holder.declineButton.setVisibility(View.GONE);
             holder.unfriendButton.setVisibility(View.GONE);
+            holder.friendButton.setVisibility(View.VISIBLE);
+            holder.unblockButton.setVisibility(View.GONE);
             checkIfInviteSent(peer, holder);
-            checkIfInviteReceived(peer, holder);
+            checkIfBlocked(peer, holder);
+            //checkIfInviteReceived(peer, holder);
         }
 
+        private void checkIfBlocked(ProfileObject peer, ProfileCardVH holder) {
+            // disable block button for already blocked peers
+        }
+
+        /*
         private void checkIfInviteReceived(ProfileObject peer, ProfileCardVH holder) {
             String url = receivedInvitationUrl + email;
             Log.d(TAG, "onClick GET_received_invitation: " + url);
@@ -345,8 +360,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                                 if (sentEmail.equals(peer.getEmail())) {
                                     holder.unfriendButton.setVisibility(View.GONE);
                                     holder.friendButton.setVisibility(View.GONE);
-                                    holder.declineButton.setVisibility(View.VISIBLE);
-                                    holder.acceptButton.setVisibility(View.VISIBLE);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -367,6 +380,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 e.printStackTrace();
             }
         }
+         */
 
         private void checkIfInviteSent(ProfileObject peer, ProfileCardVH holder) {
             String url = invitationUrl + email;
@@ -384,8 +398,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                                 String sentEmail = responseObj.getString("email");
 
                                 if (sentEmail.equals(peer.getEmail())) {
-                                    holder.acceptButton.setVisibility(View.GONE);
-                                    holder.declineButton.setVisibility(View.GONE);
                                     holder.friendButton.setVisibility(View.GONE);
                                     holder.unfriendButton.setVisibility(View.VISIBLE);
                                 }
@@ -409,12 +421,15 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             }
         }
 
+        /*
         private void declineInvite(ProfileCardVH holder) {
             data.remove(holder.getBindingAdapterPosition()); // pass by ref, this.suggestions also udpated
             notifyItemRemoved(holder.getBindingAdapterPosition());
             notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
         }
+         */
 
+        /*
         private void acceptInvite(ProfileObject peer, ProfileCardVH holder) {
             String url = peersUrl + email + "&target_peer_email=" + peer.getEmail();
             Log.d(TAG, "onClick POST_peer: " + url);
@@ -441,6 +456,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 e.printStackTrace();
             }
         }
+         */
 
         private void createChatroom(String myEmail, String peerEmail, ProfileCardVH holder) {
             Log.d(TAG, "onClick POST_create_room: " + roomUrl);
@@ -532,6 +548,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         }
 
         private void invitePeer(ProfileObject peer, ProfileCardVH holder) {
+            /*
             String url = invitationUrl + email + "&target_peer_email=" + peer.getEmail();
             Log.d(TAG, "onClick POST_invitation: " + url);
             try {
@@ -557,6 +574,70 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+             */
+
+
+            String url = invitationUrl + email + "&target_peer_email=" + peer.getEmail();
+            Log.d(TAG, "onClick POST_invitation: " + url);
+            try {
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+                StringRequest stringReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, "POST_invitation response: " + response);
+                        Toast.makeText(getContext(), "sent invitation to " + peer.getEmail(), Toast.LENGTH_SHORT).show();
+
+
+                        if (response.compareToIgnoreCase("success, both are now peers") == 0) {
+                            createChatroom(email, peer.getEmail(), holder);
+                        }
+
+                        // set button visibility
+                        holder.unfriendButton.setVisibility(View.VISIBLE);
+                        holder.friendButton.setVisibility(View.GONE);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse POST_invitation: " + error.toString());
+                        Toast.makeText(getContext(), "error: could not send invite to" + peer.getEmail(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                requestQueue.add(stringReq);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        private void unblockPeer(ProfileObject peer, ProfileCardVH holder) {
+            String url = blockUrl + email + "&target_peer_email=" + peer.getEmail();
+            Log.d(TAG, "onClick DELETE_block: " + url);
+            try {
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.DELETE, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, "DELETE_block response: " + response);
+                        Toast.makeText(getContext(), "ublocked " + peer.getEmail(), Toast.LENGTH_LONG).show();
+
+                        holder.blockButton.setVisibility(View.VISIBLE);
+                        holder.unblockButton.setVisibility(View.GONE);
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "onErrorResponse DELETE_block: " + error.toString());
+                        Toast.makeText(getContext(), "error: could not ublock " + peer.getEmail(), Toast.LENGTH_LONG).show();
+                    }
+                });
+                requestQueue.add(jsonObjReq);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
 
         private void blockPeer(ProfileObject peer, ProfileCardVH holder) {
@@ -569,9 +650,14 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, "POST_block response: " + response);
                         Toast.makeText(getContext(), "blocked " + peer.getEmail(), Toast.LENGTH_LONG).show();
-                        data.remove(holder.getBindingAdapterPosition()); // pass by ref, so this.suggestions will also be updated
-                        notifyItemRemoved(holder.getBindingAdapterPosition());
-                        notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
+
+                        // TODO: be abe to unblock
+                        //data.remove(holder.getBindingAdapterPosition()); // pass by ref, so this.suggestions will also be updated
+                        //notifyItemRemoved(holder.getBindingAdapterPosition());
+                        //notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
+
+                        holder.unblockButton.setVisibility(View.VISIBLE);
+                        holder.blockButton.setVisibility(View.GONE);
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -595,9 +681,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             TextView peerName;
             Button friendButton;
             Button unfriendButton;
-            Button acceptButton;
-            Button declineButton;
             Button blockButton;
+            Button unblockButton;
 
             public ProfileCardVH(@NonNull View itemView) {
                 super(itemView);
@@ -605,9 +690,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 peerName = itemView.findViewById(R.id.peer_name_text);
                 friendButton = itemView.findViewById(R.id.friend_button);
                 unfriendButton = itemView.findViewById(R.id.unfriend_button);
-                acceptButton = itemView.findViewById(R.id.accept_button);
-                declineButton = itemView.findViewById(R.id.decline_button);
                 blockButton = itemView.findViewById(R.id.block_button);
+                unblockButton = itemView.findViewById(R.id.unblock_button);
             }
         }
     }
