@@ -1,6 +1,6 @@
 require('http');
 var express = require("express")
-express()
+//express()
 
 const user_peers_router = express.Router()
 
@@ -238,12 +238,14 @@ user_peers_router.get("/invitations/received", async (req, res) => {
         }
         if (ret_array.length > 0 ) {
             res.status(200).send(ret_array)
+            return
         } else {
             res.status(404).send("could not find specified emails")
+            return
         }
 
-        console.log(ret_array)
-        res.status(200).send(ret_array)
+        // console.log(ret_array)
+        // res.status(200).send(ret_array)
     }
     catch (err) {
         console.log(err)
