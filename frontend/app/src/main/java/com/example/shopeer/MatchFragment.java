@@ -248,7 +248,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         currentSearch = (SearchObject)parent.getItemAtPosition(pos);
 
         // get and populate suggestion list for selected search
-        getSuggestions();
+        //getSuggestions();
     }
 
     // OnItemSelectedListener interface
@@ -275,7 +275,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         public void onBindViewHolder(@NonNull ProfileCardVH holder, int position) {
             ProfileObject profileObject = data.get(position);
             holder.peerName.setText(profileObject.getEmail());
-
+/*
             // setup button onClick handlers
             holder.blockButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -314,6 +314,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
             // set default button visibility
             setButtonVisibility(profileObject, holder);
+
+ */
         }
 
         private void setButtonVisibility(ProfileObject peer, ProfileCardVH holder) {
