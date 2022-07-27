@@ -1,10 +1,12 @@
 const request = require('supertest');
 
-const user_profile_router = require('./profile_mock')
+// const user_profile_router = require('./profile_mock')
 const user_peers_router = require('./peers_mock')
 
+const user_profile_router = require('../user/profile')
 
-describe('Profile Submodule', function () {
+
+describe('Tests for Profile Submodule', function () {
   it('GET /profile', async function () {
     const response = await request(user_profile_router)
       .get('/profile')
