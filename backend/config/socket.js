@@ -2,6 +2,11 @@ const SocketServer = require("websocket").server;
 const http = require("http");
 const PORT = 8000;
 
+const uri = "mongodb://127.0.0.1:27017";
+const { MongoClient } = require("mongodb");
+const client = new MongoClient(uri);
+var ObjectId = require("mongodb").ObjectId;
+
 const server = http.createServer((req, res) => {});
 
 server.listen(PORT, () => {
@@ -9,6 +14,7 @@ server.listen(PORT, () => {
 });
 
 wsServer = new SocketServer({ httpServer: server });
+const coll = client.db("shopeer_database").collection("room_collection");
 
 const connections = [];
 
@@ -17,7 +23,37 @@ wsServer.on("request", (req) => {
   console.log("new connection");
   connections.push(connection);
 
-  connection.on("message", (mes) => {
+  // when new message is received from client
+  connection.on("message", async (mes) => {
+    // add the message to room_id
+    var mssg_id = ObjectId();
+    var email = req.body.email;
+    var text = req.body.text;
+    var time = req.body.time;
+    var room_id = req.body.room_id;
+
+    try {
+      // searches for a document with the following fields
+      //appends an object to the "chathistory" array
+      var doc = await coll.updateOne(
+        { _id: ObjectId(room_id) },
+        { $push: { chathistory: { mssg_id, email, text, time } } }
+      );
+      if (!doc) {
+        console.log("Room not found.");
+        return;
+      }
+      console.log(doc);
+      if (doc.modifiedCount === 1) {
+        console.log(await coll.findOne({ _id: ObjectId(req.query.room_id) }));
+        console.log("Message successfully posted.");
+      } else {
+        console.log("failed");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    // notifies all other listeners
     connections.forEach((element) => {
       //add another filter to only send to people with same roomId
       if (element != connection) element.sendUTF(mes.utf8Data);
