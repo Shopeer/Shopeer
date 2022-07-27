@@ -18,10 +18,11 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
     private static final int ITEM_RECEIVE = 2;
 
     private LayoutInflater inflater;
-    private ArrayList<JSONObject> messagesList = new ArrayList<>();
+    private ArrayList<JSONObject> messagesList;
 
-    public ChatRecyclerAdapter(LayoutInflater inflater) {
+    public ChatRecyclerAdapter(LayoutInflater inflater, ArrayList<JSONObject> messagesList) {
         this.inflater = inflater;
+        this.messagesList = messagesList;
     }
 
     @NonNull
