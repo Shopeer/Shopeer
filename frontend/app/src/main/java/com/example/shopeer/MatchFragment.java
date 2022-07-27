@@ -321,80 +321,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         return result;
     }
 
-    /*
-    private void getSentInvites() {
-        String url = invitationUrl + email;
-        Log.d(TAG, "onClick GET_invitation: " + url);
-        try {
-            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-            JsonArrayRequest Req = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-                @Override
-                public void onResponse(JSONArray response) {
-                    Log.d(TAG, "GET_invitation response: " + response);
-
-                    manageInvites.clear();
-
-                    for (int i = 0; i < response.length(); i++) {
-                        try {
-                            JSONObject responseObj = response.getJSONObject(i);
-                            String sentEmail = responseObj.getString("email");
-
-                            manageInvites.add(sentEmail);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e(TAG, "onErrorResponse GET_invitation: " + error.toString());
-                }
-            });
-            requestQueue.add(Req);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void getBlocked() {
-        String url = blockUrl + email;
-        Log.d(TAG, "onClick GET_block: " + url);
-        try {
-            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-            JsonArrayRequest jsonArrReq = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-                @Override
-                public void onResponse(JSONArray response) {
-                    Log.d(TAG, "GET_block response: " + response);
-
-                    manageBlocked.clear();
-
-                    // extract and add to this.blocked
-                    for (int i = 0; i < response.length(); i++) {
-                        try {
-                            String email = response.getString(i);
-
-                            manageBlocked.add(email);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e(TAG, "onErrorResponse GET_block: " + error.toString());
-                }
-            });
-            requestQueue.add(jsonArrReq);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-     */
-
     // OnItemSelectedListener interface
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
@@ -448,29 +374,12 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     deleteInvite(profileObject, holder);
                 }
             });
-
-            /* // accepting/declining is deprecated
-            holder.acceptButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //acceptInvite(profileObject, holder);
-                }
-            });
-
-            holder.declineButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //declineInvite(holder);
-                }
-            });
-             */
             
             // populate profilecard
             setProfileCardInfo();
 
             // set default button visibility
             setButtonVisibility(profileObject, holder);
-
 
         }
 
@@ -482,7 +391,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             holder.friendButton.setVisibility(View.VISIBLE);
             holder.unblockButton.setVisibility(View.GONE);
             holder.blockButton.setVisibility(View.VISIBLE);
-
 
             // checked if blocked
             if (manageBlocked.contains(peer.getEmail())) {
@@ -498,89 +406,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 holder.friendButton.setVisibility(View.GONE);
                 holder.unfriendButton.setVisibility(View.VISIBLE);
             }
-
-            //checkIfInviteReceived(peer, holder);
         }
-
-
-        /*
-        private void checkIfInviteReceived(ProfileObject peer, ProfileCardVH holder) {
-            String url = receivedInvitationUrl + email;
-            Log.d(TAG, "onClick GET_received_invitation: " + url);
-            try {
-                //TODO: make sure it works
-                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-                JsonArrayRequest Req = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        Log.d(TAG, "GET_received_invitation response: " + response);
-
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                JSONObject responseObj = response.getJSONObject(i);
-                                String sentEmail = responseObj.getString("email");
-
-                                if (sentEmail.equals(peer.getEmail())) {
-                                    holder.unfriendButton.setVisibility(View.GONE);
-                                    holder.friendButton.setVisibility(View.GONE);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, "onErrorResponse GET_received_invitation: " + error.toString());
-                        data.remove(holder.getBindingAdapterPosition()); // pass by ref, so will update this.suggestions also
-                        notifyItemRemoved(holder.getBindingAdapterPosition());
-                        notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
-                    }
-                });
-                requestQueue.add(Req);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-         */
-
-        /*
-        private void declineInvite(ProfileCardVH holder) {
-            data.remove(holder.getBindingAdapterPosition()); // pass by ref, this.suggestions also udpated
-            notifyItemRemoved(holder.getBindingAdapterPosition());
-            notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
-        }
-         */
-
-        /*
-        private void acceptInvite(ProfileObject peer, ProfileCardVH holder) {
-            String url = peersUrl + email + "&target_peer_email=" + peer.getEmail();
-            Log.d(TAG, "onClick POST_peer: " + url);
-            try {
-                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, "POST_peer response: " + response);
-                        Toast.makeText(getContext(), "accepted invite from " + peer.getEmail(), Toast.LENGTH_LONG).show();
-
-                        // create new chat if accepted
-                        createChatroom(email, peer.getEmail(), holder);
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, "onErrorResponse POST_peer: " + error.toString());
-                        Toast.makeText(getContext(), "error: could accept invite from " + peer.getEmail(), Toast.LENGTH_LONG).show();
-                    }
-                });
-                requestQueue.add(jsonObjReq);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-         */
 
         private void createChatroom(String myEmail, String peerEmail, ProfileCardVH holder) {
             Log.d(TAG, "onClick POST_create_room: " + roomUrl);
@@ -749,11 +575,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                         Toast.makeText(getContext(), "blocked " + peer.getEmail(), Toast.LENGTH_LONG).show();
 
                         manageBlocked.add(peer.getEmail());
-
-                        // TODO: be able to unblock
-                        //data.remove(holder.getBindingAdapterPosition()); // pass by ref, so this.suggestions will also be updated
-                        //notifyItemRemoved(holder.getBindingAdapterPosition());
-                        //notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
 
                         setButtonVisibility(peer, holder);
                     }
