@@ -3,20 +3,18 @@ const http = require("http");
 const PORT = 8000;
 
 const uri = "mongodb://127.0.0.1:27017";
-// Azure: "20.230.148.126"
-// Local: "127.0.0.1"
 const { MongoClient } = require("mongodb");
 const client = new MongoClient(uri);
 var ObjectId = require("mongodb").ObjectId;
 
 const server = http.createServer((req, res) => {});
+const coll = client.db("shopeer_database").collection("room_collection");
 
 server.listen(PORT, () => {
   console.log(`Listening on port ${PORT}...`);
 });
 
 wsServer = new SocketServer({ httpServer: server });
-const coll = client.db("shopeer_database").collection("room_collection");
 
 const connections = [];
 
@@ -28,12 +26,13 @@ wsServer.on("request", (req) => {
   // when new message is received from client
   connection.on("message", async (mes) => {
     // add the message to room_id
-    console.log(mes);
     var mssg_id = ObjectId();
-    var email = mes.utf8Data.email;
-    var text = mes.utf8Data.text;
-    var time = mes.utf8Data.time;
-    var room_id = mes.utf8Data.room_id;
+    var data = JSON.parse(mes.utf8Data);
+    var email = data.email;
+    var text = data.text;
+    var time = data.time;
+    var room_id = data.room_id;
+    console.log(data);
 
     try {
       // searches for a document with the following fields
@@ -46,7 +45,7 @@ wsServer.on("request", (req) => {
         console.log("Room not found.");
         return;
       }
-      console.log(doc);
+      // console.log(doc);
       if (doc.modifiedCount === 1) {
         console.log(await coll.findOne({ _id: ObjectId(room_id) }));
         console.log("Message successfully posted.");
