@@ -107,6 +107,7 @@ public class ChatActivity extends AppCompatActivity {
 
         setRoomInfo();
         setSendMessageButton();
+        setBackButton();
     }
 
 
@@ -164,6 +165,7 @@ public class ChatActivity extends AppCompatActivity {
                 Intent intent = new Intent(ChatActivity.this, MainActivity.class);
                 intent.putExtra("email", MainActivity.email);
                 intent.putExtra("page", MainActivity.ROOM_ID);
+                startActivity(intent);
             }
         });
     }
