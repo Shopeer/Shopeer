@@ -1,7 +1,5 @@
 
-require('http');
 var express = require("express")
-express()
 
 const user_profile_router = express.Router()
 
@@ -11,7 +9,6 @@ const mongoClient = new MongoClient(uri)
 const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
 
 
-const { body, validationResult } = require('express-validator');
 const validator = require('validator')
 
 
