@@ -45,7 +45,8 @@ public class ChatActivity extends AppCompatActivity {
     private WebSocket webSocket;
     private final String roomUrl = "http://20.230.148.126:8080/chat/room/history?room_id=";
     private final String postUrl = "http://20.230.148.126:8080/chat/message?room_id=";
-    private final String SERVER_PATH = "ws://20.230.148.126:8000";
+//    private final String SERVER_PATH = "ws://20.230.148.126:8000";
+    private final String SERVER_PATH = "ws://192.168.1.179:8000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
