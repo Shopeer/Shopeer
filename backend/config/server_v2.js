@@ -1,4 +1,4 @@
-import makeApp from './app.js'
+var makeApp = require('./app.js')
 
 const app = makeApp()
 

@@ -16,7 +16,6 @@
   "scripts": {
     "test": "jest --forceExit"
   },
-  "type": "module",
   "name": "a",
   "version": "a",
   "description": "a",

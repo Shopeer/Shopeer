@@ -1,6 +1,7 @@
-import express from 'express'
 
-export default function (database) {
+
+function makeApp() {
+    var express = require('express')
     const app = express()
 
     app.use(express.json())
@@ -24,6 +25,8 @@ export default function (database) {
     })
     return app
 }
+
+module.exports = { makeApp }
 
 // export default async function() {
 
