@@ -39,7 +39,6 @@ public class ChatActivity extends AppCompatActivity {
 
     public RecyclerView recyclerView;
     public ChatRecyclerAdapter chatRecyclerAdapter;
-    String currenttime;
     Calendar calendar;
     SimpleDateFormat simpleDateFormat;
 
@@ -114,7 +113,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private void setRoomInfo() {
         roomNameTextView.setText(roomName);
-        // set senderEmail
         Bundle extras = intent.getExtras();
         roomId = extras.getString("room_id");
         roomName = extras.getString("room_name");
@@ -134,7 +132,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String enteredMessage = messageInput.getText().toString();
                 if(!enteredMessage.isEmpty()) {
-                    currenttime = simpleDateFormat.format(calendar.getTime());
+                    String currenttime = simpleDateFormat.format(calendar.getTime());
 
                     Log.d(TAG, "sending message");
                     JSONObject jsonObject = new JSONObject();
@@ -142,6 +140,7 @@ public class ChatActivity extends AppCompatActivity {
                         jsonObject.put("email", MainActivity.email);
                         jsonObject.put("text", enteredMessage);
                         jsonObject.put("time", currenttime);
+                        jsonObject.put("room_id", roomId);
 
                         webSocket.send(jsonObject.toString());
                         chatRecyclerAdapter.addItem(jsonObject);
