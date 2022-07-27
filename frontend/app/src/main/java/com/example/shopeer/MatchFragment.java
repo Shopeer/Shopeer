@@ -218,6 +218,12 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                             JSONObject peerObject = response.getJSONObject(i);
 
                             String email = peerObject.getString("email");
+
+                            if (managePeers.contains(email)) {
+                                continue;
+                            }
+
+
                             String name = peerObject.getString("name");
                             String description = peerObject.getString("description");
                             String photo = peerObject.getString("photo");
@@ -477,13 +483,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             holder.unblockButton.setVisibility(View.GONE);
             holder.blockButton.setVisibility(View.VISIBLE);
 
-            if (managePeers.contains(peer.getEmail())) {
-                data.remove(holder.getBindingAdapterPosition()); // pass by ref, so will update this.suggestions also
-                notifyItemRemoved(holder.getBindingAdapterPosition());
-                notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
-            }
+
             // checked if blocked
-            else if (manageBlocked.contains(peer.getEmail())) {
+            if (manageBlocked.contains(peer.getEmail())) {
                 holder.blockButton.setVisibility(View.GONE);
                 holder.unblockButton.setVisibility(View.VISIBLE);
                 holder.friendButton.setVisibility(View.GONE);
@@ -611,6 +613,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                         data.remove(holder.getBindingAdapterPosition()); // pass by ref, so will update this.suggestions also
                         notifyItemRemoved(holder.getBindingAdapterPosition());
                         notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
+
+                        managePeers.add(peerEmail);
                     }
                 }, new Response.ErrorListener() {
                     @Override
