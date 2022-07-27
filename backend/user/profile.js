@@ -8,8 +8,13 @@ const user_profile_router = express.Router()
 const { MongoClient } = require("mongodb")  // this is multiple return
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
-
 const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
+
+
+const { body, validationResult } = require('express-validator');
+const validator = require('validator')
+
+
 
 // Profile Submodule
 
@@ -83,11 +88,13 @@ user_profile_router.put("/profile", async (req, res) => {
 // Response: user_id
 
 user_profile_router.post("/registration", async (req, res) => {
-    console.log(req.query)
-    console.log(req.body)
     var profile = req.query
+
+    if(!validator.isEmail(profile.email)) {
+        res.status(400).send("Error: Invalid email")
+    }
+
     try {
-        // profile_email = req.query.email
         profile_email = profile.email
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor) {
@@ -99,9 +106,8 @@ user_profile_router.post("/registration", async (req, res) => {
                 res.status(400).json({response: "Failed to register user."})
                 return
             }
-            res.status(200).send(user_object)
+            res.status(200).send("Success")
         }
-
     } catch (err) {
         console.log(err)
         res.status(400).send(err)
@@ -135,7 +141,7 @@ user_profile_router.delete("/registration", async (req, res) => {
     var profile_email = req.query.email
     try {
         // var find_cursor = await user_collection.find({email:profile_email})
-        var delete_return = await user_collection.deleteOne({ email: profile_email })
+        var delete_return = await user_collection.deleteMany({ email: profile_email })
         if (!delete_return) {
             res.status(404).json({response: "User not found."})
             return
