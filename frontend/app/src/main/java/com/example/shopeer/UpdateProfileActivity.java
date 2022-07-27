@@ -64,7 +64,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                             Log.d(TAG, "update profile " + response);
                             Intent intent = new Intent(UpdateProfileActivity.this, MainActivity.class);
                             intent.putExtra("email", MainActivity.email);
-                            intent.putExtra("register", "yes");
+                            intent.putExtra("page", MainActivity.PROFILE_ID);
                             startActivity(intent);
                         }
                     }, new Response.ErrorListener() {

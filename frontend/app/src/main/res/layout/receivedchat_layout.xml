@@ -14,11 +14,21 @@
         android:id="@+id/messageLayout">
 
         <TextView
+            android:id="@+id/receivedName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="15dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="7dp"
+            android:text="Name of Sender"
+            android:textSize="10sp"/>
+
+        <TextView
             android:id="@+id/receivedMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="15dp"
-            android:paddingTop="7dp"
+            android:paddingTop="20dp"
             android:paddingRight="40dp"
             android:paddingBottom="7dp"
             android:text="Sender Message Display Here."
