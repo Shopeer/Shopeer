@@ -33,7 +33,7 @@ public class ChatActivity extends AppCompatActivity {
     androidx.appcompat.widget.Toolbar chatToolbar;
     ImageView roomPictureImageView;
     TextView roomNameTextView;
-    Intent intent;
+    ImageView backButton;
     String roomId;
     String roomName;
 
@@ -45,24 +45,21 @@ public class ChatActivity extends AppCompatActivity {
     private WebSocket webSocket;
     private final String roomUrl = "http://20.230.148.126:8080/chat/room/history?room_id=";
     private final String postUrl = "http://20.230.148.126:8080/chat/message?room_id=";
-    private final String SERVER_PATH = "ws://echo.websocket.org";
-
-
-
+//    private final String SERVER_PATH = "ws://20.230.148.126:3000";
+    private final String SERVER_PATH = "ws://192.168.1.179:3000";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        setRoomInfo();
         initiateSocketConnection();
     }
 
     private void initiateSocketConnection() {
+        Log.d(TAG, "initiateSocketConnection");
         OkHttpClient client = new OkHttpClient();
         okhttp3.Request request = new okhttp3.Request.Builder().url(SERVER_PATH).build();
         webSocket = client.newWebSocket(request, new SocketListener());
-
     }
 
     private class SocketListener extends WebSocketListener {
@@ -71,6 +68,7 @@ public class ChatActivity extends AppCompatActivity {
             super.onOpen(webSocket, response);
             runOnUiThread(() -> {
                 Toast.makeText(ChatActivity.this, "Socket Connection Successful", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Socket Connection Successful");
                 init();
             });
         }
@@ -95,10 +93,10 @@ public class ChatActivity extends AppCompatActivity {
         messageInput = findViewById(R.id.messageInput);
         sendMessageCardView = findViewById(R.id.sendMessageCardView);
         sendMessageButton = findViewById(R.id.sendMessageIcon);
+        backButton = findViewById(R.id.backButton);
         chatToolbar = findViewById(R.id.chatToolbar);
         roomNameTextView = findViewById(R.id.chatRoomName);
         roomPictureImageView = findViewById(R.id.RoomPeerPicture);
-        intent = getIntent();
         calendar = Calendar.getInstance();
         simpleDateFormat = new SimpleDateFormat("hh:mm a");
 
@@ -107,15 +105,17 @@ public class ChatActivity extends AppCompatActivity {
         recyclerView.setAdapter(chatRecyclerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        setRoomInfo();
         setSendMessageButton();
     }
 
 
     private void setRoomInfo() {
-        roomNameTextView.setText(roomName);
+        Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         roomId = extras.getString("room_id");
         roomName = extras.getString("room_name");
+        roomNameTextView.setText(roomName);
         int imgUri = extras.getInt("room_pic");
         if (imgUri==0) {
             Toast.makeText(getApplicationContext(), "null is received", Toast.LENGTH_SHORT).show();
@@ -156,15 +156,15 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        chatRecyclerAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        chatRecyclerAdapter.notifyDataSetChanged();
+    private void setBackButton() {
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "going back to rooms");
+                Intent intent = new Intent(ChatActivity.this, MainActivity.class);
+                intent.putExtra("email", MainActivity.email);
+                intent.putExtra("page", MainActivity.ROOM_ID);
+            }
+        });
     }
 }
