@@ -116,7 +116,7 @@ user_peers_router.get("/blocked", async (req, res) => {
             return
         }
         if (ret_array.length > 0 ) {
-            res.status(200).send(ret_array)
+            res.status(200).send(find_cursor.blocked)
         } else {
             res.status(404).send("could not find specified emails")
         }
