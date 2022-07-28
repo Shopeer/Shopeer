@@ -145,7 +145,7 @@ public class ProfileFragment extends Fragment {
 
     private void updateProfileInBackend(String encodedImage) {
         String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail() +
-                "&photo=" + encodedImage;
+                "&photo=" + '"' + encodedImage + '"';
         Log.d(TAG, "onClick: " + url);
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
@@ -202,6 +202,7 @@ public class ProfileFragment extends Fragment {
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         profilePic.setImageBitmap(bitmap);
                         String encodedImage = encodeImage(bitmap);
+                        Log.d(TAG, ": " + encodedImage);
                         if (!temp.equals("")) {
                             Log.d(TAG, "onResponse: " + temp.equals(encodedImage));
                         }
