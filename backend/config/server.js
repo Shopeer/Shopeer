@@ -187,6 +187,7 @@ function create_search_object(body) {
     var ret_object = {
         search_name: body.search_name,
         activity: body.activity,
+        location_name: body.location_name,
         location: body.location,
         max_range: body.max_range,
         max_budget: body.max_budget
