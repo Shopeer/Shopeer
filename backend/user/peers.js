@@ -248,10 +248,10 @@ user_peers_router.get("/invitations/received", async (req, res) => {
             return
         }
         ret_array = await get_object_array_from_email_array(find_cursor.received_invites)
-        if (!ret_array) {
-            res.status(400).json({response: "Failed to get received invitations."})
-            return
-        }
+        // if (!ret_array) {
+        //     res.status(400).json({response: "Failed to get received invitations."})
+        //     return
+        // }
         res.status(200).send(ret_array)
 
         // console.log(ret_array)
@@ -275,9 +275,10 @@ async function get_object_array_from_email_array(email_array) {
     //     array.push(return_cursor)
     // }
 
+    // works but makes error-checking difficult.
     var return_arr = await user_collection.find({ email: { $in: email_array } }).toArray()
 
-    console.log(return_arr)
+    // console.log(return_arr)
     if (!return_arr) {
         throw "Error: invalid email"
     }

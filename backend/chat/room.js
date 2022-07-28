@@ -106,7 +106,7 @@ router.delete("/remove_user", async (req, res) => {
       { _id: ObjectId(req.query.room_id) }, { $pull: { peerslist: req.body.email } }
     );
     if (doc.matchedCount === 0) {
-      res.status(200).send("\nCould not find this room.\n");
+      res.status(200).send("Could not find this room.");
     } else if (doc.modifiedCount === 0) {
       res
         .status(200)
@@ -137,14 +137,15 @@ router.post("/", async (req, res) => {
       peerslist: req.body.peerslist,
       chathistory: req.body.chathistory,
     });
+    console.log(doc)
     // console.log("\n New chatroom " + req.body.name + " created with id " + doc.insertedId)
     if (!doc) {
       res.status(404).json({ response: "Room not found." });
       return;
     }
-    if (doc.insertedCount === 1) {
-      res.status(201).send(doc);
-    }
+
+    res.status(201).send(doc);
+    
   } catch (err) {
     console.log(err);
     res.status(400).send(err);
@@ -186,13 +187,13 @@ router.delete("/", async (req, res) => {
       _id: ObjectId(req.query.room_id),
     });
     if (!doc) {
-      res.status(404).json({ response: "Room not found." });
+      res.status(404).json({ response: "Failed to delete." });
       return;
     }
     if (doc.deletedCount > 0) {
-      res.status(200).send("\nRoom deleted\n");
+      res.status(200).send
     } else {
-      res.status(400).send("\nFailed to delete room.\n");
+      res.status(404).json({ response: "Room not found." });
     }
   } catch (err) {
     console.log(err);

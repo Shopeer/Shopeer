@@ -7,6 +7,7 @@ app.use('*', user_profile_router);
 app.use('/user', user_profile_router)
 
 const user_peers_router = require('../user/peers.js');
+const MongoClient = require('mongo-mock/lib/mongo_client.js');
 app.use('*', user_peers_router);
 app.use('/user', user_peers_router)
 
@@ -58,9 +59,11 @@ beforeEach(() => {
   resetDatabase()
   return initializeDatabase()
 });
+afterEach(() => {
+  return resetDatabase()
+});
 // afterAll(() => {
-//   return resetDatabase()
-// });
+// })
 
 async function initializeDatabase() {
   // register the test users
@@ -126,9 +129,9 @@ describe("Get all peers scenario", () => {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 describe("Delete peer scenario", () => {
-
+const nonexistentEmail= "nonexisting_test_email@test.com"
   it('should return 404-user-not-found for non-existing user', async function () {
-    const nonexistentEmail= "nonexisting_test_email@test.com"
+    
     // first try to delete the user from the database, just in case.
     await request(app).delete('/user/registration').query({email: nonexistentEmail })
     // attempt to delete a random email from this nonexisting user's peerlist
@@ -254,7 +257,6 @@ describe("Send an invitation", () => {
     expect(response.status).toEqual(404);
   });
 
-
   it('should successfully post an invitation', async function () {
     // attempt to post an invitation from pam to tam
     const response = await request(app).post('/user/invitations').query({ email: emails[5], target_peer_email: emails[4] })
@@ -308,6 +310,16 @@ describe("Send an invitation", () => {
     expect(targetUser.body.received_invites).toEqual(expect.not.arrayContaining([emails[5]]))
     expect(response.body).toEqual({"response":"The target user cannot be invited."});
     expect(response.status).toEqual(400);
+  });
+  it('should return 409 if a user tries to invite themself', async function () {
+    // rob attempts to invite self
+    const response = await request(app).post('/user/invitations').query({ email: emails[0], target_peer_email: emails[0] })
+    const thisUser = await request(app).get('/user/profile').query({ email: emails[0] }).set('Accept', 'application/json')
+
+    expect(thisUser.body.invites).toEqual(expect.not.arrayContaining([emails[0]]))
+    expect(thisUser.body.received_invites).toEqual(expect.not.arrayContaining([emails[0]]))
+    expect(response.body).toEqual({"response":"Cannot operate on self."});
+    expect(response.status).toEqual(409);
   });
 
 
