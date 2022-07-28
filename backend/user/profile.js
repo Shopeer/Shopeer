@@ -53,7 +53,7 @@ user_profile_router.put("/profile", async (req, res) => {
             res.status(404).json({response: "User not found."})
             return
         }
-        res.status(200).send(find_cursor)
+        //res.status(200).send(find_cursor)
         if (profile_name) {
             await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
         }
@@ -68,6 +68,7 @@ user_profile_router.put("/profile", async (req, res) => {
         }
         // var find_cursor = await user_collection.findOne({ email: profile_email })
         res.status(200).send(find_cursor)
+        
         // res.status(200).send("Success")
     }
     catch (err) {

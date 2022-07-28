@@ -161,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
                     mainIntent.putExtra("name", account.getDisplayName());
                     mainIntent.putExtra("email", account.getEmail());
                     //mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
-                    mainIntent.putExtra("register", "yes");
+                    mainIntent.putExtra("page", MainActivity.PROFILE_ID);
                     startActivity(mainIntent);
                 }
             }, new Response.ErrorListener() {

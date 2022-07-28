@@ -8,55 +8,70 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
-    private ArrayList<ChatObject> messagesList;
-    private int ITEM_SEND = 1;
-    private int ITEM_RECEIVE = 2;
+    private static final int ITEM_SEND = 1;
+    private static final int ITEM_RECEIVE = 2;
 
-    TextView textViewMessage;
-    TextView messageTime;
+    private LayoutInflater inflater;
+    private ArrayList<JSONObject> messagesList = new ArrayList<>();
 
-    public ChatRecyclerAdapter(ArrayList<ChatObject> messagesList) {
-        this.messagesList = messagesList;
+    public ChatRecyclerAdapter(LayoutInflater inflater) {
+        this.inflater = inflater;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View v;
         if (viewType==ITEM_SEND) {
-            View v = inflater.inflate(R.layout.senderchat_layout, parent, false);
+            v = inflater.inflate(R.layout.senderchat_layout, parent, false);
             return new SenderViewHolder(v);
         } else {
-            View v = inflater.inflate(R.layout.receivedchat_layout, parent, false);
+            v = inflater.inflate(R.layout.receivedchat_layout, parent, false);
             return new ReceivedViewHolder(v);
         }
-
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ChatObject message = messagesList.get(position);
-        if(holder.getClass() == SenderViewHolder.class) {
-            textViewMessage.setText(message.getText());
-            messageTime.setText(message.getCurrenttime());
-        } else {
-            textViewMessage.setText(message.getText());
-            messageTime.setText(message.getCurrenttime());
+        JSONObject message = messagesList.get(position);
+        try {
+            if(holder.getClass() == SenderViewHolder.class) {
+                SenderViewHolder viewHolder = (SenderViewHolder) holder;
+                viewHolder.textViewMessage.setText(message.getString("text"));
+                viewHolder.messageTime.setText(message.getString("time"));
+            } else {
+                ReceivedViewHolder viewHolder = (ReceivedViewHolder) holder;
+                viewHolder.senderName.setText(message.getString("email"));
+                viewHolder.textViewMessage.setText(message.getString("text"));
+                viewHolder.messageTime.setText(message.getString("time"));
+            }
+
+        } catch(JSONException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public int getItemViewType(int position) {
         // if the message was sent by current user-> return ITEM_SEND, else return ITEM_RECEIVE
-        ChatObject message = messagesList.get(position);
-        if (MainActivity.email.equals(message.getSenderEmail())) {
-            return ITEM_SEND;
-        } else {
-            return ITEM_RECEIVE;
+        JSONObject message = messagesList.get(position);
+        try {
+            if (MainActivity.email.equals(message.getString("email"))) {
+                return ITEM_SEND;
+            } else {
+                return ITEM_RECEIVE;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+        return -1;
     }
 
     @Override
@@ -64,9 +79,15 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
         return messagesList.size();
     }
 
+    public void addItem (JSONObject jsonObject) {
+        messagesList.add(jsonObject);
+        notifyDataSetChanged();
+    }
+
     // Helper classes
     public class SenderViewHolder extends RecyclerView.ViewHolder {
-
+        TextView textViewMessage;
+        TextView messageTime;
 
         public SenderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -76,9 +97,13 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
     }
 
     public class ReceivedViewHolder extends RecyclerView.ViewHolder {
+        TextView senderName;
+        TextView textViewMessage;
+        TextView messageTime;
 
         public ReceivedViewHolder(@NonNull View itemView) {
             super(itemView);
+            senderName = itemView.findViewById(R.id.receivedName);
             textViewMessage = itemView.findViewById(R.id.receivedMessage);
             messageTime = itemView.findViewById(R.id.messageTimeR);
         }
