@@ -4,13 +4,26 @@ var express = require("express")
 const app = express()
 
 
-const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
-const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
-const mongoClient = new MongoClient(uri)
+// const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
+// const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+// const mongoClient = new MongoClient(uri)
 
-const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
+// const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
 
-console.log({ MongoClient, ObjectId })
+//==========server.js==========
+//=============================
+var user_collection = require('./mongodb_connection.js')
+
+
+// var app = require('./app.js')
+
+
+// app.listen()
+
+//==============================
+
+
+// console.log({ MongoClient, ObjectId })
 
 var server = null;
 
@@ -241,7 +254,7 @@ app.delete("/match/searches", async (req, res) => {
 
 async function run() {
   try {
-      await mongoClient.connect()  // waits for sync op to finish
+    //   await mongoClient.connect()  // waits for sync op to finish
       console.log("Successfully connected to the database")
       // var server = app.listen(8081, '0.0.0.0', function () {
       server = app.listen(PORT, function () {
@@ -252,7 +265,7 @@ async function run() {
   }
   catch (err) {
       console.log(err)
-      await mongoClient.close()
+    //   await mongoClient.close()
   }
 }
 

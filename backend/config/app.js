@@ -1,32 +1,78 @@
 
+//======================app.js============================
+//========================================================
+var user_collection = require('./mongodb_connection.js')
 
-function makeApp() {
-    var express = require('express')
-    const app = express()
-
-    app.use(express.json())
-
-
-    const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
-    const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
-    const mongoClient = new MongoClient(uri)
-
-
-    app.post('/users', async (req, res) => {
-        const { password, username } = req.body
-        if (!password || !username) {
-            res.sendStatus(400)
+app.get("/match/searches", async (req, res) => {
+    var profile_email = req.query.email
+    try {
+        var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
             return
         }
+        var temp_arry = await find_cursor.searches
+        console.log(temp_arry)
+        res.status(200).send(temp_arry)
+        
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
 
-        const userId = await database.createUser(username, password)
+//========================================================
 
-        res.send({ userId })
-    })
-    return app
-}
 
-module.exports = { makeApp }
+// var express = require('express')
+// const app = express()
+
+// app.use(express.json())
+
+
+
+// app.post('/users', async (req, res) => {
+//     const { password, username } = req.body
+//     if (!password || !username) {
+//         res.sendStatus(400)
+//         return
+//     }
+
+//     const userId = await database.createUser(username, password)
+
+//     res.send({ userId })
+// })
+
+// module.exports = { app }
+
+// function makeApp() {
+//     var express = require('express')
+//     const app = express()
+
+//     app.use(express.json())
+
+
+//     const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
+//     const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+//     const mongoClient = new MongoClient(uri)
+
+
+//     app.post('/users', async (req, res) => {
+//         const { password, username } = req.body
+//         if (!password || !username) {
+//             res.sendStatus(400)
+//             return
+//         }
+
+//         const userId = await database.createUser(username, password)
+
+//         res.send({ userId })
+//     })
+//     return app
+// }
+
+// module.exports = { makeApp }
 
 // export default async function() {
 
