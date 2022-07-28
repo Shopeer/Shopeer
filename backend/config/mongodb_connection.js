@@ -4,4 +4,6 @@ const mongoClient = new MongoClient(uri)
 const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
 mongoClient.connect()
 
+console.log(process.env.DBPASS)
+
 module.exports = user_collection
