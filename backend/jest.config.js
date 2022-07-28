@@ -6,8 +6,9 @@
 module.exports = {
   testEnvironment: 'node',
   "modulePaths": [
-    "~/"
+    "node_modules/"
   ],
+  
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
