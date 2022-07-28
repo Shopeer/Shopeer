@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const { MongoClient } = require("mongodb");  // this is multiple return
-const { find } = require('./config/mongodb_connection');
-const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+const uri = "mongodb://127.0.0.1:27017/test_"
 const mongoClient = new MongoClient(uri)
 const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
 mongoClient.connect()
