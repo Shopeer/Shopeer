@@ -47,8 +47,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     private static final String suggestionUrl = "http://20.230.148.126:8080/match/suggestions?email=";
     private static final String blockUrl = "http://20.230.148.126:8080/user/blocked?email=";
     private static final String invitationUrl = "http://20.230.148.126:8080/user/invitations?email="; // for invites I SEND
-    private static final String receivedInvitationUrl = "http://20.230.148.126:8080/user/invitations/received?email="; // to get recieved invites
-    private static final String peersUrl = "http://20.230.148.126:8080/user/peers?email=";
     private static final String roomUrl = "http://20.230.148.126:8080/chat/room";
     private static final String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
 
@@ -67,8 +65,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     ArrayList<ProfileObject> suggestions = new ArrayList<>();
 
     // peer management lists
-    HashSet<String> manageBlocked = new HashSet<>();
-    HashSet<String> manageInvites = new HashSet<>();
+    HashSet<String> manageBlocked;
+    HashSet<String> manageInvites;
     HashSet<String> managePeers;
 
     public static MatchFragment newInstance() {
