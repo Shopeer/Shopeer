@@ -24,8 +24,8 @@ jobs:
       with:
         mongodb-version: ${{ matrix.mongodb-version }}
 
-    - run: npm install
+    - run: npm --prefix backend/ install
 
-    - run: npm test
+    - run: npm --prefix backend/ test
       env:
         CI: true
