@@ -16,6 +16,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +53,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String enteredName = nameInput.getText().toString();
                 String enteredBio = bioInput.getText().toString();
-                String url = profileUrl + MainActivity.email +
+                String url = profileUrl + GoogleSignIn.getLastSignedInAccount(UpdateProfileActivity.this).getEmail() +
                         "&name=" + enteredName +
                         "&description=" + enteredBio;
                 Log.d(TAG, "onClick: " + url);
