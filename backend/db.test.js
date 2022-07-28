@@ -1,12 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const { MongoClient } = require("mongodb");  // this is multiple return
-const uri = "mongodb://127.0.0.1:27017/test_"
-const mongoClient = new MongoClient(uri)
-const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
-mongoClient.connect()
-
+var user_collection = require('../backend/config/mongodb_connection')
 
 describe('Customer CRUD', () => {
     let connection;
@@ -40,7 +35,7 @@ describe('Customer CRUD', () => {
     test("This one", async () => {
         var finder = await user_collection.findOne()
         console.log(finder)
-        expect(finder.email).toBe("timothy@gmail.com")
+        expect(finder.email).toBe("janjan3332001@gmail.com")
     });
 
 
