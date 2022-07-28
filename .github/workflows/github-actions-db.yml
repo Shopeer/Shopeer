@@ -3,6 +3,7 @@ name: Run tests
 on: [push]
 
 jobs:
+  working-directory: ./
   build:
     runs-on: ubuntu-latest
     strategy:
