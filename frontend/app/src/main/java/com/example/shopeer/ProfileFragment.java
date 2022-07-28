@@ -20,10 +20,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -34,6 +36,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,8 +52,6 @@ public class ProfileFragment extends Fragment {
     private ImageView profilePic;
     private ImageView cameraButton;
     private ImageView editButton;
-
-    private String temp="";
 
     final private String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
 
@@ -103,7 +104,6 @@ public class ProfileFragment extends Fragment {
                             JSONObject jsonResponse = new JSONObject(response);
                             profileName.setText(jsonResponse.getString("name"));
                             profileBio.setText(jsonResponse.getString("description"));
-                            temp = jsonResponse.getString("photo");
                             Bitmap profilePhoto = decodeImage(jsonResponse.getString("photo"));
                             profilePic.setImageBitmap(profilePhoto);
                         } catch (JSONException e) {
@@ -144,25 +144,48 @@ public class ProfileFragment extends Fragment {
     }
 
     private void updateProfileInBackend(String encodedImage) {
-        String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail() +
-                "&photo=" + '"' + encodedImage + '"';
-        Log.d(TAG, "onClick: " + url);
-        try {
-            RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-            StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d(TAG, "profile picture updated");
-                    Toast.makeText(getContext(), "Profile Picture updated", Toast.LENGTH_SHORT).show();
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse login: " + error.toString());
-                }
-            });
-            requestQueue.add(stringRequest);
-        } catch (Exception e) {
+        try{
+            String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("photo", encodedImage);
+            final String requestBody = jsonObject.toString();
+
+            Log.d(TAG, "onClick: " + url);
+            try {
+                RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+                StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, "profile photo updated");
+                        Toast.makeText(getContext(), "Photo updated", Toast.LENGTH_SHORT).show();
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, "onErrorResponse login: " + error.toString());
+                    }
+                }) {
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
+                    }
+
+                    @Override
+                    public byte[] getBody() throws AuthFailureError {
+                        try {
+                            return requestBody == null ? null : requestBody.getBytes("utf-8");
+                        } catch (UnsupportedEncodingException uee) {
+                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                            return null;
+                        }
+                    }
+                };
+                requestQueue.add(stringRequest);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
@@ -170,7 +193,7 @@ public class ProfileFragment extends Fragment {
 
     private String encodeImage(Bitmap bitmap) {
         int previewWidth = 150;
-        int previewHeight = bitmap.getHeight() + previewWidth / bitmap.getWidth();
+        int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
         Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         previewBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
@@ -202,10 +225,6 @@ public class ProfileFragment extends Fragment {
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         profilePic.setImageBitmap(bitmap);
                         String encodedImage = encodeImage(bitmap);
-                        Log.d(TAG, ": " + encodedImage);
-                        if (!temp.equals("")) {
-                            Log.d(TAG, "onResponse: " + temp.equals(encodedImage));
-                        }
                         // send encoded image to backend as put
                         updateProfileInBackend(encodedImage);
                     } catch (FileNotFoundException e) {
