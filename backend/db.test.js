@@ -13,7 +13,6 @@ describe('Customer CRUD', () => {
 
     beforeAll(async () => {
 
-        console.log(process.env.CUSTOMER_EMAIL)
         connection = mongoose.connect('mongodb://127.0.0.1:27017/test_' + process.env.DATABASE, { useNewUrlParser: true, useUnifiedTopology: true });
         db = mongoose.connection;
         const collection = process.env.COLLECTION;
@@ -34,7 +33,6 @@ describe('Customer CRUD', () => {
 
     test("This one", async () => {
         var finder = await user_collection.findOne()
-        console.log(finder)
         expect(finder.email).toBe("janjan3332001@gmail.com")
     });
 
