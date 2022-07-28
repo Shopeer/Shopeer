@@ -1,8 +1,6 @@
 var express = require("express")
 const app = express()
 app.use(express.json())
-var user_collection = require('../config/mongodb_connection')
-
 
 
 app.get("/", (req, res) => {
