@@ -254,6 +254,7 @@ describe("Send an invitation", () => {
     expect(response.status).toEqual(404);
   });
 
+
   it('should successfully post an invitation', async function () {
     // attempt to post an invitation from pam to tam
     const response = await request(app).post('/user/invitations').query({ email: emails[5], target_peer_email: emails[4] })
@@ -296,6 +297,17 @@ describe("Send an invitation", () => {
     response = await request(app).post('/user/invitations').query({ email: emails[2], target_peer_email: emails[0] })
     expect(response.body).toEqual({"response":"Target already in peerlist."});
     expect(response.status).toEqual(409);
+  });
+  it('should return 400 if a blocked user tries to send an invite', async function () {
+    // pam attempts to send jim an invite
+    const response = await request(app).post('/user/invitations').query({ email: emails[5], target_peer_email: emails[3] })
+    const thisUser = await request(app).get('/user/profile').query({ email: emails[5] }).set('Accept', 'application/json')
+    const targetUser = await request(app).get('/user/profile').query({ email: emails[3] }).set('Accept', 'application/json')
+
+    expect(thisUser.body.invites).toEqual(expect.not.arrayContaining([emails[3]]))
+    expect(targetUser.body.received_invites).toEqual(expect.not.arrayContaining([emails[5]]))
+    expect(response.body).toEqual({"response":"The target user cannot be invited."});
+    expect(response.status).toEqual(400);
   });
 
 
@@ -429,6 +441,37 @@ describe("Block user scenario", () => {
     expect(thisUser.body.received_invites).toEqual(expect.not.arrayContaining([emails[3]]))
     expect(targetUser.body.invites).toEqual(expect.not.arrayContaining([emails[1]]))
     expect(response.status).toEqual(201);
+  });
+
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+describe("Unblock user scenario", () => {
+
+  it('should return 404-user-not-found for non-existing user', async function () {
+    const nonexistentEmail= "nonexisting_test_email@test.com"
+    // first try to delete the user from the database, just in case.
+    await request(app).delete('/user/registration').query({email: nonexistentEmail })
+    // attempt to delete a random email from this nonexisting user's sent-invitations list
+    const response = await request(app).delete('/user/blocked').query({ email: nonexistentEmail, target_peer_email: emails[0] }).set('Accept', 'application/json')
+    
+    expect(response.body).toEqual({"response":"User not found."});
+    expect(response.status).toEqual(404);
+  });
+
+  it('should return 404-target-not-found for target not in blocklist', async function () {
+    // attempt to unblock pam for tam if not currently in tam's blocklist
+    const response = await request(app).delete('/user/blocked').query({ email: emails[4], target_peer_email: emails[5] }).set('Accept', 'application/json')
+    expect(response.body).toEqual({"response":"Target peer is not in blocklist."});
+    expect(response.status).toEqual(404);
+  });
+
+  it('should successfully unblock a user', async function () {
+    // jim has tam blocked
+    const response = await request(app).delete('/user/blocked').query({ email: emails[3], target_peer_email: emails[4] }).set('Accept', 'application/json')
+    const thisUser = await request(app).get('/user/profile').query({ email: emails[3] }).set('Accept', 'application/json')
+    expect(thisUser.body.blocked).toEqual(expect.not.arrayContaining([emails[4]]))
+    expect(response.status).toEqual(200);
   });
 
 });

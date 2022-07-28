@@ -182,8 +182,13 @@ user_peers_router.delete("/blocked", async (req, res) => {
     var target_peer_email = req.query.target_peer_email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        var target_cursor = await user_collection.findOne({ email: target_peer_email })
         if (!find_cursor) {
             res.status(404).json({response: "User not found."})
+            return
+        }
+        if (!target_cursor) {
+            res.status(404).json({response: "Target user not found."})
             return
         }
 
@@ -194,7 +199,7 @@ user_peers_router.delete("/blocked", async (req, res) => {
             // res.status(200).send("Success")
         } else {
             // var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(404).send("Target peer is not in blocklist")
+            res.status(404).json({response: "Target peer is not in blocklist."})
             // res.status(200).send("Fail")
         }
     }
