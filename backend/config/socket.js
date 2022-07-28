@@ -37,9 +37,7 @@ wsServer.on("request", (req) => {
     try {
       // searches for a document with the following fields
       //appends an object to the "chathistory" array
-      var doc = await coll.updateOne(
-        { _id: ObjectId(room_id) },
-        { $push: { chathistory: { mssg_id, email, text, time } } }
+      var doc = await coll.updateOne({ _id: ObjectId(room_id) },{ $push: { chathistory: { mssg_id, email, text, time } } }
       );
       if (!doc) {
         console.log("Room not found.");
