@@ -81,51 +81,34 @@ function sleep(ms) {
     setTimeout(resolve, ms);
   });
 }
-
-beforeEach(() => {
+beforeAll(() => {
   initializeDatabase();
-  // sleep(10000)
-  // setTimeout(function () {
-  //   console.log("waiting 1 sec");
-  // }, 1000)
-  // setTimeout(function () {
-  //   console.log("waiting 1 sec");
-  // }, 1000)
 });
 
-afterEach(() => {
+afterAll(() => {
   resetDatabase();
-  // sleep(10000)
-  // setTimeout(function () {
-  //   console.log("waiting 1 sec");
-  // }, 1000)
-  // setTimeout(function () {
-  //   console.log("waiting 1 sec");
-  // }, 1000)
 });
 
+// this is used as a delay function
+await new Promise(res => setTimeout(() => { res() }, 200))
 
 describe('Tests for Profile Submodule', function () {
-  it('GET /profile', async function () {
-    await user_collection.insertMany([{ name: names[0], email: emails[0] }])
-    await new Promise(res => setTimeout(() => {
-      res()
-    }, 500))
-    const response = await request(app)
-      .get('/profile')
-      .query({
-        email: emails[0],
-        name: names[0]
-      })
-      .set('Accept', 'application/json')
+  describe('Tests for GET /profile', function () {
+    it('GET /profile', async function () {
+      await user_collection.insertOne({ name: names[0], email: emails[0] })
+      const response = await request(app)
+        .get('/user/profile')
+        .query({
+          email: emails[0]
+        })
+        .set('Accept', 'application/json')
 
+      expect(response.status).toEqual(200);
+      expect(response.body.email).toEqual(emails[0]);
+      expect(response.headers["content-type"]).toMatch(/json/);
+    });
+  })
 
-    expect(response.status).toEqual(200);
-    expect(response.body.email).toEqual(emails[0]);
-    expect(response.headers["content-type"]).toMatch(/json/);
-  });
-
-  
 
 
 
@@ -141,6 +124,7 @@ describe('Tests for Profile Submodule', function () {
       expect(response.text).toEqual("Success");
     });
 
+    
     it('POST /registration - user exists', async function () {
       const response = await request(app)
         .post('/user/registration')

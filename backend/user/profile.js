@@ -15,8 +15,6 @@ var user_collection = require('../config/mongodb_connection')
 // Response: User details (profile, bio, name)
 
 user_profile_router.get("/profile", async (req, res) => {
-    console.log(req.query)
-    console.log(req.body)
     var profile_email = req.query.email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
@@ -80,7 +78,9 @@ user_profile_router.put("/profile", async (req, res) => {
 user_profile_router.post("/registration", async (req, res) => {
     var profile = req.query
 
-    if (!validator.isEmail(profile.email)) {
+    if (profile.email == null || profile.name == null) {
+        res.status(400).send("Error")
+    } else if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
     } else if (!validator.isAlpha(profile.name)) {
         res.status(400).send("Error: Invalid name")
