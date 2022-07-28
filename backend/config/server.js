@@ -153,8 +153,8 @@ app.post("/match/searches", async (req, res) => {
                 // }
             }
 
-            //await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-            // var find_cursor = await user_collection.findOne({ email: profile_email })
+            await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+            find_cursor = await user_collection.findOne({ email: profile_email })
             console.log(debug_res)
             res.status(201).json({ response: 'added new search' });
             return
