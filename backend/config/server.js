@@ -153,8 +153,8 @@ app.post("/match/searches", async (req, res) => {
                 // }
             }
 
-            //await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-            // var find_cursor = await user_collection.findOne({ email: profile_email })
+            await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+            find_cursor = await user_collection.findOne({ email: profile_email })
             console.log(debug_res)
             res.status(201).json({ response: 'added new search' });
             return
@@ -187,6 +187,7 @@ function create_search_object(body) {
     var ret_object = {
         search_name: body.search_name,
         activity: body.activity,
+        location_name: body.location_name,
         location: body.location,
         max_range: body.max_range,
         max_budget: body.max_budget
