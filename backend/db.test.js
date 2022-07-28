@@ -40,7 +40,7 @@ describe('Customer CRUD', () => {
 
     test("This one", async () => {
         var finder = await user_collection.findOne()
-        console.log(finder.email == "timothy@gmail.com")
+        console.log(finder)
         expect(finder.email).toBe("timothy@gmail.com")
     });
 
