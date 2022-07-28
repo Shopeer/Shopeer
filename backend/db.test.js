@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+const { MongoClient } = require("mongodb");  // this is multiple return
+const { find } = require('./config/mongodb_connection');
+const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+const mongoClient = new MongoClient(uri)
+const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
+mongoClient.connect()
+
 
 describe('Customer CRUD', () => {
     let connection;
@@ -31,6 +38,12 @@ describe('Customer CRUD', () => {
 
     });
 
+    test("This one", async () => {
+        var finder = await user_collection.findOne()
+        console.log(finder.email == "timothy@gmail.com")
+        expect(finder.email).toBe("timothy@gmail.com")
+    });
+
 
     test("Add Customer POST /customers", async () => {
 
@@ -43,27 +56,27 @@ describe('Customer CRUD', () => {
 
     });
 
-    test("All Customers GET /customers", async () => {
+    // test("All Customers GET /customers", async () => {
 
-        const response = await customers.find({});
-        expect(response.length).toBeGreaterThan(0);
+    //     const response = await customers.find({});
+    //     expect(response.length).toBeGreaterThan(0);
 
-    });
+    // });
 
-    test("Update Customer PUT /customers/:id", async () => {
+    // test("Update Customer PUT /customers/:id", async () => {
 
-        const response = await customers.updateOne({ name: process.env.CUSTOMER_NAME }, { email: process.env.CUSTOMER_EMAIL_ALT });
-        console.log(response)
-        expect(response.matchedCount).toBeTruthy();
+    //     const response = await customers.updateOne({ name: process.env.CUSTOMER_NAME }, { email: process.env.CUSTOMER_EMAIL_ALT });
+    //     console.log(response)
+    //     expect(response.matchedCount).toBeTruthy();
 
-    });
+    // });
 
-    test("Customer update is correct", async () => {
+    // test("Customer update is correct", async () => {
 
-        const responseTwo = await customers.findOne({ name: process.env.CUSTOMER_NAME });
-        expect(responseTwo.email).toBe(process.env.CUSTOMER_EMAIL_ALT);
+    //     const responseTwo = await customers.findOne({ name: process.env.CUSTOMER_NAME });
+    //     expect(responseTwo.email).toBe(process.env.CUSTOMER_EMAIL_ALT);
 
-    });
+    // });
 
     // test("Delete Customer DELETE /customers/:id", async () => {
 
