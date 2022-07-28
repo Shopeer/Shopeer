@@ -2,27 +2,13 @@
 // const user_profile_router = require('./profile_mock')
 // const user_peers_router = require('./peers_mock')
 
-// const user_profile_router = require('../user/profile.js')
-
 const request = require('supertest');
 const express = require('express');
 const validator = require('validator')
-const app = express()
-// reuse original application?
-const user_profile_router = require('../user/profile.js');
-app.use('*', user_profile_router);
-app.use('/user', user_profile_router)
-
-const user_peers_router = require('../user/peers.js');
-app.use('*', user_peers_router);
-app.use('/user', user_peers_router)
+const app = require('../config/app')
 
 
-
-const { MongoClient } = require("mongodb")  // this is multiple return
-const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
-const mongoClient = new MongoClient(uri)
-const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
+var user_collection = require('../config/mongodb_connection')
 
 /**database is initialized as follows:
  * Rob:
@@ -57,70 +43,116 @@ const user_collection = mongoClient.db("shopeer_database").collection("user_coll
  * ---- blocked:
  * */
 
-const rob_email = 'rob_test_user@test.com'
-const rob_name = 'rob'
-const bob_email = 'bob_test_user@test.com'
-const bob_name = 'bob'
-const tim_email = 'tim_test_user@test.com'
-const tim_name = 'tim'
-const jim_email = 'jim_test_user@test.com'
-const jim_name = 'jim'
-const tam_email = 'tam_test_user@test.com'
-const tam_name = 'tam'
-const pam_email = 'pam_test_user@test.com'
-const pam_name = 'pam'
-var emails = [rob_email, bob_email, tim_email, jim_email, tam_email, pam_email]
-var names = [rob_name, bob_name, tim_name, jim_name, tam_name, pam_name]
-
+const rob_email = 'robithy_test_user@test.com'
+const rob_name = 'robithy'
+const bob_email = 'bobithy_test_user@test.com'
+const bob_name = 'bobithy'
+const tim_email = 'timothy_test_user@test.com'
+const tim_name = 'timothy'
+// const jim_email = 'jimothy_test_user@test.com'
+// const jim_name = 'jimothy'
+// const tam_email = 'tambert_test_user@test.com'
+// const tam_name = 'tambert'
+const pam_email = 'pambert_test_user@test.com'
+const pam_name = 'pambert'
+// var emails = [rob_email, bob_email, tim_email, jim_email, tam_email, pam_email]
+// var names = [rob_name, bob_name, tim_name, jim_name, tam_name, pam_name]
+var emails = [rob_email, bob_email, tim_email]
+var names = [rob_name, bob_name, tim_name]
 
 async function initializeDatabase() {
-  for (let i = 0; i < emails.length; i++) {
-    await request(app).post('/user/registration').query({ name: names[i], email: emails[i] })
-  }
-  await request(app).delete('/user/registration').query({ name: names[0], email: emails[0] })
+  // for (let i = 1; i < emails.length; i++) {
+  //   // await request(app).post('/user/registration').query({ name: names[i], email: emails[i] })
+  //   await user_collection.insertOne({ name: names[i], email: emails[i] })
+  // }
+  await user_collection.insertMany([{ name: names[0], email: emails[0] }, { name: names[1], email: emails[1] }, { name: names[2], email: emails[2] }])
 }
 async function resetDatabase() {
-  for (let i = 0; i < emails.length; i++) {
-    await request(app).delete('/user/registration').query({ name: names[i], email: emails[i] })
-  }
+  // for (let i = 0; i < emails.length; i++) {
+  //   // await request(app).delete('/user/registration').query({ name: names[i], email: emails[i] })
+  //   // await user_collection.deleteMany({ name: names[i], email: emails[i] })
+  //   await user_collection.deleteMany({})
+  // }
+  await user_collection.deleteMany({})
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 beforeEach(() => {
   initializeDatabase();
+  // sleep(10000)
+  // setTimeout(function () {
+  //   console.log("waiting 1 sec");
+  // }, 1000)
+  // setTimeout(function () {
+  //   console.log("waiting 1 sec");
+  // }, 1000)
 });
 
 afterEach(() => {
   resetDatabase();
+  // sleep(10000)
+  // setTimeout(function () {
+  //   console.log("waiting 1 sec");
+  // }, 1000)
+  // setTimeout(function () {
+  //   console.log("waiting 1 sec");
+  // }, 1000)
 });
 
 
 describe('Tests for Profile Submodule', function () {
-  // it('GET /profile', async function () {
-  //   const response = await request(user_profile_router)
-  //     .get('/profile')
-  //     .query({ email: 'jimothy@gmail.com' })
-  //     .set('Accept', 'application/json')
-  //   expect(response.status).toEqual(200);
-  //   expect(response.body.email).toEqual('jimothy@gmail.com');
-  //   expect(response.headers["content-type"]).toMatch(/json/);
-  // });
+  it('GET /profile', async function () {
+    await user_collection.insertMany([{ name: names[0], email: emails[0] }])
+    await new Promise(res => setTimeout(() => {
+      res()
+    }, 500))
+    const response = await request(app)
+      .get('/profile')
+      .query({
+        email: emails[0],
+        name: names[0]
+      })
+      .set('Accept', 'application/json')
 
-  describe('Tests for Post /registration', function () {
 
-    it('POST /registration', async function () {
+    expect(response.status).toEqual(200);
+    expect(response.body.email).toEqual(emails[0]);
+    expect(response.headers["content-type"]).toMatch(/json/);
+  });
+
+  
+
+
+
+  describe('Tests for POST /registration', function () {
+    it('POST /registration - success', async function () {
       const response = await request(app)
         .post('/user/registration')
         .query({
-          email: emails[0],
-          name: names[0]
+          email: pam_email,
+          name: pam_name
         })
       expect(response.status).toEqual(200);
       expect(response.text).toEqual("Success");
     });
 
+    it('POST /registration - user exists', async function () {
+      const response = await request(app)
+        .post('/user/registration')
+        .query({
+          email: emails[1],
+          name: names[1]
+        })
+      expect(response.status).toEqual(409);
+      expect(response.text).toEqual("User already exists");
+    });
+
     it('POST /registration - invalid email', async function () {
-      await request(app).delete('/user/registration').query({ name: names[0], email: emails[0] })
       const response = await request(app)
         .post('/user/registration')
         .query({
@@ -131,8 +163,38 @@ describe('Tests for Profile Submodule', function () {
       expect(response.text).toEqual("Error: Invalid email");
     });
 
+    it('POST /registration - invalid name', async function () {
+      const response = await request(app)
+        .post('/user/registration')
+        .query({
+          email: emails[0],
+          name: "!@#$"
+        })
+      expect(response.status).toEqual(400);
+      expect(response.text).toEqual("Error: Invalid name");
+    });
 
+    it('POST /registration - invalid email', async function () {
+      const response = await request(app)
+        .post('/user/registration')
+        .query({
+          email: "",
+          name: names[0]
+        })
+      expect(response.status).toEqual(400);
+      expect(response.text).toEqual("Error: Invalid email");
+    });
 
+    it('POST /registration - invalid name', async function () {
+      const response = await request(app)
+        .post('/user/registration')
+        .query({
+          email: emails[0],
+          name: ""
+        })
+      expect(response.status).toEqual(400);
+      expect(response.text).toEqual("Error: Invalid name");
+    });
   })
 
 

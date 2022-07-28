@@ -5,6 +5,7 @@
 
 module.exports = {
   testEnvironment: 'node',
+  // runner: 'jest-serial-runner',
   // "modulePaths": [
   //   "~/"
   // ],
