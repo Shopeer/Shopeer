@@ -18,10 +18,11 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
     private static final int ITEM_RECEIVE = 2;
 
     private LayoutInflater inflater;
-    private ArrayList<JSONObject> messagesList = new ArrayList<>();
+    private ArrayList<JSONObject> messagesList;
 
-    public ChatRecyclerAdapter(LayoutInflater inflater) {
+    public ChatRecyclerAdapter(LayoutInflater inflater, ArrayList<JSONObject> messagesList) {
         this.inflater = inflater;
+        this.messagesList = messagesList;
     }
 
     @NonNull
@@ -79,9 +80,15 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
         return messagesList.size();
     }
 
-    public void addItem (JSONObject jsonObject) {
-        messagesList.add(jsonObject);
-        notifyDataSetChanged();
+    public void addItem (JSONObject jsonObject, String roomId) {
+        try {
+            if (roomId.equals(jsonObject.getString("room_id"))) {
+                messagesList.add(jsonObject);
+                notifyDataSetChanged();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     // Helper classes

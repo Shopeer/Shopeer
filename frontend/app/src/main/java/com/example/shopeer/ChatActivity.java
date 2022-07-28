@@ -15,10 +15,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import okhttp3.OkHttpClient;
@@ -37,6 +47,8 @@ public class ChatActivity extends AppCompatActivity {
     String roomId;
     String roomName;
 
+    ArrayList<JSONObject> messagesList = new ArrayList<>();
+
     public RecyclerView recyclerView;
     public ChatRecyclerAdapter chatRecyclerAdapter;
     Calendar calendar;
@@ -44,8 +56,9 @@ public class ChatActivity extends AppCompatActivity {
 
     private WebSocket webSocket;
     private final String roomUrl = "http://20.230.148.126:8080/chat/room/history?room_id=";
-    private final String postUrl = "http://20.230.148.126:8080/chat/message?room_id=";
+//    private final String postUrl = "http://20.230.148.126:8080/chat/message?room_id=";
     private final String SERVER_PATH = "ws://20.230.148.126:8000";
+//    private final String SERVER_PATH = "ws://192.168.1.179:8000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +82,7 @@ public class ChatActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 Toast.makeText(ChatActivity.this, "Socket Connection Successful", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Socket Connection Successful");
+//                Log.d(TAG, MainActivity.email + "  " + GoogleSignIn.getLastSignedInAccount(ChatActivity.this).getEmail());
                 init();
             });
         }
@@ -80,7 +94,7 @@ public class ChatActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 try{
                     JSONObject jsonObject = new JSONObject(text);
-                    chatRecyclerAdapter.addItem(jsonObject);
+                    chatRecyclerAdapter.addItem(jsonObject, roomId);
                     recyclerView.smoothScrollToPosition(chatRecyclerAdapter.getItemCount()-1);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -101,13 +115,14 @@ public class ChatActivity extends AppCompatActivity {
         simpleDateFormat = new SimpleDateFormat("hh:mm a");
 
         recyclerView = findViewById(R.id.chat_recyclerView);
-        chatRecyclerAdapter = new ChatRecyclerAdapter(getLayoutInflater());
+        chatRecyclerAdapter = new ChatRecyclerAdapter(getLayoutInflater(), messagesList);
         recyclerView.setAdapter(chatRecyclerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         setRoomInfo();
         setSendMessageButton();
         setBackButton();
+        fetchMessageHistory(roomId);
     }
 
 
@@ -138,13 +153,14 @@ public class ChatActivity extends AppCompatActivity {
                     Log.d(TAG, "sending message");
                     JSONObject jsonObject = new JSONObject();
                     try{
-                        jsonObject.put("email", MainActivity.email);
+                        jsonObject.put("email", GoogleSignIn.getLastSignedInAccount(ChatActivity.this).getEmail());
                         jsonObject.put("text", enteredMessage);
                         jsonObject.put("time", currenttime);
                         jsonObject.put("room_id", roomId);
 
+                        Log.d(TAG, "sending: " + jsonObject);
                         webSocket.send(jsonObject.toString());
-                        chatRecyclerAdapter.addItem(jsonObject);
+                        chatRecyclerAdapter.addItem(jsonObject, roomId);
                         recyclerView.smoothScrollToPosition(chatRecyclerAdapter.getItemCount()-1);
 
                     } catch(JSONException e) {
@@ -169,4 +185,42 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+
+    // fetch from BE
+    private void fetchMessageHistory(String room_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        String url = roomUrl + room_id;
+        Log.d(TAG, url);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
+                (Request.Method.GET,
+                        url, null,
+                        new Response.Listener<JSONArray>() {
+                            @Override
+                            public void onResponse(JSONArray response) {
+                                try{
+                                    if (response.length() == 0) {return;}
+                                    messagesList.clear();
+                                    for (int i = 0; i < response.length(); i++) {
+                                        JSONObject obj = response.getJSONObject(i);
+                                        obj.put("room_id", roomId);
+                                        messagesList.add(obj);
+                                    }
+                                    // notify change, scroll
+                                    chatRecyclerAdapter.notifyDataSetChanged();
+                                    recyclerView.smoothScrollToPosition(chatRecyclerAdapter.getItemCount()-1);
+
+                                    Log.d(TAG, "received message history");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, "get message history: " + error.toString());
+                    }
+                });
+        requestQueue.add(jsonArrayRequest);
+    }
+
 }
