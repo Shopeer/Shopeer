@@ -92,7 +92,7 @@ describe('Tests for Profile Submodule', function () {
       expect(response.status).toEqual(400);
       expect(response.text).toEqual("Error: Invalid email")
     });
-    
+
     it('GET /profile user does not exist', async function () {
       const response = await request(app)
         .get('/user/profile')
@@ -230,6 +230,7 @@ describe('Tests for Profile Submodule', function () {
 
 
     it('POST /registration - user exists', async function () {
+      await user_collection.insertOne({ email: emails[1], name: names[1] })
       const response = await request(app)
         .post('/user/registration')
         .query({
