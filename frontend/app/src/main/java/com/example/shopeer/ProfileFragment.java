@@ -240,7 +240,7 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    private String encodeImage(Bitmap bitmap) {
+    public String encodeImage(Bitmap bitmap) {
         int previewWidth = 150;
         int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
         Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
@@ -250,7 +250,7 @@ public class ProfileFragment extends Fragment {
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
 
-    private Bitmap decodeImage(String encodedImage) {
+    public Bitmap decodeImage(String encodedImage) {
         try{
             Log.d(TAG, "decodeImage: " + encodedImage);
             byte [] encodeByte = Base64.decode(encodedImage,Base64.DEFAULT);
