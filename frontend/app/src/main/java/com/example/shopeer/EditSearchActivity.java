@@ -92,10 +92,9 @@ public class EditSearchActivity extends AppCompatActivity {
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getLatLng());
-                //searchLocation.setText(place.getName()); //TODO: uncomment this later when location name is in backend
+                searchLocation.setText(place.getName()); //TODO: uncomment this later when location name is in backend
                 locationLat = place.getLatLng().latitude;
                 locationLon = place.getLatLng().longitude;
-                searchLocation.setText("lat: " + locationLat + "\nlon: " + locationLon);
             }
 
             @Override
@@ -133,16 +132,13 @@ public class EditSearchActivity extends AppCompatActivity {
             this.locationLat = intent.getDoubleExtra("lat", -1);
             this.locationLon = intent.getDoubleExtra("lon", -1);
 
-            if (intent.getStringExtra("locationName").equals("")) {
+            if (intent.getStringExtra("locationName").equals("") || intent.getStringExtra("locationName") == null) {
                 // set to lat lon if no location name set
                 searchLocation.setText("lat: " + this.locationLat + "\nlon: " + this.locationLon);
             }
             else {
                 searchLocation.setText(intent.getStringExtra("locationName"));
             }
-            // for now, just make all locations as lat lon, delete this line when location name is added to backend
-            searchLocation.setText("lat: " + this.locationLat + "\nlon: " + this.locationLon);
-
 
             distanceNumber.setText(Integer.toString(intent.getIntExtra("range", 0)));
             budgetNumber.setText(Integer.toString(intent.getIntExtra("budget", 0)));
@@ -172,10 +168,9 @@ public class EditSearchActivity extends AppCompatActivity {
 
     private void setDefaultLocation(){
         // defaults to north pole in beginning
-        //searchLocation.setText("North Pole");
+        searchLocation.setText("North Pole");
         locationLat = 90;
         locationLon = 135;
-        searchLocation.setText("lat: " + this.locationLat + "\nlon: " + this.locationLon);
     }
 
     private void setDeleteButton() {
@@ -230,8 +225,7 @@ public class EditSearchActivity extends AppCompatActivity {
 
                 String nameInput = searchName.getText().toString();
 
-                // TODO: integrate locationInput functionality later
-                // String locationInput = searchLocation.getText().toString();
+                String locationInput = searchLocation.getText().toString();
 
                 double latInput = locationLat;
                 double lonInput = locationLon;
@@ -240,7 +234,7 @@ public class EditSearchActivity extends AppCompatActivity {
 
                 ArrayList<String> activitiesInput = getActivitySelection();
                 if (activitiesInput.isEmpty()) {
-                    Toast.makeText(EditSearchActivity.this, "choose at least one activity", Toast.LENGTH_LONG).show();
+                    Toast.makeText(EditSearchActivity.this, "choose at least one activity", Toast.LENGTH_SHORT).show();
                     canSave = false;
                 }
 
@@ -266,6 +260,8 @@ public class EditSearchActivity extends AppCompatActivity {
 
                         JSONArray activity = new JSONArray(activitiesInput);
                         search.put("activity",activity);
+
+                        search.put("location_name", locationInput);
 
                         JSONArray location = new JSONArray();
                         location.put(latInput);

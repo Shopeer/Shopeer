@@ -155,6 +155,13 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                                 activities.add(activity.getString(j));
                             }
 
+                            String location_name = "";
+                            try { //TODO: get rid of this try catch once all searches in server have location_name
+                                location_name = responseObj.getString("location_name");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
                             JSONArray location = responseObj.getJSONArray("location");
                             double lon = location.getDouble(0);
                             double lat = location.getDouble(1);
@@ -163,7 +170,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                             int budget = responseObj.getInt("max_budget");
 
-                            SearchObject searchObject = new SearchObject(search_name, "", lat, lon, range, budget, activities);
+                            SearchObject searchObject = new SearchObject(search_name, location_name, lat, lon, range, budget, activities);
                             searches.add(searchObject);
 
                             Log.d(TAG, "search: " + searchObject.toString());
