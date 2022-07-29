@@ -46,7 +46,6 @@ import java.io.UnsupportedEncodingException;
 public class ProfileFragment extends Fragment {
     final static String TAG = "ProfileFragment"; // good practice for debugging
     private static final int RESULT_OK = -1;
-    private static final int RESULT_CANCELED = 0;
     private TextView profileName;
     private TextView profileBio;
     private ImageView profilePic;
@@ -54,6 +53,25 @@ public class ProfileFragment extends Fragment {
     private ImageView editButton;
 
     final private String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
+
+    private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if(result.getResultCode() == RESULT_OK) {
+                    Uri imageUri = result.getData().getData();
+                    try{
+                        InputStream inputStream = getActivity().getContentResolver().openInputStream(imageUri);
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        profilePic.setImageBitmap(bitmap);
+                        String encodedImage = encodeImage(bitmap);
+                        // send encoded image to backend as put
+                        updateProfileInBackend(encodedImage);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+    );
 
     /**
      * Use this factory method to create a new instance of
@@ -214,23 +232,4 @@ public class ProfileFragment extends Fragment {
             return null;
         }
     }
-
-    private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if(result.getResultCode() == RESULT_OK) {
-                    Uri imageUri = result.getData().getData();
-                    try{
-                        InputStream inputStream = getActivity().getContentResolver().openInputStream(imageUri);
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        profilePic.setImageBitmap(bitmap);
-                        String encodedImage = encodeImage(bitmap);
-                        // send encoded image to backend as put
-                        updateProfileInBackend(encodedImage);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-    );
 }
