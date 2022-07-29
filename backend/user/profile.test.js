@@ -28,11 +28,6 @@ async function resetDatabase() {
   await user_collection.deleteMany({})
 }
 
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 beforeAll(() => {
   initializeDatabase();
 });
@@ -40,9 +35,6 @@ beforeAll(() => {
 afterAll(() => {
   resetDatabase();
 });
-
-// this is used as a delay function
-// await new Promise(res => setTimeout(() => { res() }, 200))
 
 describe('Tests for Profile Submodule', function () {
 
