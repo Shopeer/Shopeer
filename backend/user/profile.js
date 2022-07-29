@@ -12,7 +12,6 @@ var user_collection = require('../config/mongodb_connection')
 // Param: user_id
 // Body: user id token
 // Response: User details (profile, bio, name)
-
 user_profile_router.get("/profile", async (req, res) => {
     var profile = req.query
     if (!validator.isEmail(profile.email)) {
@@ -32,7 +31,6 @@ user_profile_router.get("/profile", async (req, res) => {
 // Edits fields in the profile
 // Body: user id token AND New profile info {profile_pic, name, bio}
 // Response: success/fail
-
 user_profile_router.put("/profile", async (req, res) => {
     var profile_email = req.query.email
     var profile_name = req.body.name
@@ -46,7 +44,6 @@ user_profile_router.put("/profile", async (req, res) => {
     } else if (!validator.isAlpha(profile_name)) {
         res.status(400).send("Error: Invalid name")
     } else {
-        // try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (!find_cursor) {
             res.status(404).json({ response: "User not found." })
@@ -64,21 +61,14 @@ user_profile_router.put("/profile", async (req, res) => {
         if (profile_photo) {
             await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
         }
-        // var find_cursor = await user_collection.findOne({ email: profile_email })
-        // res.status(200).send(find_cursor)
         res.status(200).send("Success")
-        // }
-        // catch (err) {
-        //     console.log(err)
-        //     res.status(400).send(err)
-        // }
     }
 })
+
 
 // Register User POST https://shopeer.com/user/register
 // Body (Parameter): {"name":<user_name>, "email":<user_email>}
 // Response: user_id
-
 user_profile_router.post("/registration", async (req, res) => {
     var profile = req.query
 
@@ -87,7 +77,6 @@ user_profile_router.post("/registration", async (req, res) => {
     } else if (!validator.isAlpha(profile.name)) {
         res.status(400).send("Error: Invalid name")
     } else {
-        // try {
         profile_email = profile.email
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor) {
@@ -95,28 +84,15 @@ user_profile_router.post("/registration", async (req, res) => {
         } else {
             var user_object = create_user_object(profile)
             var result_debug = await user_collection.insertOne(user_object)
-            // if (!result_debug) {
-            //     res.status(400).json({ response: "Failed to register user." })
-            //     return
-            // } else {
             res.status(200).send("Success")
-            // }
         }
-        // } catch (err) {
-        //     console.log(err)
-        //     res.status(400).send(err)
-        // }
     }
 })
-
-
 
 // Delete User DELETE https://shopeer.com/user/registration?user_id=[user_id]
 // Removes the user from User Database and clears all info regarding the user
 // Body (Parameter): <user_email>
 // Response: success/fail
-
-
 user_profile_router.delete("/registration", async (req, res) => {
     var profile_email = req.query.email
     var profile = req.query
@@ -126,31 +102,17 @@ user_profile_router.delete("/registration", async (req, res) => {
     } else if (!validator.isAlpha(profile.name)) {
         res.status(400).send("Error: Invalid name")
     } else {
-        // try {
             var status_code
             var text_res
-            // var find_cursor = await user_collection.find({email:profile_email})
             var delete_return = await user_collection.deleteMany({ email: profile_email })
-            // if (!delete_return) {
-            //     status_code = 404
-            //     text_res = "User not found"
-            //     // res.status(404).json({response: "User not found."})
-            // } else {
                 if (delete_return.deletedCount > 0) {
                     status_code = 200
                     text_res = "User deleted"
-                    // res.status(200).send("User deleted")
                 } else {
                     status_code = 404
                     text_res = "User does not exist"
-                    // res.status(404).send("User does not exist")
                 }
-            // }
             res.status(status_code).send(text_res)
-        // } catch (err) {
-        //     console.log(err)
-        //     res.status(400).send(err)
-        // }
     }
 })
 
@@ -193,8 +155,6 @@ function create_user_object(body) {
 //         res.status(400).send(err)
 //     }
 // })
-
-
 
 module.exports = user_profile_router;
 
