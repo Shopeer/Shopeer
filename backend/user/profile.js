@@ -6,7 +6,7 @@ express()
 const user_profile_router = express.Router()
 
 const { MongoClient } = require("mongodb")  // this is multiple return
-const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+const uri = "mongodb://admin:shopeer@20.230.148.126:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
 const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
@@ -43,10 +43,9 @@ user_profile_router.get("/profile", async (req, res) => {
 
 user_profile_router.put("/profile", async (req, res) => {
     var profile_email = req.query.email
-    var profile_name = req.query.name
-    var profile_description = req.query.description
-    var profile_photo = req.query.photo
-
+    var profile_name = req.body.name
+    var profile_description = req.body.description
+    var profile_photo = req.body.photo
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (!find_cursor) {

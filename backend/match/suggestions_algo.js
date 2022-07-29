@@ -6,7 +6,7 @@ const suggestions_algo_router = express.Router()
 
 // const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
 const {MongoClient} = require("mongodb")
-const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+const uri = "mongodb://admin:shopeer@20.230.148.126:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
 const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
@@ -21,6 +21,7 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
     console.log(req.query)
     try {
         var main_user_cursor = await user_collection.findOne({email:profile_email})
+
         var target_searches = main_user_cursor.searches
 
         var remaining_user_cursor = await user_collection.find({email: { $ne: profile_email }})
@@ -31,6 +32,10 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
         
         console.log("----------")
         for (let i = 0; i < remaining_user_array.length; i++){
+            var user = await user_collection.findOne({email: remaining_user_array[i].email})
+            // console.log("is this user valid?")
+            // console.log(user)
+
             var each_search_array = remaining_user_array[i].searches
             var each_email = remaining_user_array[i].email
             console.log(each_search_array)
@@ -62,7 +67,33 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
 
         console.log(result)
 
-        res.status(200).send(result)
+        obj_arr = []
+        for (let i = 0; i < result.length; i++) {
+            var currEmail = result[i]
+            // console.log("\nsearching for email:\n")
+            // console.log(result[i])
+            // console.log("\n")
+            //var main_user_cursor = await user_collection.findOne({email:profile_email})
+            var cursor = await user_collection.findOne({email: currEmail.toString()})
+            if (cursor == null) {
+                console.log("suggested email not found")
+                continue
+            } else {
+                obj_arr.push(cursor)
+                // console.log("cursor is")
+                // console.log(cursor)
+            }
+
+        }
+        res.status(200).send(obj_arr)
+
+        // if (get_object_array_from_email_array(result).length > 0 ) {
+        //     res.status(200).send(get_object_array_from_email_array(result))
+        // } else {
+        //     res.status(404).send("there may be invalid emails in the suggestion list")
+        // }
+
+        
     }
     catch (err) {
         console.log(err)
@@ -99,6 +130,29 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
 // Browse users
 // Manage peers
 // Manage blocking
+
+// TODO Fix repeated code from peers.js
+// async function get_object_array_from_email_array(email_array) {
+//     // console.log(email_array)
+//     // var array = []
+//     // for (let i = 0; i < email_array.length; i++) {
+//     //     var return_cursor = await user_collection.findOne({ email: email_array[i] })
+//     //     if (!return_cursor) {
+//     //         throw "Error: Invalid email"
+//     //     }
+//     //     // console.log(return_cursor)
+//     //     array.push(return_cursor)
+//     // }
+
+//     var return_arr = await user_collection.find({ email: { $in: email_array } }).toArray()
+//     console.log("return arr is ")
+//     console.log(return_arr)
+//     if (!return_arr) {
+//         throw "Error: invalid email"
+//     }
+//     return return_arr
+// }
+
 
 module.exports = suggestions_algo_router;
 
