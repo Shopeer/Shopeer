@@ -93,7 +93,9 @@ afterAll(() => {
 // await new Promise(res => setTimeout(() => { res() }, 200))
 
 describe('Tests for Profile Submodule', function () {
+
   describe('GET /user/profile', function () {
+
     it('GET /profile success', async function () {
       await user_collection.insertOne({ name: names[0], email: emails[0] })
       const response = await request(app)
@@ -106,6 +108,7 @@ describe('Tests for Profile Submodule', function () {
       expect(response.body.email).toEqual(emails[0]);
       expect(response.headers["content-type"]).toMatch(/json/);
     });
+
     it('GET /profile illegal email', async function () {
       const response = await request(app)
         .get('/user/profile')
@@ -116,6 +119,7 @@ describe('Tests for Profile Submodule', function () {
       expect(response.status).toEqual(400);
       expect(response.text).toEqual("Error: Invalid email")
     });
+
     it('GET /profile empty email', async function () {
       const response = await request(app)
         .get('/user/profile')
@@ -126,16 +130,17 @@ describe('Tests for Profile Submodule', function () {
       expect(response.status).toEqual(400);
       expect(response.text).toEqual("Error: Invalid email")
     });
+
     it('GET /profile null email', async function () {
       const response = await request(app)
         .get('/user/profile')
         .query({
           email: null
         })
-        .set('Accept', 'application/json')
       expect(response.status).toEqual(400);
       expect(response.text).toEqual("Error: Invalid email")
     });
+    
     it('GET /profile user does not exist', async function () {
       const response = await request(app)
         .get('/user/profile')
@@ -147,6 +152,7 @@ describe('Tests for Profile Submodule', function () {
       expect(response.status).toEqual(404);
       expect(JSON.parse(response.text).response).toEqual("User does not exist")
     });
+
   })
 
   describe('PUT /user/profile', function () {
@@ -243,6 +249,19 @@ describe('Tests for Profile Submodule', function () {
       expect(response.status).toEqual(400);
       expect(response.text).toEqual("Error: Invalid name");
     });
+
+    it('PUT /profile - user not found', async function () {
+      const response = await request(app)
+        .put('/user/profile')
+        .query({
+          email: "null@null.com"
+        })
+        .send({
+          name: "null"
+        })
+      expect(response.status).toEqual(404);
+      expect(response.text).toEqual('{"response":"User not found."}');
+    });
   })
 
   describe('POST /user/registration', function () {
@@ -312,6 +331,28 @@ describe('Tests for Profile Submodule', function () {
       expect(response.status).toEqual(400);
       expect(response.text).toEqual("Error: Invalid name");
     });
+
+    it('POST /registration - null email', async function () {
+      const response = await request(app)
+        .post('/user/registration')
+        .query({
+          email: null,
+          name: names[0]
+        })
+      expect(response.status).toEqual(400);
+      expect(response.text).toEqual("Error: Invalid email");
+    });
+
+    it('POST /registration - null name', async function () {
+      const response = await request(app)
+        .post('/user/registration')
+        .query({
+          email: emails[0],
+          name: null
+        })
+      expect(response.status).toEqual(400);
+      expect(response.text).toEqual("Error: Invalid name");
+    });
   })
 
   describe('DELETE /user/registration', function () {
@@ -377,6 +418,28 @@ describe('Tests for Profile Submodule', function () {
         .query({
           email: emails[0],
           name: ""
+        })
+      expect(response.status).toEqual(400);
+      expect(response.text).toEqual("Error: Invalid name");
+    });
+
+    it('DELETE /registration - null email', async function () {
+      const response = await request(app)
+        .delete('/user/registration')
+        .query({
+          email: null,
+          name: names[0]
+        })
+      expect(response.status).toEqual(400);
+      expect(response.text).toEqual("Error: Invalid email");
+    });
+
+    it('DELETE /registration - null name', async function () {
+      const response = await request(app)
+        .delete('/user/registration')
+        .query({
+          email: emails[0],
+          name: null
         })
       expect(response.status).toEqual(400);
       expect(response.text).toEqual("Error: Invalid name");
