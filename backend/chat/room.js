@@ -9,6 +9,7 @@ var ObjectId = require("mongodb").ObjectId;
 
 module.exports = router;
 const coll = client.db("shopeer_database").collection("room_collection");
+const user_collection = client.db("shopeer_database").collection("user_collection");
 /**************** Room submodule **************** */
 
 /**
@@ -23,7 +24,12 @@ const coll = client.db("shopeer_database").collection("room_collection");
 router.get("/all", async (req, res) => {
   var roomArr = []
   try {
-    let roomsCursor = coll.find({peerslist: { $in: [req.query.email] },})
+    let userCursor = await user_collection.findOne({ email: req.query.email }) 
+    if (!userCursor) {
+      res.status(404).json({ response: "User not found." })
+      return
+    }
+    let roomsCursor = await coll.find({peerslist: { $in: [req.query.email] },})
     await roomsCursor.forEach((getRooms = (room) => {roomArr.push(room);}))
     res.status(200).send(roomArr)
   } catch (err) {
@@ -43,25 +49,28 @@ router.get("/all", async (req, res) => {
 // curl -X "GET" -H "Content-Type: application/json" -d localhost:8081/chat/room?room_id=62c4bb1ba6c3f54d76bdf6f8
 
 router.get("/history", async (req, res) => {
-  var doc = null
-  try {
-    // gets message history of a particular room
-    // consider some form of authentication?
-    doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
-    doc.chathistory.forEach(
-      (printMssgs = (mssg) => {
-        console.log("Message: " + mssg.text);
-        console.log("Time: " + mssg.time + "\n");
-      })
-    );
 
-    res.status(200).send(doc.chathistory);
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
+  // gets message history of a particular room
+  // consider some form of authentication?
+
+  if (!ObjectId.isValid(req.query.room_id)) {
+    res.status(400).json({ response: "Invalid room id." })
+    return
   }
-});
+  var doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
+  if (!doc) {
+    res.status(404).json({ response: "Room not found." })
+    return
+  }
+  doc.chathistory.forEach(
+    (printMssgs = (mssg) => {
+      console.log("Message: " + mssg.text);
+      console.log("Time: " + mssg.time + "\n");
+    })
+  );
 
+  res.status(200).send(doc.chathistory);
+  })
 /**
  * Add peers to group chat PUT https://shopeer.com/chat/room?room_id=[room_id]
  * Adds new peer to existing group
@@ -129,9 +138,8 @@ router.delete("/remove_user", async (req, res) => {
 //curl -X "POST" -H "Content-Type: application/json" -d '{"name": "anotherRoom", "peerslist": ["nick@gmail.com", "hellbb@msn.com", "grace@gmail.com"], "chathistory": [{"123213": "hey", "text": "hello world", "time": "3pm"}, {"id": "14214", "text": "my message", "time": "5pm"}] }' localhost:8081/chat/room
 //curl -X "POST" -H "Content-Type: application/json" -d '{"name": "room", "peerslist": ["nando@gmail.com","grace@gmail.com"], "chathistory": []}' localhost:8081/chat/room
 router.post("/", async (req, res) => {
-  var doc = null
   try {
-    doc = await coll.insertOne({
+    var doc = await coll.insertOne({
       name: req.body.name,
       // "picture": req.body.picture,
       peerslist: req.body.peerslist,
@@ -181,9 +189,22 @@ router.get("/summary", async (req, res) => {
  */
 // curl -X "DELETE" -H "Content-Type: application/json" -d '' localhost:8081/chat/room?room_id=62c4ac94ee79eff89f8ac0bc
 router.delete("/", async (req, res) => {
-  var doc = null
   try {
-    doc = await coll.deleteOne({
+    if (!ObjectId.isValid(req.query.room_id)) {
+      // if the query is not a room id, check if it is a user email
+      var user = await user_collection.findOne({ email: req.query.room_id })
+      if (!user) {
+        res.status(400).json({ response: "Invalid room id." });
+        return
+      }
+      var update = await coll.deleteMany(
+        {peerslist: {$elemMatch: {$in: [req.query.room_id]}}}
+      )
+      var count = update.deletedCount
+      res.status(200).send("deleted " + count + " rooms")
+      return
+  }
+    var doc = await coll.deleteOne({
       _id: ObjectId(req.query.room_id),
     });
     if (!doc) {
@@ -200,3 +221,4 @@ router.delete("/", async (req, res) => {
     res.status(400).send(err);
   }
 });
+
