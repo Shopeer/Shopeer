@@ -15,18 +15,26 @@ var user_collection = require('../config/mongodb_connection')
 // Response: User details (profile, bio, name)
 
 user_profile_router.get("/profile", async (req, res) => {
-    var profile_email = req.query.email
-    try {
-        var find_cursor = await user_collection.findOne({ email: profile_email })
-        if (!find_cursor) {
-            res.status(404).json({ response: "User not found." })
-            return
+    var profile = req.query
+    if (profile.email == null) {
+        res.status(400).send("Error: Invalid email")
+    } else if (!validator.isEmail(profile.email)) {
+        res.status(400).send("Error: Invalid email")
+    } else if (validator.isEmpty(profile.email)) {
+        res.status(400).send("Error: Invalid email")
+    } else {
+        try {
+            var find_cursor = await user_collection.findOne({ email: profile.email })
+            if (!find_cursor) {
+                res.status(404).json({ response: "User does not exist" })
+            } else {
+                res.status(200).send(find_cursor)
+            }
         }
-        res.status(200).send(find_cursor)
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
+        catch (err) {
+            console.log(err)
+            res.status(410).send(err)
+        }
     }
 })
 
@@ -42,32 +50,45 @@ user_profile_router.put("/profile", async (req, res) => {
     var profile_description = req.body.description
     var profile_photo = req.body.photo
 
-    try {
-        var find_cursor = await user_collection.findOne({ email: profile_email })
-        if (!find_cursor) {
-            res.status(404).json({ response: "User not found." })
-            return
+    if (profile_email == null) {
+        res.status(400).send("Error: Invalid email")
+    } else if (profile_name == null) {
+        res.status(400).send("Error: Invalid name")
+    } else if (!validator.isEmail(profile_email)) {
+        res.status(400).send("Error: Invalid email")
+    } else if (!validator.isAlpha(profile_name)) {
+        res.status(400).send("Error: Invalid name")
+    } else if (validator.isEmpty(profile_email)) {
+        res.status(400).send("Error: Invalid email")
+    } else if (validator.isEmpty(profile_name)) {
+        res.status(400).send("Error: Invalid name")
+    } else {
+        try {
+            var find_cursor = await user_collection.findOne({ email: profile_email })
+            if (!find_cursor) {
+                res.status(404).json({ response: "User not found." })
+                return
+            }
+            if (profile_name) {
+                await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
+            }
+            if (profile_email) {
+                await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
+            }
+            if (profile_description) {
+                await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
+            }
+            if (profile_photo) {
+                await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
+            }
+            // var find_cursor = await user_collection.findOne({ email: profile_email })
+            // res.status(200).send(find_cursor)
+            res.status(200).send("Success")
         }
-        res.status(200).send(find_cursor)
-        if (profile_name) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
+        catch (err) {
+            console.log(err)
+            res.status(400).send(err)
         }
-        if (profile_email) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
-        }
-        if (profile_description) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
-        }
-        if (profile_photo) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
-        }
-        // var find_cursor = await user_collection.findOne({ email: profile_email })
-        res.status(200).send(find_cursor)
-        // res.status(200).send("Success")
-    }
-    catch (err) {
-        console.log(err)
-        res.status(400).send(err)
     }
 })
 
@@ -121,30 +142,43 @@ user_profile_router.post("/registration", async (req, res) => {
 
 user_profile_router.delete("/registration", async (req, res) => {
     var profile_email = req.query.email
-    try {
-        var status_code
-        var text_res
-        // var find_cursor = await user_collection.find({email:profile_email})
-        var delete_return = await user_collection.deleteMany({ email: profile_email })
-        if (!delete_return) {
-            status_code = 404
-            text_res = "User not found"
-            // res.status(404).json({response: "User not found."})
-        } else {
-            if (delete_return.deletedCount > 0) {
-                status_code = 200
-                text_res = "User deleted"
-                // res.status(200).send("User deleted")
-            } else {
+    var profile = req.query
+    if (profile.email == null || profile.name == null) {
+        res.status(400).send("Error")
+    } else if (!validator.isEmail(profile.email)) {
+        res.status(400).send("Error: Invalid email")
+    } else if (!validator.isAlpha(profile.name)) {
+        res.status(400).send("Error: Invalid name")
+    } else if (validator.isEmpty(profile.email)) {
+        res.status(400).send("Error: Invalid email")
+    } else if (validator.isEmpty(profile.name)) {
+        res.status(400).send("Error: Invalid name")
+    } else {
+        try {
+            var status_code
+            var text_res
+            // var find_cursor = await user_collection.find({email:profile_email})
+            var delete_return = await user_collection.deleteMany({ email: profile_email })
+            if (!delete_return) {
                 status_code = 404
-                text_res = "User does not exist"
-                // res.status(404).send("User does not exist")
+                text_res = "User not found"
+                // res.status(404).json({response: "User not found."})
+            } else {
+                if (delete_return.deletedCount > 0) {
+                    status_code = 200
+                    text_res = "User deleted"
+                    // res.status(200).send("User deleted")
+                } else {
+                    status_code = 404
+                    text_res = "User does not exist"
+                    // res.status(404).send("User does not exist")
+                }
             }
+            res.status(status_code).send(text_res)
+        } catch (err) {
+            console.log(err)
+            res.status(400).send(err)
         }
-        res.status(status_code).send(text_res)
-    } catch (err) {
-        console.log(err)
-        res.status(400).send(err)
     }
 })
 
