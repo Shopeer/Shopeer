@@ -17,6 +17,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.intent.Intents;
@@ -49,13 +50,17 @@ public class BrowseManagePeersTest {
     final static String name = "BMPTest";
     final String TAG = "BrowseManagePeers Test";
     final String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
+    private static final String blockUrl = "http://20.230.148.126:8080/user/blocked?email=";
+    private static final String invitationUrl = "http://20.230.148.126:8080/user/invitations?email=";
+
+    final static String emailAddr = "@test.com";
 
     final Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     static Intent intent;
     static {
         intent = new Intent(ApplicationProvider.getApplicationContext(), MainActivity.class);
-        intent.putExtra("email", name + "@email.com");
+        intent.putExtra("email", name + emailAddr);
         intent.putExtra("isBMPTest", true);
     }
 
@@ -66,12 +71,62 @@ public class BrowseManagePeersTest {
         createUser("B");
         createUser("C");
 
+        // B has blocked user
+        blockPeer("B", this.name);
+
+        // C has sent invite to user
+        invitePeer("C", this.name);
+    }
+
+    private void invitePeer(String name, String targetName) {
+        String url = invitationUrl + name + this.emailAddr + "&target_peer_email=" + targetName + this.emailAddr;
+        Log.d(TAG, "onClick POST_invitation: " + url);
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(testContext);
+            StringRequest stringReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    // good job
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e(TAG, "onErrorResponse POST_invitation: " + error.toString());
+                    fail(name + " could not sent invite to " + targetName + "during setup: \n" + "onErrorResponse POST_block: " + error.toString());
+
+                }
+            });
+            requestQueue.add(stringReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void blockPeer(String name, String targetName) {
+        String url = blockUrl + name + this.emailAddr + "&target_peer_email=" + targetName + this.emailAddr;
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(testContext);
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    // good job
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    fail(name + "could not block " + targetName + "during setup: \n" + "onErrorResponse POST_block: " + error.toString());
+                }
+            });
+            requestQueue.add(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void createUser(String name) {
         //assertEquals("com.example.volleysampleforgithub", appContext.getPackageName());
         // setup new user
-        String url = profileUrl + name + "@email.com" + "&name=" + name;
+        String url = profileUrl + name + this.emailAddr + "&name=" + name;
         Log.d(TAG, "POST_registration: " + url);
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(testContext);
@@ -127,11 +182,13 @@ public class BrowseManagePeersTest {
         deleteUser("A");
         deleteUser("B");
         deleteUser("C");
+
+        // TODO: delete room created with C
     }
 
     private void deleteUser(String name) {
         // delete user
-        String url = profileUrl + name + "@email.com";
+        String url = profileUrl + name + this.emailAddr;
         Log.d(TAG, "DELETE_registration: " + url);
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(testContext);
