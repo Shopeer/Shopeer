@@ -47,18 +47,24 @@ router.post("/", async (req, res) => {
         res.status(400).json({ response: "Missing fields." })
         return
     }
+    // check if room exists
+    var room = await coll.findOne( {_id: ObjectId(req.query.room_id)} )
+    if (!room) {
+        res.status(404).json({ response: "Room not found." })
+        return
+    }
     // searches for a document with the following fields
     //appends an object to the "chathistory" array, checking that the sender is part of this room
-    doc = await coll.updateOne(
+    var doc = await coll.updateOne(
         { _id: ObjectId(req.query.room_id), peerslist: {$elemMatch: {$in: [req.body.email]}} }, 
         {$push: {"chathistory": {mssg_id, email, text, time}}})
-    
     if (doc.modifiedCount === 1) {
-        console.log(await coll.findOne({ _id: ObjectId(req.query.room_id) }))
-        res.status(201).json({ response: "Message successfully posted." })
-
+        // console.log(await coll.findOne({ _id: ObjectId(req.query.room_id) }))
+        res.status(201).send(doc)
     } else {
-        res.status(404).json({ response: "Room not found." })
+        // we already know the room exists, 
+        // so this means that the user who sent the message is not part of the room.
+        res.status(400).json({ response: "User is not a member of this room." })
     } 
     
 

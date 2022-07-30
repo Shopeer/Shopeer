@@ -23,19 +23,15 @@ const user_collection = client.db("shopeer_database").collection("user_collectio
 // curl -X "GET" -H "Content-Type: application/json" -d '{"email": "gracemyzhang@gmail.com" }' localhost:8081/chat/room/all
 router.get("/all", async (req, res) => {
   var roomArr = []
-  try {
-    let userCursor = await user_collection.findOne({ email: req.query.email }) 
-    if (!userCursor) {
-      res.status(404).json({ response: "User not found." })
-      return
-    }
-    let roomsCursor = await coll.find({peerslist: { $in: [req.query.email] },})
-    await roomsCursor.forEach((getRooms = (room) => {roomArr.push(room);}))
-    res.status(200).send(roomArr)
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
+  let userCursor = await user_collection.findOne({ email: req.query.email }) 
+  if (!userCursor) {
+    res.status(404).json({ response: "User not found." })
+    return
   }
+  let roomsCursor = await coll.find({peerslist: { $in: [req.query.email] },})
+  await roomsCursor.forEach((getRooms = (room) => {roomArr.push(room);}))
+  res.status(200).send(roomArr)
+  
 });
 
 /**
@@ -62,12 +58,12 @@ router.get("/history", async (req, res) => {
     res.status(404).json({ response: "Room not found." })
     return
   }
-  doc.chathistory.forEach(
-    (printMssgs = (mssg) => {
-      console.log("Message: " + mssg.text);
-      console.log("Time: " + mssg.time + "\n");
-    })
-  );
+  // doc.chathistory.forEach(
+  //   (printMssgs = (mssg) => {
+  //     console.log("Message: " + mssg.text);
+  //     console.log("Time: " + mssg.time + "\n");
+  //   })
+  // );
 
   res.status(200).send(doc.chathistory);
   })
@@ -138,43 +134,37 @@ router.get("/history", async (req, res) => {
 //curl -X "POST" -H "Content-Type: application/json" -d '{"name": "anotherRoom", "peerslist": ["nick@gmail.com", "hellbb@msn.com", "grace@gmail.com"], "chathistory": [{"123213": "hey", "text": "hello world", "time": "3pm"}, {"id": "14214", "text": "my message", "time": "5pm"}] }' localhost:8081/chat/room
 //curl -X "POST" -H "Content-Type: application/json" -d '{"name": "room", "peerslist": ["nando@gmail.com","grace@gmail.com"], "chathistory": []}' localhost:8081/chat/room
 router.post("/", async (req, res) => {
-  try {
-    
-    var name = req.body.name
-    var peerslist = req.body.peerslist
-    var chathistory = req.body.chathistory
-    if ( peerslist == null || peerslist.length !== 2 ) {
-      res.status(400).json({ response: "Invalid peerslist." });
-      return;
-    }
-    if ( name == null || name == "" ) {
-      res.status(400).json({ response: "Missing room name." });
-      return;
-    }
-
-    var user0 = await user_collection.findOne({ email: peerslist[0] })
-    var user1 = await user_collection.findOne({ email: peerslist[1] })
-    if (!user0 || !user1) {
-      res.status(404).json({ response: "Users not found." });
-      return;
-    }
-    if (!user0.peers.includes(peerslist[1])) {
-      res.status(400).json({ response: "Users are not peers." });
-      return;
-    }
-
-    var doc = await coll.insertOne({
-      name,
-      peerslist,
-      chathistory
-    });
-
-    res.status(201).send(doc);
-    
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
+  var name = req.body.name
+  var peerslist = req.body.peerslist
+  var chathistory = req.body.chathistory
+  if ( peerslist == null || peerslist.length !== 2 ) {
+    res.status(400).json({ response: "Invalid peerslist." });
+    return;
   }
+  if ( name == null || name == "" ) {
+    res.status(400).json({ response: "Missing room name." });
+    return;
+  }
+
+  var user0 = await user_collection.findOne({ email: peerslist[0] })
+  var user1 = await user_collection.findOne({ email: peerslist[1] })
+  if (!user0 || !user1) {
+    res.status(404).json({ response: "Users not found." });
+    return;
+  }
+  if (!user0.peers.includes(peerslist[1])) {
+    res.status(400).json({ response: "Users are not peers." });
+    return;
+  }
+
+  var doc = await coll.insertOne({
+    name,
+    peerslist,
+    chathistory
+  });
+
+  res.status(201).send(doc);
+    
 });
 
 /**
@@ -184,19 +174,22 @@ router.post("/", async (req, res) => {
  */
 //curl -X "GET" -H "Content-Type: application/json" -d '' localhost:8081/chat/room/summary?room_id=62c4bb1ba6c3f54d76bdf6f8
 router.get("/summary", async (req, res) => {
-  var doc = null
-  try {
-    doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
-    var roomSummary = {
-      name: doc.name,
-      //"picture": doc.picture,
-      lastmessage: doc.chathistory[doc.chathistory.length - 1],
-    };
-    res.status(200).send(roomSummary);
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
+  if (!ObjectId.isValid(req.query.room_id)) {
+    res.status(400).json({ response: "Invalid room id." });
+    return
   }
+  var doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
+  if (!doc) {
+    res.status(404).json({ response: "Room not found." });
+    return
+  }
+  var roomSummary = {
+    name: doc.name,
+    //"picture": doc.picture,
+    lastmessage: doc.chathistory[doc.chathistory.length - 1],
+  };
+  res.status(200).send(roomSummary);
+
 });
 
 /**
@@ -206,36 +199,34 @@ router.get("/summary", async (req, res) => {
  */
 // curl -X "DELETE" -H "Content-Type: application/json" -d '' localhost:8081/chat/room?room_id=62c4ac94ee79eff89f8ac0bc
 router.delete("/", async (req, res) => {
-  try {
-    if (!ObjectId.isValid(req.query.room_id)) {
-      // if the query is not a room id, check if it is a user email
-      var user = await user_collection.findOne({ email: req.query.room_id })
-      if (!user) {
-        res.status(400).json({ response: "Invalid room id." });
-        return
-      }
-      var update = await coll.deleteMany(
-        {peerslist: {$elemMatch: {$in: [req.query.room_id]}}}
-      )
-      var count = update.deletedCount
-      res.status(200).send("deleted " + count + " rooms")
-      return
+  
+  if (!ObjectId.isValid(req.query.room_id)) {
+    res.status(400).json({ response: "Invalid room id." });
+    return
+    // if the query is not a room id, check if it is a user email
+    // var user = await user_collection.findOne({ email: req.query.room_id })
+    // if (!user) {
+    //   res.status(400).json({ response: "Invalid room id." });
+    //   return
+    // }
+    // var update = await coll.deleteMany(
+    //   {peerslist: {$elemMatch: {$in: [req.query.room_id]}}}
+    // )
+    // var count = update.deletedCount
+    // res.status(200).send("deleted " + count + " rooms")
+    // return
   }
-    var doc = await coll.deleteOne({
-      _id: ObjectId(req.query.room_id),
-    });
-    if (!doc) {
-      res.status(404).json({ response: "Failed to delete." });
-      return;
-    }
-    if (doc.deletedCount > 0) {
-      res.status(200).send
-    } else {
-      res.status(404).json({ response: "Room not found." });
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
+  var doc = await coll.deleteOne({
+    _id: ObjectId(req.query.room_id),
+  });
+  
+  if (doc.deletedCount === 1) {
+    res.status(200).json({ response: "Deleted room." });
+    
+  } else {
+    res.status(404).json({ response: "Room not found." });
+
   }
+
 });
 
