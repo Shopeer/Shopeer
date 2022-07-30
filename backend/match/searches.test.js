@@ -300,7 +300,7 @@ describe('Tests for Searches Submodule', function () {
           })
           .set('Accept', 'application/json')
         expect(response.status).toEqual(404);
-        expect(JSON.parse(response.text).response).toEqual("removed search")
+        expect(JSON.parse(response.text).response).toEqual("Removed search")
       })
 
     })

@@ -190,13 +190,13 @@ app.delete("/searches", async (req, res) => {
         for (let i = 0; i < find_cursor.searches.length; i++) {
             if (find_cursor.searches[i].search_name == search) {
                 await user_collection.updateOne({ email: profile_email }, { $pull: { searches: { search_name: search } } })
-                res.status(200).json({ response: 'removed search' })
+                res.status(200).json({ response: 'Removed search' })
                 no_match_flag = 1
                 return
             }
         }
         if (!no_match_flag) {
-            res.status(404).json({ response: 'search not found' })
+            res.status(404).json({ response: 'Search not found' })
         }
     }
 })
