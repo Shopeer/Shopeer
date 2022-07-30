@@ -143,16 +143,24 @@ router.post("/", async (req, res) => {
     var name = req.body.name
     var peerslist = req.body.peerslist
     var chathistory = req.body.chathistory
-    if (name == null || peerslist == null || chathistory == null) {
-      res.status(400).json({ response: "Missing fields." });
+    if ( peerslist == null || peerslist.length !== 2 ) {
+      res.status(400).json({ response: "Invalid peerslist." });
+      return;
+    }
+    if ( name == null || name == "" ) {
+      res.status(400).json({ response: "Missing room name." });
       return;
     }
 
-    var user = await user_collection.findOne({ email: peerslist[0] })
-    if (!user.peers.includes(peerslist[1])) {
+    var user0 = await user_collection.findOne({ email: peerslist[0] })
+    var user1 = await user_collection.findOne({ email: peerslist[1] })
+    if (!user0 || !user1) {
+      res.status(404).json({ response: "Users not found." });
+      return;
+    }
+    if (!user0.peers.includes(peerslist[1])) {
       res.status(400).json({ response: "Users are not peers." });
       return;
-
     }
 
     var doc = await coll.insertOne({
