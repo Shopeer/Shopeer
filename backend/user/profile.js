@@ -1,7 +1,6 @@
 var express = require("express")
 const user_profile_router = express.Router()
 const validator = require('validator')
-
 var user_collection = require('../config/mongodb_connection')
 
 
