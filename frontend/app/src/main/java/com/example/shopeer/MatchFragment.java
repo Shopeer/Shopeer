@@ -1,5 +1,7 @@
 package com.example.shopeer;
 
+import static android.view.View.GONE;
+
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -51,6 +53,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     private static final String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
 
     private static String email;
+    private static boolean isBrowseManagePeersTest;
 
     RecyclerView rv;
     private LinearLayoutManager layoutManager;
@@ -79,6 +82,10 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         super.onCreate(savedInstanceState);
 
         this.email = getActivity().getIntent().getStringExtra("email");
+
+        // Browse and Manage Peers testing
+        isBrowseManagePeersTest = getActivity().getIntent().getBooleanExtra("isBMPTest", false);
+
         getSearchList();
     }
 
@@ -156,19 +163,10 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                                 activities.add(activity.getString(j));
                             }
 
-                            String location_name = "";
-                            JSONArray location = responseObj.getJSONArray("location");
-                            double lon = location.getDouble(0);
-                            double lat = location.getDouble(1);
-                            try { //TODO: get rid of this try catch once all searches in server have location_name and log lat seperate
-                                location_name = responseObj.getString("location_name");
+                            String location_name = responseObj.getString("location_name");
 
-                                lon = responseObj.getDouble("location_long");
-                                lat = responseObj.getDouble("location_lati");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Log.e(TAG, "parsing GET search error: " + responseObj);
-                            }
+                            double lon  = responseObj.getDouble("location_long");
+                            double lat = responseObj.getDouble("location_lati");
 
                             int range = responseObj.getInt("max_range");
 
@@ -176,8 +174,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                             SearchObject searchObject = new SearchObject(search_name, location_name, lat, lon, range, budget, activities);
                             searches.add(searchObject);
-
-                            Log.d(TAG, "search: " + searchObject.toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -185,6 +181,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     for (SearchObject s : searches) {
                         Log.d(TAG, "search: " + s.toString());
                     }
+
+                    // if no searches exist, edit search button is disabled
+                    editSearchButton.setVisibility(View.GONE);
                     setSearchSpinner();
                 }
             }, new Response.ErrorListener() {
@@ -272,10 +271,31 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         currentSearch = (SearchObject)parent.getItemAtPosition(pos);
 
-        setPeerManagementLists();
+        if (isBrowseManagePeersTest){
+            // set up dummy suggestions list
+            createDummyProfileObj("A");
+            createDummyProfileObj("B");
+            createDummyProfileObj("C");
 
+
+
+
+
+            //setProfileCardRecycler();
+            return;
+        }
+
+        setPeerManagementLists();
         // get and populate suggestion list for selected search
         getSuggestions();
+    }
+
+    // used for testing only
+    private void createDummyProfileObj(String name) {
+        String email = name + "@email.com";
+        String description = email + "'s description";
+        //String photo = ;
+
     }
 
     private void setPeerManagementLists() {
@@ -396,23 +416,23 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         }
 
         private void setButtonVisibility(ProfileObject peer, ProfileCardVH holder) {
-            holder.unfriendButton.setVisibility(View.GONE);
+            holder.unfriendButton.setVisibility(GONE);
             holder.friendButton.setVisibility(View.VISIBLE);
-            holder.unblockButton.setVisibility(View.GONE);
+            holder.unblockButton.setVisibility(GONE);
             holder.blockButton.setVisibility(View.VISIBLE);
 
             // checked if blocked
             if (manageBlocked.contains(peer.getEmail())) {
-                holder.blockButton.setVisibility(View.GONE);
+                holder.blockButton.setVisibility(GONE);
                 holder.unblockButton.setVisibility(View.VISIBLE);
-                holder.friendButton.setVisibility(View.GONE);
-                holder.unfriendButton.setVisibility(View.GONE);
+                holder.friendButton.setVisibility(GONE);
+                holder.unfriendButton.setVisibility(GONE);
             }
             // check if sent invite
             else if (manageInvites.contains(peer.getEmail())) {
-                holder.blockButton.setVisibility(View.GONE);
-                holder.unblockButton.setVisibility(View.GONE);
-                holder.friendButton.setVisibility(View.GONE);
+                holder.blockButton.setVisibility(GONE);
+                holder.unblockButton.setVisibility(GONE);
+                holder.friendButton.setVisibility(GONE);
                 holder.unfriendButton.setVisibility(View.VISIBLE);
             }
         }
