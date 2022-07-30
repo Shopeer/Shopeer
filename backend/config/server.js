@@ -100,6 +100,43 @@ app.get("/match/searches", async (req, res) => {
 // if it's not empty, use it to find that search object and replace it with the search in the body
 app.post("/match/searches", async (req, res) => {
     var profile_email = req.query.email
+    // var search_id = req.query.search
+    var newsearchname = req.body.search.search_name
+    var search_object = create_search_object(req.body.search)
+    // console.log(search_object)
+    try {
+        var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (find_cursor == null) {
+            res.status(404).json({ response: 'User not found' })
+            return
+        }
+        // if this email has no searches yet, push the search
+        if (find_cursor.searches.length == 0) {
+            var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+            // var find_cursor = await user_collection.findOne({ email: profile_email })
+            res.status(201).json({ response: 'first search added!' });
+            return
+        }
+        for (let i = 0; i < find_cursor.searches.length; i++) {
+            if (find_cursor.searches[i].search_name == newsearchname) {
+                res.status(409).json({ response: 'search already exists' });
+                return
+            }
+        }
+        await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+        find_cursor = await user_collection.findOne({ email: profile_email })
+        console.log(debug_res)
+        res.status(201).json({ response: 'added new search' });
+        return
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
+app.put("/match/searches", async (req, res) => {
+    var profile_email = req.query.email
     var search_id = req.query.search
     var newsearchname = req.body.search.search_name
     var search_object = create_search_object(req.body.search)
@@ -109,74 +146,44 @@ app.post("/match/searches", async (req, res) => {
         if (find_cursor == null) {
             res.status(404).json({ response: 'User not found' })
             return
-            
         }
-        // console.log(find_cursor)
-        // res.status(200).send("ok")
-        // console.log(find_cursor.searches.length)
 
-        // if this email has no searches yet, push the search
-
-        if (find_cursor.searches.length == 0) {
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-            // var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(201).json({ response: 'first search added!' });
+        if (search_id == newsearchname) {
+            // if we wish to modify the body:
+            await user_collection.updateOne(
+                {email: req.query.email, searches: {$elemMatch: {search_name: search_id}}},
+                {$set: {"searches.$": search_object }}
+            )
+            res.status(200).json({ response: 'overwrote prev search' });
             return
         } else {
-
-            // if this email has made searches, 
-            // --- overwrite duplicate
-            for (let i = 0; i < find_cursor.searches.length; i++) {
-
-                // if the search already exists
-                if (find_cursor.searches[i].search_name == newsearchname) {
-                    res.status(409).json({ response: 'search already exists' });
-                    return
-                }
-                
-                // if we need to modify the search name, identify by search_id
-                else if (find_cursor.searches[i].search_name == search_id) {
-                    await user_collection.updateOne({ email: profile_email }, { $pull: { searches: find_cursor.searches[i] } })
-                    await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-                    // console.log(find_cursor)
-                    console.log("Overwrote prev search")
-                    res.status(200).json({ response: 'overwrote prev search' });
-                    return
-                }
-
-                //  else {
-                //     var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-                //     // var find_cursor = await user_collection.findOne({ email: profile_email })
-                //     console.log(debug_res)
-                //     res.status(200).send("find_cursor")
-                //     break
-                // }
+            // if we wish to modify the search name:
+            var duplicate = await user_collection.findOne(
+                {email: req.query.email, searches: {$elemMatch: {search_name: newsearchname}}}
+            )
+            var check = await user_collection.findOne(
+                {"email": req.query.email,"searches": {$elemMatch: {search_name: req.query.search}}}
+            )
+            if (!check) {
+                res.status(404).json({ response: 'search not found' });
+                return
             }
+            if (!duplicate) {
+                await user_collection.updateOne(
+                    {"email": req.query.email,"searches": {$elemMatch: {search_name: req.query.search}}},
+                    {$set: {"searches.$.search_name": newsearchname}}
+                )
+                res.status(200).json({ response: 'modified search_name' });
+                return
 
-            //await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-            // var find_cursor = await user_collection.findOne({ email: profile_email })
-            console.log(debug_res)
-            res.status(201).json({ response: 'added new search' });
-            return
-
-
-
-
-
-            // --- deny duplicate and overwriting
-            // for (let i = 0; i < find_cursor.searches.length; i++) {
-            //     if (find_cursor.searches[i].search_name == search_object.search_name) {
-            //         console.log("Search already added")
-            //         res.status(200).send("Search already added")
-            //     } else {
-            //         var debug_res = await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-            //         var find_cursor = await user_collection.findOne({ email: profile_email })
-            //         res.status(200).send(find_cursor)
-            //         break
-            //     }
-            // }
+            } else {
+                console.log(duplicate)
+                console.log("above is duplicate")   
+                res.status(409).json({ response: 'this search_name already exists' });
+            }
         }
     }
+    
     catch (err) {
         console.log(err)
         res.status(400).send(err)
@@ -203,12 +210,26 @@ function create_search_object(body) {
 // Response: success/ fail
 app.delete("/match/searches", async (req, res) => {
     var profile_email = req.query.email
-    var search = req.query.search
+    var search = req.query.search_name
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (!find_cursor) {
             res.status(404).json({response: "User not found."})
             return
+        }
+
+        // if query null, delete all
+        if (profile_email==null) {
+            for (let i = 0; i < find_cursor.searches.length; i++) {
+                if (find_cursor.searches[i].search_name == search) {
+                    await user_collection.updateOne({ email: profile_email }, { $pull: { searches: {search_name: search} } })
+                    // var find_cursor = await user_collection.findOne({ email: profile_email })
+                    res.status(200).json({ response: 'removed search' })
+                    no_match_flag = 1
+                }
+            }
+            return
+
         }
         console.log(search)
         var no_match_flag = 0
