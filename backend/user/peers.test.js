@@ -251,8 +251,6 @@ describe("Send an invitation", () => {
     await request(app).delete('/user/registration').query({email: nonexistentEmail })
     // attempt to post an invitation to Rob
     const response = await request(app).post('/user/invitations').query({ email: emails[0], target_peer_email: nonexistentEmail })
-    console.log(response.body)
-    console.log("above should be 404 response")
     expect(response.body).toEqual({"response":"Target user not found."});
     expect(response.status).toEqual(404);
   });
