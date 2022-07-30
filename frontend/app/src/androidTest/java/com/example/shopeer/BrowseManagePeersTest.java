@@ -13,6 +13,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
+import static java.lang.Thread.sleep;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -37,7 +39,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,14 +52,14 @@ import org.junit.runners.MethodSorters;
 public class BrowseManagePeersTest {
 
     final static String name = "BMPTest";
-    final String TAG = "BrowseManagePeers Test";
-    final String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
+    final static String TAG = "BrowseManagePeers Test";
+    final static String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
     private static final String blockUrl = "http://20.230.148.126:8080/user/blocked?email=";
     private static final String invitationUrl = "http://20.230.148.126:8080/user/invitations?email=";
 
     final static String emailAddr = "@test.com";
 
-    final Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    final static Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     static Intent intent;
     static {
@@ -64,22 +68,28 @@ public class BrowseManagePeersTest {
         intent.putExtra("isBMPTest", true);
     }
 
-    @Before
-    public void testSetup() {
-        createUser(this.name);
+    @BeforeClass
+    public static void testSetup() {
+        createUser(name);
         createUser("A");
         createUser("B");
         createUser("C");
 
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         // B has blocked user
-        blockPeer("B", this.name);
+        blockPeer("B", name);
 
         // C has sent invite to user
-        invitePeer("C", this.name);
+        invitePeer("C", name);
     }
 
-    private void invitePeer(String name, String targetName) {
-        String url = invitationUrl + name + this.emailAddr + "&target_peer_email=" + targetName + this.emailAddr;
+    private static void invitePeer(String name, String targetName) {
+        String url = invitationUrl + name + emailAddr + "&target_peer_email=" + targetName + emailAddr;
         Log.d(TAG, "onClick POST_invitation: " + url);
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(testContext);
@@ -92,7 +102,7 @@ public class BrowseManagePeersTest {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.e(TAG, "onErrorResponse POST_invitation: " + error.toString());
-                    fail(name + " could not sent invite to " + targetName + "during setup: \n" + "onErrorResponse POST_block: " + error.toString());
+                    fail(name + " could not sent invite to " + targetName + " during setup: \n" + "onErrorResponse POST_block: " + error.toString());
 
                 }
             });
@@ -102,8 +112,8 @@ public class BrowseManagePeersTest {
         }
     }
 
-    private void blockPeer(String name, String targetName) {
-        String url = blockUrl + name + this.emailAddr + "&target_peer_email=" + targetName + this.emailAddr;
+    private static void blockPeer(String name, String targetName) {
+        String url = blockUrl + name + emailAddr + "&target_peer_email=" + targetName + emailAddr;
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(testContext);
             JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
@@ -123,10 +133,10 @@ public class BrowseManagePeersTest {
         }
     }
 
-    private void createUser(String name) {
+    private static void createUser(String name) {
         //assertEquals("com.example.volleysampleforgithub", appContext.getPackageName());
         // setup new user
-        String url = profileUrl + name + this.emailAddr + "&name=" + name;
+        String url = profileUrl + name + emailAddr + "&name=" + name;
         Log.d(TAG, "POST_registration: " + url);
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(testContext);
@@ -147,10 +157,6 @@ public class BrowseManagePeersTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void createUserSearch() {
-
     }
 
     @Rule
@@ -176,9 +182,9 @@ public class BrowseManagePeersTest {
      */
 
 
-    @After
-    public void testCleanup() {
-        deleteUser(this.name);
+    @AfterClass
+    public static void testCleanup() {
+        deleteUser(name);
         deleteUser("A");
         deleteUser("B");
         deleteUser("C");
@@ -186,9 +192,9 @@ public class BrowseManagePeersTest {
         // TODO: delete room created with C
     }
 
-    private void deleteUser(String name) {
+    private static void deleteUser(String name) {
         // delete user
-        String url = profileUrl + name + this.emailAddr;
+        String url = profileUrl + name + emailAddr;
         Log.d(TAG, "DELETE_registration: " + url);
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(testContext);
