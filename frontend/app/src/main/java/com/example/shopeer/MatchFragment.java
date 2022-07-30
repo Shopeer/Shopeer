@@ -145,6 +145,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     // extract search info from returned JSON Array of search objects
                     for (int i = 0; i < response.length(); i++) {
                         try {
+
                             JSONObject responseObj = response.getJSONObject(i);
 
                             String search_name = responseObj.getString("search_name");
@@ -156,15 +157,18 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                             }
 
                             String location_name = "";
-                            try { //TODO: get rid of this try catch once all searches in server have location_name
-                                location_name = responseObj.getString("location_name");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
                             JSONArray location = responseObj.getJSONArray("location");
                             double lon = location.getDouble(0);
                             double lat = location.getDouble(1);
+                            try { //TODO: get rid of this try catch once all searches in server have location_name and log lat seperate
+                                location_name = responseObj.getString("location_name");
+
+                                lon = responseObj.getDouble("location_long");
+                                lat = responseObj.getDouble("location_lati");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Log.e(TAG, "parsing GET search error: " + responseObj);
+                            }
 
                             int range = responseObj.getInt("max_range");
 

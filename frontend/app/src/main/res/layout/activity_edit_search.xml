@@ -47,6 +47,7 @@
                 android:ems="10"
                 android:inputType="textPersonName"
                 android:maxLength="30"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
                 android:text="my search" />
 
         </TableRow>
