@@ -28,8 +28,8 @@ public class ProfileObject {
         return this.name;
     }
 
-    public void getDescription(String description) {
-        this.description = description;
+    public String getDescription() {
+        return this.description;
     }
 
     public Bitmap getPhotoBitmap() {

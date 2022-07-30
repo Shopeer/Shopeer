@@ -186,7 +186,7 @@ public class EditSearchActivity extends AppCompatActivity {
                 }
                 else {
                     Log.d(TAG, "deleting a existing search " + oldSearchName);
-                    String url = searchUrl + MainActivity.email + "&search=" + oldSearchName;
+                    String url = searchUrl + MainActivity.email + "&search_name=" + oldSearchName;
                     Log.d(TAG, "onClick: " + url);
                     try {
                         RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);

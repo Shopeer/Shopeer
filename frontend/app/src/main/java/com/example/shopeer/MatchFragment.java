@@ -1,6 +1,7 @@
 package com.example.shopeer;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -183,7 +185,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     }
 
                     // if no searches exist, edit search button is disabled
-                    editSearchButton.setVisibility(View.GONE);
+                    if (searches.isEmpty()) {
+                        editSearchButton.setVisibility(View.GONE);
+                    }
                     setSearchSpinner();
                 }
             }, new Response.ErrorListener() {
@@ -384,7 +388,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         @Override
         public void onBindViewHolder(@NonNull ProfileCardVH holder, int position) {
             ProfileObject profileObject = data.get(position);
-            holder.peerName.setText(profileObject.getEmail());
 
             // setup button onClick handlers
             holder.blockButton.setOnClickListener(new View.OnClickListener() {
@@ -416,35 +419,54 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             });
             
             // populate profilecard
-            setProfileCardInfo();
+            setProfileCardInfo(profileObject, holder);
 
             // set default button visibility
             setButtonVisibility(profileObject, holder);
 
         }
 
-        private void setProfileCardInfo() {
+        private void setProfileCardInfo(ProfileObject peer, ProfileCardVH holder) {
+            if (peer.getPhotoBitmap() == null) {
+                holder.peerPhoto.setImageResource(R.drawable.temp_profile);
+            }
+            else {
+                holder.peerPhoto.setImageBitmap(peer.getPhotoBitmap());
+            }
+
+            holder.peerName.setText(peer.getName());
+
+            if (peer.getDescription() != null && peer.getDescription().compareToIgnoreCase("null") != 0) {
+                holder.peerDescription.setText(peer.getDescription());
+            }
         }
 
         private void setButtonVisibility(ProfileObject peer, ProfileCardVH holder) {
             holder.unfriendButton.setVisibility(GONE);
-            holder.friendButton.setVisibility(View.VISIBLE);
+            holder.friendButton.setVisibility(VISIBLE);
             holder.unblockButton.setVisibility(GONE);
-            holder.blockButton.setVisibility(View.VISIBLE);
+            holder.blockButton.setVisibility(VISIBLE);
+
+            holder.peerPhoto.setVisibility(VISIBLE);
+            holder.peerDescription.setVisibility(VISIBLE);
 
             // checked if blocked
             if (manageBlocked.contains(peer.getEmail())) {
                 holder.blockButton.setVisibility(GONE);
-                holder.unblockButton.setVisibility(View.VISIBLE);
+                holder.unblockButton.setVisibility(VISIBLE);
                 holder.friendButton.setVisibility(GONE);
                 holder.unfriendButton.setVisibility(GONE);
+
+                // profile info also set to invisible
+                holder.peerPhoto.setVisibility(View.INVISIBLE);
+                holder.peerDescription.setVisibility(View.INVISIBLE);
             }
             // check if sent invite
             else if (manageInvites.contains(peer.getEmail())) {
                 holder.blockButton.setVisibility(GONE);
                 holder.unblockButton.setVisibility(GONE);
                 holder.friendButton.setVisibility(GONE);
-                holder.unfriendButton.setVisibility(View.VISIBLE);
+                holder.unfriendButton.setVisibility(VISIBLE);
             }
         }
 
@@ -637,7 +659,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         }
 
         class ProfileCardVH extends RecyclerView.ViewHolder {
+            ImageView peerPhoto;
             TextView peerName;
+            TextView peerDescription;
             Button friendButton;
             Button unfriendButton;
             Button blockButton;
@@ -646,7 +670,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             public ProfileCardVH(@NonNull View itemView) {
                 super(itemView);
 
+                peerPhoto = itemView.findViewById(R.id.peer_profile_photo);
                 peerName = itemView.findViewById(R.id.peer_name_text);
+                peerDescription = itemView.findViewById(R.id.peer_description_text);
                 friendButton = itemView.findViewById(R.id.friend_button);
                 unfriendButton = itemView.findViewById(R.id.unfriend_button);
                 blockButton = itemView.findViewById(R.id.block_button);
