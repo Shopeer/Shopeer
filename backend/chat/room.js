@@ -80,26 +80,26 @@ router.get("/history", async (req, res) => {
  */
 // we could insert only the email, or insert the entire user object. For now it inserts the email.
 // curl -X "PUT" -H "Content-Type: application/json" -d '{"email": "hello@gmail.com" }' localhost:8081/chat/room?room_id=62c4d5c76896713a30649546
-router.put("/", async (req, res) => {
-  var doc = null
-  try {
-    doc = await coll.updateOne(
-      { _id: ObjectId(req.query.room_id) }, { $addToSet: { peerslist: req.body.email } }
-    );
-    if (doc.matchedCount === 0) {
-      res.status(200).send("\nCould not find this room.\n");
-    } else if (doc.modifiedCount === 0) {
-      res
-        .status(200)
-        .send("\n" + req.body.email + " is already a member of this room\n");
-    } else {
-      res.status(200).send("\n" + req.body.email + " added to room\n");
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
-  }
-});
+// router.put("/", async (req, res) => {
+//   var doc = null
+//   try {
+//     doc = await coll.updateOne(
+//       { _id: ObjectId(req.query.room_id) }, { $addToSet: { peerslist: req.body.email } }
+//     );
+//     if (doc.matchedCount === 0) {
+//       res.status(200).send("\nCould not find this room.\n");
+//     } else if (doc.modifiedCount === 0) {
+//       res
+//         .status(200)
+//         .send("\n" + req.body.email + " is already a member of this room\n");
+//     } else {
+//       res.status(200).send("\n" + req.body.email + " added to room\n");
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     res.status(400).send(err);
+//   }
+// });
 
 /**
  * Delete peer from group chat DELETE https://shopeer.com/chat/room/remove_user?room_id=[room_id]
@@ -108,26 +108,26 @@ router.put("/", async (req, res) => {
  * Returns: success/fail
  */
 // curl -X "DELETE" -H "Content-Type: application/json" -d '{"email": "sally@gmail.com" }' localhost:8081/chat/room/remove_user?room_id=62c4d5c76896713a30649546
-router.delete("/remove_user", async (req, res) => {
-  var doc = null
-  try {
-    doc = await coll.updateOne(
-      { _id: ObjectId(req.query.room_id) }, { $pull: { peerslist: req.body.email } }
-    );
-    if (doc.matchedCount === 0) {
-      res.status(200).send("Could not find this room.");
-    } else if (doc.modifiedCount === 0) {
-      res
-        .status(200)
-        .send("\n" + req.body.email + " is not a member of this room\n");
-    } else {
-      res.status(200).send("\n" + req.body.email + " removed from room\n");
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
-  }
-});
+// router.delete("/remove_user", async (req, res) => {
+//   var doc = null
+//   try {
+//     doc = await coll.updateOne(
+//       { _id: ObjectId(req.query.room_id) }, { $pull: { peerslist: req.body.email } }
+//     );
+//     if (doc.matchedCount === 0) {
+//       res.status(200).send("Could not find this room.");
+//     } else if (doc.modifiedCount === 0) {
+//       res
+//         .status(200)
+//         .send("\n" + req.body.email + " is not a member of this room\n");
+//     } else {
+//       res.status(200).send("\n" + req.body.email + " removed from room\n");
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     res.status(400).send(err);
+//   }
+// });
 
 /**
  * Create New Chatroom POST https://shopeer.com/chat/room
@@ -139,18 +139,27 @@ router.delete("/remove_user", async (req, res) => {
 //curl -X "POST" -H "Content-Type: application/json" -d '{"name": "room", "peerslist": ["nando@gmail.com","grace@gmail.com"], "chathistory": []}' localhost:8081/chat/room
 router.post("/", async (req, res) => {
   try {
-    var doc = await coll.insertOne({
-      name: req.body.name,
-      // "picture": req.body.picture,
-      peerslist: req.body.peerslist,
-      chathistory: req.body.chathistory,
-    });
-    console.log(doc)
-    // console.log("\n New chatroom " + req.body.name + " created with id " + doc.insertedId)
-    if (!doc) {
-      res.status(404).json({ response: "Room not found." });
+    
+    var name = req.body.name
+    var peerslist = req.body.peerslist
+    var chathistory = req.body.chathistory
+    if (name == null || peerslist == null || chathistory == null) {
+      res.status(400).json({ response: "Missing fields." });
       return;
     }
+
+    var user = await user_collection.findOne({ email: peerslist[0] })
+    if (!user.peers.includes(peerslist[1])) {
+      res.status(400).json({ response: "Users are not peers." });
+      return;
+
+    }
+
+    var doc = await coll.insertOne({
+      name,
+      peerslist,
+      chathistory
+    });
 
     res.status(201).send(doc);
     

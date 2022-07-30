@@ -12,6 +12,9 @@ app.use('/chat/message', mssgRouter)
 const user_profile_router = require('../user/profile.js');
 app.use('*', user_profile_router);
 app.use('/user', user_profile_router)
+const user_peers_router = require('../user/peers.js');
+app.use('*', user_peers_router);
+app.use('/user', user_peers_router)
 
 const invalidRoomId = "clearlyfakeid"
 const fakeRoomId = "62e2feb74ce5451dd12322a4"
@@ -40,15 +43,22 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  return resetDatabase()
+  // return resetDatabase()
 
 })
 
 async function initializeDatabase() {
   try {
+    // register three users
     await request(app).post('/user/registration').query({ name: testUserA.name, email: testUserA.email})
     await request(app).post('/user/registration').query({ name: testUserB.name, email: testUserB.email})
     await request(app).post('/user/registration').query({ name: testUserC.name, email: testUserC.email})
+    // make A and B peers, and A and C peers
+    await request(app).post('/user/invitations').query({ email: testUserA.email, target_peer_email: testUserB.email})
+    await request(app).post('/user/invitations').query({ email: testUserB.email, target_peer_email: testUserA.email})
+    await request(app).post('/user/invitations').query({ email: testUserA.email, target_peer_email: testUserC.email})
+    await request(app).post('/user/invitations').query({ email: testUserC.email, target_peer_email: testUserA.email})
+    // create two chatrooms, one with A/C and one with A/B
     var room = await request(app).post('/chat/room').set('Accept', 'application/json').send( testRoom )
     var room_2 = await request(app).post('/chat/room').set('Accept', 'application/json').send( testRoom_2 )
     testRoomId = room.body.insertedId
@@ -140,7 +150,7 @@ describe("Get chatroom history scenario", () => {
   });
 
   it('should get message history of an existing room', async function () {
-    // first post two messages to the Alice/Bob room
+    // first post three messages to the Alice/Bob room
     var newMssg1 = {email: testUserA.email, text: "hey, this is Alice!", time: "3:05"}
     var newMssg2 = {email: testUserA.email, text: "how are you, Bob?", time: "3:06 PM"}
     var newMssg3 = {email: testUserB.email, text: "hi Alice, I'm doing great!", time: "3:07 PM"}
@@ -169,3 +179,45 @@ describe("Get chatroom history scenario", () => {
   });
 
 });
+
+// describe("Post new room scenario", () => {
+
+//   it('should return 404 for nonexisting room', async function () {
+//     // first try to delete the room, just in case
+//     await request(app).delete('/room').query({ room_id: fakeRoomId })
+    
+//     const response = await request(app).get('/chat/room/history').query({ room_id: fakeRoomId }).set('Accept', 'application/json')
+//     expect(response.body).toEqual({"response": "Room not found."});
+//     expect(response.status).toEqual(404);
+//   });
+
+//   it('should get message history of an existing room', async function () {
+//     // first post three messages to the Alice/Bob room
+//     var newMssg1 = {email: testUserA.email, text: "hey, this is Alice!", time: "3:05"}
+//     var newMssg2 = {email: testUserA.email, text: "how are you, Bob?", time: "3:06 PM"}
+//     var newMssg3 = {email: testUserB.email, text: "hi Alice, I'm doing great!", time: "3:07 PM"}
+//     await request(app).post('/chat/message')
+//       .query({ room_id: testRoomId }).set('Accept', 'application/json')
+//       .send( newMssg1 )
+//     await request(app).post('/chat/message')
+//       .query({ room_id: testRoomId }).set('Accept', 'application/json')
+//       .send( newMssg2 )
+//     await request(app).post('/chat/message')
+//       .query({ room_id: testRoomId }).set('Accept', 'application/json')
+//       .send( newMssg3 )
+    
+//     var response = await request(app).get('/chat/room/history').query({room_id: testRoomId})
+//     expect(response.body.length).toEqual(3);
+//     expect(response.body[0].email).toEqual(newMssg1.email)
+//     expect(response.body[1].email).toEqual(newMssg2.email)
+//     expect(response.body[2].email).toEqual(newMssg3.email)
+//     expect(response.body[0].text).toEqual(newMssg1.text)
+//     expect(response.body[1].text).toEqual(newMssg2.text)
+//     expect(response.body[2].text).toEqual(newMssg3.text)
+//     expect(response.body[0].time).toEqual(newMssg1.time)
+//     expect(response.body[1].time).toEqual(newMssg2.time)
+//     expect(response.body[2].time).toEqual(newMssg3.time)
+//     expect(response.status).toEqual(200);
+//   });
+
+// });
