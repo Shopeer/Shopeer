@@ -195,7 +195,8 @@ function create_search_object(body) {
         search_name: body.search_name,
         activity: body.activity,
         location_name: body.location_name,
-        location: body.location,
+        location_long: body.location_long,
+        location_lati: body.location_lati,
         max_range: body.max_range,
         max_budget: body.max_budget
     }
