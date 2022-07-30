@@ -83,7 +83,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.email = "BMPTest@test.com";//getActivity().getIntent().getStringExtra("email");
+        this.email = getActivity().getIntent().getStringExtra("email");
 
         // Browse and Manage Peers testing
         isBrowseManagePeersTest = getActivity().getIntent().getBooleanExtra("isBMPTest", false);
@@ -275,7 +275,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         currentSearch = (SearchObject)parent.getItemAtPosition(pos);
 
-        if (true){//isBrowseManagePeersTest){
+        if (isBrowseManagePeersTest){
+            Log.d(TAG, "Browse Manage Peers Test");
+
             // set up dummy suggestions list
             this.suggestions = new ArrayList<ProfileObject>();
 

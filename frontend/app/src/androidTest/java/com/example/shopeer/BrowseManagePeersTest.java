@@ -80,7 +80,7 @@ public class BrowseManagePeersTest {
     final static String emailAddr = "@test.com";
 
     final Util.RecyclerViewMatcher profileCards = Util.withRecyclerView(R.id.profile_cards_rv);
-    private int swipe = 0; // +1 right, -1 left
+    private static int swipe; // +1 right, -1 left
 
     final static Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
@@ -95,14 +95,31 @@ public class BrowseManagePeersTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
 
-    @Test // 1.0
-    public void A_registeredUserWithActiveSearch() {
+    // cannot split each action of the test into separate test cases because app state is not
+    // persistent across test cases (always a new activity start on each test case)
+    @Test
+    public void AA_BrowseManagePeerTest() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+        C_blockA();
+        D_swipeRightBProfileCardShowing();
+        E_sendInviteToB();
+        F_swipeLeftAProfileCardShowing();
+        G_unblockA();
+        H_swipeRightBProfileCardShowing();
+        I_removeInviteToB();
+        J_swipeRightCProfileCardShowing();
+        K_matchWithC();
+    }
+
+    // 1.0
+    private void A_registeredUserWithActiveSearch() {
         // spinner has a search
         onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("my search"))));
     }
 
-    @Test // 1.1
-    public void B_AProfileCardShowing() {
+    // 1.1
+    private void B_AProfileCardShowing() {
         // A's pc is showing, friend and block enabled
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
         onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("A")));
@@ -114,13 +131,26 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    @Test // 2
-    public void C_blockA() {
+    // 2
+    private void C_blockA() {
         onView(profileCards.atPositionOnView(swipe, R.id.block_button)).perform(click());
+
+        onView(withText(R.string.toast)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
+
+
+        // A's pc is not showing since blocked, unblocked enabled
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(not((isDisplayed()))));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("A")));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(not((isDisplayed()))));
+
+        onView(profileCards.atPositionOnView(swipe, R.id.block_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    @Test // 3
-    public void D_swipeRightBProfileCardShowing() {
+    // 3
+    private void D_swipeRightBProfileCardShowing() {
         // swipe right
         swipe++;
         onView(withId(R.id.profile_cards_rv)).perform(scrollToPosition(swipe));
@@ -136,21 +166,30 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    @Test // 4
-    public void E_sendInviteToB() {
+    // 4
+    private void E_sendInviteToB() {
         onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).perform(click());
+
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("B")));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(withText("B's description")));
+
+        onView(profileCards.atPositionOnView(swipe, R.id.block_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(isDisplayed()));
     }
 
-    @Test // 5
-    public void F_swipeLeftAProfileCardShowing() {
+    // 5
+    private void F_swipeLeftAProfileCardShowing() {
         // swipe left
         swipe--;
         onView(withId(R.id.profile_cards_rv)).perform(scrollToPosition(swipe));
 
-        // B's pc is not showing since blocked, unblocked enabled
-        onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(not((isDisplayed()))));
+        // A's pc is not showing since blocked, unblocked enabled
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(not(isDisplayed())));
         onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("A")));
-        onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(not((isDisplayed()))));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(not(isDisplayed())));
 
         onView(profileCards.atPositionOnView(swipe, R.id.block_button)).check(matches(not(isDisplayed())));
         onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).check(matches(isDisplayed()));
@@ -158,21 +197,63 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    @Test // 6
-    public void G_unblockA() {
+    // 6
+    private void G_unblockA() {
         onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).perform(click());
+
+        // A's pc is showing, friend and block enabled
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("A")));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(withText("A's description")));
+
+        onView(profileCards.atPositionOnView(swipe, R.id.block_button)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    @Test // 7
-    public void H_swipeRightBProfileCardShowing() {
+    // 7
+    private void H_swipeRightBProfileCardShowing() {
         // swipe right
+        swipe++;
+        onView(withId(R.id.profile_cards_rv)).perform(scrollToPosition(swipe));
+
+        // B's pc is showing, only unfriend enabled
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("B")));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(withText("B's description")));
+
+        onView(profileCards.atPositionOnView(swipe, R.id.block_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(isDisplayed()));
+    }
+
+    // 8
+    private void I_removeInviteToB() {
+        onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).perform(click());
+
+        // B's pc is showing, friend and block enabled
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("B")));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(withText("B's description")));
+
+        onView(profileCards.atPositionOnView(swipe, R.id.block_button)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
+    }
+
+    // 9
+    private void J_swipeRightCProfileCardShowing() {
+        //swipe right
         swipe++;
         onView(withId(R.id.profile_cards_rv)).perform(scrollToPosition(swipe));
 
         // C's pc is showing, friend and block enabled
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
-        onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("A")));
-        onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(withText("A's description")));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("C")));
+        onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(withText("C's description")));
 
         onView(profileCards.atPositionOnView(swipe, R.id.block_button)).check(matches(isDisplayed()));
         onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).check(matches(not(isDisplayed())));
@@ -180,30 +261,8 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    @Test // 8
-    public void I_removeInviteToB() {
-        onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).perform(click());
-    }
-
-    @Test // 9
-    public void J_swipeRightCProfileCardShowing() {
-        //swipe right
-        swipe++;
-        onView(withId(R.id.profile_cards_rv)).perform(scrollToPosition(swipe));
-
-        // B's pc is showing, friend and block enabled
-        onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
-        onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("A")));
-        onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(withText("A's description")));
-
-        onView(profileCards.atPositionOnView(swipe, R.id.block_button)).check(matches(isDisplayed()));
-        onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).check(matches(not(isDisplayed())));
-        onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).check(matches(isDisplayed()));
-        onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
-    }
-
-    @Test // 10
-    public void K_matchWithC() {
+    // 10
+    private void K_matchWithC() {
 
     }
 
@@ -234,6 +293,8 @@ public class BrowseManagePeersTest {
 
         // C has sent invite to user
         invitePeer("C", name);
+
+        swipe = 0;
     }
 
     private static void createSearch(String username, String nameInput, String locationInput, double latInput, double lonInput, int rangeInput, ArrayList<String> activitiesInput, int budgetInput) {
