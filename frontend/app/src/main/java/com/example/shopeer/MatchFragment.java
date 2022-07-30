@@ -3,6 +3,8 @@ package com.example.shopeer;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import static com.example.shopeer.MainActivity.navController;
+
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -73,6 +75,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     HashSet<String> manageBlocked;
     HashSet<String> manageInvites;
     HashSet<String> managePeers;
+
+    ProfileObject myProfile;
 
     public static MatchFragment newInstance() {
         MatchFragment fragment = new MatchFragment();
@@ -277,6 +281,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         if (isBrowseManagePeersTest){
             Log.d(TAG, "Browse Manage Peers Test");
+            myProfile = new ProfileObject(email, "BMPTest", null, null);
 
             // set up dummy suggestions list
             this.suggestions = new ArrayList<ProfileObject>();
@@ -334,6 +339,11 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                         JSONArray peersList = response.getJSONArray("peers");
                         managePeers = jsonArrayToHashSet(peersList);
+
+                        // set my own profile info
+                        String myName = response.getString("name");
+                        String myEmail = response.getString("email");
+                        myProfile = new ProfileObject(myName, myEmail, null, null);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -472,18 +482,20 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             }
         }
 
-        private void createChatroom(String myEmail, String peerEmail, ProfileCardVH holder) {
+        private void createChatroom(String myEmail, ProfileObject peer, ProfileCardVH holder) {
             Log.d(TAG, "onClick POST_create_room: " + roomUrl);
             try {
                 RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
 
                 // create POST request body
                 JSONObject body = new JSONObject();
-                body.put("name", peerEmail.split("@")[0]);
+
+                String roomName = peer.getName() + " & " + myProfile.getName();
+                body.put("name", roomName);
 
                 JSONArray peerslist = new JSONArray();
                 peerslist.put(myEmail);
-                peerslist.put(peerEmail);
+                peerslist.put(peer.getEmail());
 
                 body.put("peerslist", peerslist);
 
@@ -494,17 +506,30 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                 Log.d(TAG, "POST_create_room request body: " + reqBody);
 
-                StringRequest jsonObjReq = new StringRequest(Request.Method.POST, roomUrl, new Response.Listener<String>() {
+                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, roomUrl, body, new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response) {
                         Log.d(TAG, "POST_create_room response: " + response);
-                        Toast.makeText(getContext(), "created new chatroom with " + peerEmail, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "created new chatroom with " + peer.getEmail(), Toast.LENGTH_LONG).show();
 
                         data.remove(holder.getBindingAdapterPosition()); // pass by ref, so will update this.suggestions also
                         notifyItemRemoved(holder.getBindingAdapterPosition());
                         notifyItemRangeChanged(holder.getBindingAdapterPosition(), data.size());
 
-                        managePeers.add(peerEmail);
+                        managePeers.add(peer.getEmail());
+
+                        // going to Rooms fragment, to the auto created room
+                        navController.navigate(R.id.roomsFragment);
+                        // Redirect to new chat activity
+                        Intent intent = new Intent(getActivity(), ChatActivity.class);
+                        try {
+                            intent.putExtra("room_id", response.getString("insertedId"));
+                            intent.putExtra("room_name", roomName);
+                            intent.putExtra("room_pic", 1); //TODO: make sure this is an actual pic later
+                            startActivity(intent);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -512,23 +537,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                         Log.e(TAG, "onErrorResponse POST_create_room: " + error.toString());
 
                     }
-                })
-                {
-                    @Override
-                    public String getBodyContentType() {
-                        return "application/json; charset=utf-8";
-                    }
-
-                    @Override
-                    public byte[] getBody() throws AuthFailureError {
-                        try {
-                            return reqBody == null ? null : reqBody.getBytes("utf-8");
-                        } catch (UnsupportedEncodingException uee) {
-                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", reqBody, "utf-8");
-                            return null;
-                        }
-                    }
-                };
+                });
                 requestQueue.add(jsonObjReq);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -578,7 +587,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                         manageInvites.add(peer.getEmail());
 
                         if (response.compareToIgnoreCase("success, both are now peers") == 0) {
-                            createChatroom(email, peer.getEmail(), holder);
+                            createChatroom(email, peer, holder);
                         }
 
                         // set button visibility

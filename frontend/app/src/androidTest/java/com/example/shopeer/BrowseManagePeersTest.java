@@ -1,5 +1,6 @@
 package com.example.shopeer;
 
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.example.shopeer.Util;
 
 import static androidx.test.InstrumentationRegistry.getTargetContext;
@@ -11,6 +12,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -32,6 +34,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -64,6 +67,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 @LargeTest
@@ -76,6 +80,7 @@ public class BrowseManagePeersTest {
     private static final String blockUrl = "http://20.230.148.126:8080/user/blocked?email=";
     private static final String invitationUrl = "http://20.230.148.126:8080/user/invitations?email=";
     private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
+    private static final String roomsUrl = "http://20.230.148.126:8080/chat/room";
 
     final static String emailAddr = "@test.com";
 
@@ -134,9 +139,6 @@ public class BrowseManagePeersTest {
     // 2
     private void C_blockA() {
         onView(profileCards.atPositionOnView(swipe, R.id.block_button)).perform(click());
-
-        onView(withText(R.string.toast)).inRoot(withDecorView(not(is(mActivityRule.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
-
 
         // A's pc is not showing since blocked, unblocked enabled
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(not((isDisplayed()))));
@@ -263,7 +265,10 @@ public class BrowseManagePeersTest {
 
     // 10
     private void K_matchWithC() {
-
+        Intents.init();
+        onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).perform(click());
+        intended(hasComponent(new ComponentName(getTargetContext(), ChatActivity.class)));
+        Intents.release();
     }
 
 
@@ -423,6 +428,79 @@ public class BrowseManagePeersTest {
         deleteUser("C");
 
         // TODO: delete room created with C
+        deleteAllRooms("C");
+    }
+
+    private static void deleteAllRooms(String user) {
+        ArrayList<String> ids = getRoomId(user);
+        for (String id : ids) {
+            deleteRoom(id);
+        }
+    }
+
+    private static void deleteRoom(String roomId) {
+        if (roomId.isEmpty()){
+            return;
+        }
+        String url = roomsUrl + "?room_id=" + roomId;
+        Log.d(TAG, "DELETE_room: " + url);
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(testContext);
+            StringRequest jsonStrReq = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.d(TAG, "DELETE_room response: " + response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e(TAG, "onErrorResponse DELETE_room: " + error.toString());
+                    fail("Could not delete room " +  "during cleanup: \n" + "onErrorResponse DELETE_registration: " + error.toString());
+                }
+            });
+            requestQueue.add(jsonStrReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static ArrayList<String> getRoomId(String user) {
+        ArrayList<String> roomIds = new ArrayList<String>();
+
+        String url = roomsUrl + "/all?email=" + user + emailAddr;
+        Log.d(TAG, "GET all rooms: " + url);
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(testContext);
+            JsonArrayRequest stringRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    Log.d(TAG, "onResponse GET all rooms: " + response);
+                    // extract search info from returned JSON Array of search objects
+                    for (int i = 0; i < response.length(); i++) {
+                        try {
+                            JSONObject responseObj = response.getJSONObject(i);
+                            String id = responseObj.getString("_id");
+                            roomIds.add(id);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    for (String i : roomIds) {
+                        Log.d(TAG, "search: " + i);
+                    }
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "onErrorResponse login: " + error.toString());
+                }
+            });
+            requestQueue.add(stringRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return roomIds;
     }
 
     private static void deleteUser(String name) {
