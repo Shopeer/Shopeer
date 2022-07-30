@@ -8,6 +8,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 //import static androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
+import static androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
@@ -117,7 +118,7 @@ public class BrowseManagePeersTest {
     public void C_blockA() {
         onView(profileCards.atPositionOnView(swipe, R.id.block_button)).perform(click());
     }
-/*
+
     @Test // 3
     public void D_swipeRightBProfileCardShowing() {
         // swipe right
@@ -144,7 +145,7 @@ public class BrowseManagePeersTest {
     public void F_swipeLeftAProfileCardShowing() {
         // swipe left
         swipe--;
-        onView(withId(R.id.profile_cards_rv)).perform((ViewAction) scrollToPosition(swipe));
+        onView(withId(R.id.profile_cards_rv)).perform(scrollToPosition(swipe));
 
         // B's pc is not showing since blocked, unblocked enabled
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(not((isDisplayed()))));
@@ -166,7 +167,7 @@ public class BrowseManagePeersTest {
     public void H_swipeRightBProfileCardShowing() {
         // swipe right
         swipe++;
-        onView(withId(R.id.profile_cards_rv)).perform((ViewAction) scrollToPosition(swipe));
+        onView(withId(R.id.profile_cards_rv)).perform(scrollToPosition(swipe));
 
         // C's pc is showing, friend and block enabled
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
@@ -188,7 +189,7 @@ public class BrowseManagePeersTest {
     public void J_swipeRightCProfileCardShowing() {
         //swipe right
         swipe++;
-        onView(withId(R.id.profile_cards_rv)).perform((ViewAction) scrollToPosition(swipe));
+        onView(withId(R.id.profile_cards_rv)).perform(scrollToPosition(swipe));
 
         // B's pc is showing, friend and block enabled
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
