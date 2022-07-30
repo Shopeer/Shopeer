@@ -273,15 +273,22 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         if (isBrowseManagePeersTest){
             // set up dummy suggestions list
-            createDummyProfileObj("A");
-            createDummyProfileObj("B");
-            createDummyProfileObj("C");
+            this.suggestions = new ArrayList<ProfileObject>();
 
+            // A is nobody
+            ProfileObject A = createDummyProfileObj("A");
 
+            // B sent a block
+            ProfileObject B = createDummyProfileObj("B");
 
+            // C sent invite
+            ProfileObject C = createDummyProfileObj("C");
 
+            this.manageBlocked = new HashSet<>();
+            this.manageInvites = new HashSet<>();
+            this.managePeers = new HashSet<>();
 
-            //setProfileCardRecycler();
+            setProfileCardRecycler();
             return;
         }
 
@@ -291,11 +298,15 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     }
 
     // used for testing only
-    private void createDummyProfileObj(String name) {
+    private ProfileObject createDummyProfileObj(String name) {
         String email = name + "@email.com";
         String description = email + "'s description";
-        //String photo = ;
 
+        ProfileObject profileObject = new ProfileObject(email, name, description, null);
+
+        this.suggestions.add(profileObject);
+
+        return profileObject;
     }
 
     private void setPeerManagementLists() {
