@@ -83,7 +83,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.email = getActivity().getIntent().getStringExtra("email");
+        this.email = "BMPTest@test.com";//getActivity().getIntent().getStringExtra("email");
 
         // Browse and Manage Peers testing
         isBrowseManagePeersTest = getActivity().getIntent().getBooleanExtra("isBMPTest", false);
@@ -275,7 +275,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         currentSearch = (SearchObject)parent.getItemAtPosition(pos);
 
-        if (isBrowseManagePeersTest){
+        if (true){//isBrowseManagePeersTest){
             // set up dummy suggestions list
             this.suggestions = new ArrayList<ProfileObject>();
 
@@ -303,8 +303,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
     // used for testing only
     private ProfileObject createDummyProfileObj(String name) {
-        String email = name + "@email.com";
-        String description = email + "'s description";
+        String email = name + "@test.com";
+        String description = name + "'s description";
 
         ProfileObject profileObject = new ProfileObject(email, name, description, null);
 

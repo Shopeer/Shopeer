@@ -1,14 +1,24 @@
 package com.example.shopeer;
 
+import com.example.shopeer.Util;
+
 import static androidx.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
@@ -27,6 +37,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -47,6 +58,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.util.ArrayList;
+
 @LargeTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BrowseManagePeersTest {
@@ -56,8 +69,11 @@ public class BrowseManagePeersTest {
     final static String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
     private static final String blockUrl = "http://20.230.148.126:8080/user/blocked?email=";
     private static final String invitationUrl = "http://20.230.148.126:8080/user/invitations?email=";
+    private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
 
     final static String emailAddr = "@test.com";
+
+    final Util.RecyclerViewMatcher profileCards = Util.withRecyclerView(R.id.profile_cards_rv);
 
     final static Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
@@ -67,6 +83,37 @@ public class BrowseManagePeersTest {
         intent.putExtra("email", name + emailAddr);
         intent.putExtra("isBMPTest", true);
     }
+
+
+    @Rule
+    public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
+
+    @Test // action 1
+    public void A_registeredUserWithActiveSearch() {
+        // spinner has a search
+        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("my search"))));
+    }
+
+    @Test
+    public void B_AProfileCardShowing() {
+        // A's pc is showing, friend and block enabled
+        onView(profileCards.atPositionOnView(0, R.id.peer_profile_photo)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(0, R.id.peer_name_text)).check(matches(withText("A")));
+        onView(profileCards.atPositionOnView(0, R.id.peer_description_text)).check(matches(withText("A's description")));
+
+
+    }
+
+    @Test
+    public void C_FriendA() {
+
+    }
+
+
+    //test spinner is on the right search
+    /*
+    https://stackoverflow.com/questions/31420839/android-espresso-check-selected-spinner-text
+     */
 
     @BeforeClass
     public static void testSetup() {
@@ -81,11 +128,61 @@ public class BrowseManagePeersTest {
             e.printStackTrace();
         }
 
+        // A has active search7
+        createSearch(name, "my search", "somewhere", 49, 49, 10, new ArrayList<String>(), 100);
+
         // B has blocked user
         blockPeer("B", name);
 
         // C has sent invite to user
         invitePeer("C", name);
+    }
+
+    private static void createSearch(String username, String nameInput, String locationInput, double latInput, double lonInput, int rangeInput, ArrayList<String> activitiesInput, int budgetInput) {
+        String url = searchUrl + username + emailAddr;
+        Log.d(TAG, "create POST_search: " + url);
+        try {
+            //TODO: change to be for POST to search
+            RequestQueue requestQueue = Volley.newRequestQueue(testContext);
+
+            // create json
+            JSONObject search = new JSONObject();
+            search.put("search_name", nameInput);
+
+            JSONArray activity = new JSONArray(activitiesInput);
+            search.put("activity",activity);
+
+            search.put("location_name", locationInput);
+
+            search.put("location_long", lonInput);
+            search.put("location_lati", latInput);
+
+            search.put("max_range", rangeInput);
+
+            search.put("max_budget", budgetInput);
+
+            JSONObject body = new JSONObject();
+            body.put("search", search);
+            Log.d(TAG, "POST_search request body: " + body);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, body, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    // good job
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    int statusCode = Integer.valueOf(String.valueOf(error.networkResponse.statusCode));
+
+                    fail(username + " could not create search: " + body + "\nonErrorResponse post_search: " + error.toString() + "\nerr code: " + statusCode);
+                }
+            });
+            requestQueue.add(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static void invitePeer(String name, String targetName) {
@@ -158,29 +255,6 @@ public class BrowseManagePeersTest {
             e.printStackTrace();
         }
     }
-
-    @Rule
-    public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
-
-    @Test // action 1
-    public void A_addSearchButton_launchNewSearch() {
-        Intents.init();
-        onView(withId(R.id.add_search_button)).perform(click());
-        intended(hasComponent(new ComponentName(getTargetContext(), EditSearchActivity.class)));
-        Intents.release();
-
-        onView(withId(R.id.search_name_text)).check(matches(withText("my search")));
-    }
-
-    @Test
-    public void B_saveSearchButton_invalidActivity() {}
-
-
-    //test spinner is on the right search
-    /*
-    https://stackoverflow.com/questions/31420839/android-espresso-check-selected-spinner-text
-     */
-
 
     @AfterClass
     public static void testCleanup() {
