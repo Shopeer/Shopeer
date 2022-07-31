@@ -1,8 +1,6 @@
-from importlib.util import set_loader
 from random import randrange
 import time
 import unittest
-from urllib import response
 import requests
 
 USERNAME = "testUser"
@@ -58,7 +56,7 @@ class TestResponseTime(unittest.TestCase):
                         "max_budget":100
                     }
                 }
-        response = requests.post(SEARCH_URL, params=params, json=data)
+        requests.post(SEARCH_URL, params=params, json=data)
 
             
 
@@ -73,7 +71,7 @@ class TestResponseTime(unittest.TestCase):
         email = USERNAME + str(randrange(20)) + EMAIL_TAG
         # Call Api function to get searches
         params = {"email":email}
-        response = requests.get(SUGG_URL, params=params)
+        requests.get(SUGG_URL, params=params)
 
 
 if __name__ == '__main__':

@@ -8,7 +8,6 @@ import static androidx.test.espresso.intent.matcher.IntentMatchers.isInternal;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasAnyDrawable;
 import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasNoDrawable;
 import static org.hamcrest.Matchers.allOf;
