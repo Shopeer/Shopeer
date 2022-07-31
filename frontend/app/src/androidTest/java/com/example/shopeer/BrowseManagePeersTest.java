@@ -285,7 +285,7 @@ public class BrowseManagePeersTest {
         createUser("C");
 
         try {
-            sleep(1000);
+            sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -429,12 +429,19 @@ public class BrowseManagePeersTest {
 
         // TODO: delete room created with C
         deleteAllRooms("C");
+
     }
 
     private static void deleteAllRooms(String user) {
-        ArrayList<String> ids = getRoomId(user);
+        ArrayList<String> ids = getRoomIds(user);
         for (String id : ids) {
+            Log.e(TAG, "deletetng" + id);
             deleteRoom(id);
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -464,7 +471,7 @@ public class BrowseManagePeersTest {
         }
     }
 
-    private static ArrayList<String> getRoomId(String user) {
+    private static ArrayList<String> getRoomIds(String user) {
         ArrayList<String> roomIds = new ArrayList<String>();
 
         String url = roomsUrl + "/all?email=" + user + emailAddr;
@@ -480,15 +487,12 @@ public class BrowseManagePeersTest {
                         try {
                             JSONObject responseObj = response.getJSONObject(i);
                             String id = responseObj.getString("_id");
+                            Log.d(TAG, "got room id: " + id);
                             roomIds.add(id);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                    for (String i : roomIds) {
-                        Log.d(TAG, "search: " + i);
-                    }
-
                 }
             }, new Response.ErrorListener() {
                 @Override
