@@ -1,32 +1,23 @@
 package com.example.shopeer;
 
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.example.shopeer.Util;
 
 import static androidx.test.InstrumentationRegistry.getTargetContext;
-import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-//import static androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
-import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
 
 import static java.lang.Thread.sleep;
 
@@ -34,19 +25,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.espresso.ViewAction;
-//import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -59,15 +44,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 @LargeTest
@@ -98,35 +80,8 @@ public class BrowseManagePeersTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
 
-    @Before
-    public void testSetup() {
-        createUser(name);
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        createUser("A");
-
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        createUser("B");
-
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        createUser("C");
-        swipe = 0;
-    }
-
     // cannot split each action of the test into separate test cases because app state is not
-    // persistent across test cases (always a new activity start on each test case)
+    // persistent across test cases (always a new activity starts on each test case)
     @Test // full test
     public void BrowseManagePeerTest() {
         // load time
@@ -149,11 +104,10 @@ public class BrowseManagePeersTest {
         K_matchWithC();
     }
 
-    @Test // 1
+    //@Test // 1
     public void A_registeredUserWithActiveSearch() {
         // spinner has a search
         onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("my search"))));
-
     }
 
     //@Test // 2
@@ -311,53 +265,47 @@ public class BrowseManagePeersTest {
         Intents.release();
     }
 
+ ////////////////////////////////// set up and clean up ///////////////////////////////////////////
 
-    private void createSearch(String username, String nameInput, String locationInput, double latInput, double lonInput, int rangeInput, ArrayList<String> activitiesInput, int budgetInput) {
-        String url = searchUrl + username + emailAddr;
-        Log.d(TAG, "create POST_search: " + url);
+    @Before
+    public void testSetup() {
+        createUser(name);
         try {
-            //TODO: change to be for POST to search
-            RequestQueue requestQueue = Volley.newRequestQueue(testContext);
-
-            // create json
-            JSONObject search = new JSONObject();
-            search.put("search_name", nameInput);
-
-            JSONArray activity = new JSONArray(activitiesInput);
-            search.put("activity",activity);
-
-            search.put("location_name", locationInput);
-
-            search.put("location_long", lonInput);
-            search.put("location_lati", latInput);
-
-            search.put("max_range", rangeInput);
-
-            search.put("max_budget", budgetInput);
-
-            JSONObject body = new JSONObject();
-            body.put("search", search);
-            Log.d(TAG, "POST_search request body: " + body);
-
-            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, body, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    // good job
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    int statusCode = Integer.valueOf(String.valueOf(error.networkResponse.statusCode));
-
-                    Log.e(TAG, username + " could not create search: " + body + "\nonErrorResponse post_search: " + error.toString() + "\nerr code: " + statusCode);
-                }
-            });
-            requestQueue.add(jsonObjReq);
-        } catch (Exception e) {
+            sleep(1000);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        createUser("A");
+
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        createUser("B");
+
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        createUser("C");
+        swipe = 0;
     }
+
+    @After
+    public void testCleanup() {
+        deleteUser(name);
+        deleteUser("A");
+        deleteUser("B");
+        deleteUser("C");
+
+        // possibly redundant
+        deleteAllRooms("C");
+    }
+
+    ////////////////////////////////////// helper functions /////////////////////////////////////////
 
     private void invitePeer(String name, String targetName) {
         String url = invitationUrl + name + emailAddr + "&target_peer_email=" + targetName + emailAddr;
@@ -437,18 +385,6 @@ public class BrowseManagePeersTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @After
-    public void testCleanup() {
-        deleteUser(name);
-        deleteUser("A");
-        deleteUser("B");
-        deleteUser("C");
-
-        // TODO: delete room created with C
-        deleteAllRooms("C");
-
     }
 
     private void deleteAllRooms(String user) {
@@ -550,6 +486,4 @@ public class BrowseManagePeersTest {
             e.printStackTrace();
         }
     }
-
-
 }
