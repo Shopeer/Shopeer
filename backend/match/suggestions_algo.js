@@ -42,7 +42,13 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
     try {
         
         var main_user_cursor = await user_collection.findOne({ email: profile_email })
-        console.log(main_user_cursor)
+
+        if (main_user_cursor.searches.length === 0) {
+            var arr = await get_viable_matches(main_user_cursor)
+            res.status(200).send(arr)
+            return 
+        }
+
         var email_score_pair_array = await get_scores(main_user_cursor)
         var user_object_array = []
         for (const pair of email_score_pair_array) {
@@ -103,19 +109,28 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
 
 })
 
-
+// this function excludes the user's peers, invites, and blocklist, as well as anyone who has blocked this user
+async function get_viable_matches(user) {
+    var excluded_user_emails = user.peers.concat(user.invites, user.blocked)
+    
+    var viable_matches = await (user_collection.find(
+        { email: { $ne: user.email, $nin: excluded_user_emails }, 
+        blocked: {$nin: [user.email] } }))
+        .toArray()
+    // console.log(viable_matches)
+    console.log("excluded")
+    console.log(excluded_user_emails)
+    return viable_matches
+}
 
 async function get_scores(user) {
     // filter out user's peers, invitations, and blocklist. Filter out anyone who has blocked this user.
     //var blocked_by_emails = await (user_collection.find({ blocked: {$in: [user.email] }})).project( { email: 1, _id: 0 }).toArray()
     
     var user_scores = [] // array contains email/score pairs
-    var excluded_user_emails = user.peers.concat(user.invites, user.blocked)
+    var viable_matches = await get_viable_matches(user)
     
-    var viable_matches = await (user_collection.find({ email: { $ne: user.email, $nin: excluded_user_emails }, blocked: {$nin: [user.email] } })).toArray()
-    // console.log(viable_matches)
-    console.log("excluded")
-    console.log(excluded_user_emails)
+    
 
     for (let i = 0; i < viable_matches.length; i++) {
         var potential_match = viable_matches[i]
