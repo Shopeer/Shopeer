@@ -57,67 +57,63 @@ app.post("/searches", async (req, res) => {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor == null) {
             res.status(404).json({ response: 'User not found' })
-            return
-        }
-        for (let i = 0; i < find_cursor.searches.length; i++) {
-            if (find_cursor.searches[i].search_name == new_search_name) {
-                res.status(409).json({ response: 'Search already exists' });
-                break
+        } else {
+
+            if (find_cursor.searches.length == 0) {
+                await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+                find_cursor = await user_collection.findOne({ email: profile_email })
+                res.status(201).json({ response: 'Added new search' });
+            } else {
+                for (let i = 0; i < find_cursor.searches.length; i++) {
+                    if (find_cursor.searches[i].search_name == new_search_name) {
+                        res.status(409).json({ response: 'Search already exists' });
+                        break
+                    }
+                }
             }
         }
-        await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
-        find_cursor = await user_collection.findOne({ email: profile_email })
-        res.status(201).json({ response: 'Added new search' });
-        return
     }
 })
 
 
-//----------------NOT TESTED----------------
 app.put("/searches", async (req, res) => {
     var profile_email = req.query.email
 
     if (!validator.isEmail(profile_email)) {
-        res.status(400).json("Error: Invalid Email")
-    } else if (!error_check_search(body)) {
-        res.status(400).json("Bad fields")
+        res.status(413).json("Error: Invalid Email")
+    } else if (!error_check_search(req.body)) {
+        res.status(412).json("Bad fields")
     } else {
-        var search_id = req.query.search
-        var new_search_name = req.body.search.search_name
-        var search_object = create_search_object(req.body.search)
+        var old_search_name = req.query.search_name
+        var new_search_name = req.body.search_name
+        var search_object = create_search_object(req.body)
         var find_cursor = await user_collection.findOne({ email: profile_email })
+
         if (find_cursor == null) {
             res.status(404).json({ response: 'User not found' })
-            return
-        }
-
-        if (search_id == new_search_name) {
-            // if we wish to modify the body:
+        } else if (old_search_name == new_search_name) {
+            // updates search_name
             await user_collection.updateOne(
-                { email: req.query.email, searches: { $elemMatch: { search_name: search_id } } },
+                { email: req.query.email, searches: { $elemMatch: { search_name: old_search_name } } },
                 { $set: { "searches.$": search_object } }
             )
             res.status(200).json({ response: 'overwrote prev search' });
-            return
         } else {
-            // if we wish to modify the search name:
+            // updates body
             var duplicate = await user_collection.findOne(
                 { email: req.query.email, searches: { $elemMatch: { search_name: new_search_name } } }
             )
             var check = await user_collection.findOne(
-                { "email": req.query.email, "searches": { $elemMatch: { search_name: req.query.search } } }
+                { "email": req.query.email, "searches": { $elemMatch: { search_name: req.query.search_name } } }
             )
             if (!check) {
                 res.status(404).json({ response: 'search not found' });
-                return
-            }
-            if (!duplicate) {
+            } else if (!duplicate) {
                 await user_collection.updateOne(
-                    { "email": req.query.email, "searches": { $elemMatch: { search_name: req.query.search } } },
+                    { "email": req.query.email, "searches": { $elemMatch: { search_name: req.query } } },
                     { $set: { "searches.$.search_name": new_search_name } }
                 )
                 res.status(200).json({ response: 'modified search_name' });
-                return
             } else {
                 res.status(409).json({ response: 'this search_name already exists' });
             }
@@ -168,7 +164,7 @@ function error_check_search(body) {
 }
 
 
-// Delete active search DELETE https://shopeer.com/match/searches?search_id=[id]
+// Delete active search DELETE https://shopeer.com/match/searches?old_search_name=[id]
 // Removes a current active search from active_searches to past_searches in User Database
 // Param: search id
 // Body: User Id Token
@@ -183,7 +179,7 @@ app.delete("/searches", async (req, res) => {
     } else {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (!find_cursor) {
-            res.status(404).json({ response: "User not found." })
+            res.status(404).json({ response: "User not found" })
             return
         }
         var no_match_flag = 0
@@ -192,7 +188,7 @@ app.delete("/searches", async (req, res) => {
                 await user_collection.updateOne({ email: profile_email }, { $pull: { searches: { search_name: search } } })
                 res.status(200).json({ response: 'Removed search' })
                 no_match_flag = 1
-                return
+                break
             }
         }
         if (!no_match_flag) {

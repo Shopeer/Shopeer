@@ -1,28 +1,30 @@
-** Directory Structure
+# Shopeer Backend
 
-|─── Config Folder
-|   └── server.js
+## Directory Structure
 
-|─── Match Folder
-|   ├── searches.js
-|   └── suggestions_algo.js
+- Config Folder
+    - server.js
 
-|─── User Folder
-|   ├── profile.js
-|   └── peers.js
+- Match Folder
+    - searches.js
+    - suggestions_algo.js
 
-|─── Database Folder (not yet decided on)
-|   ├── user_collection.js
-|   └── room_collection.js
+- User Folder
+    - profile.js
+    - peers.js
 
-|─── Chat Folder
-|   ├── rooms.js
-|   └── message.js
+- Database Folder (not yet decided on)
+    - user_collection.js
+    - room_collection.js
+
+- Chat Folder
+    - rooms.js
+    - message.js
 
 
+----------------------------------------------------
 
-
-** Designated test modules and use cases
+## Designated test modules and use cases
 - the two back-end modules specified by TA for your project are: 
     - User
     - Matches
