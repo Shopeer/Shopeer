@@ -24,16 +24,6 @@ async function resetDatabase() {
   await user_collection.deleteMany({})
 }
 
-// this is used as a delay function
-// function sleep(ms) {
-//   return new Promise((resolve) => {
-//     setTimeout(resolve, ms);
-//   });
-// }
-
-// this is used as another delay function
-// await new Promise(res => setTimeout(() => { res() }, 200))
-
 
 beforeAll(() => {
   initializeDatabase();
