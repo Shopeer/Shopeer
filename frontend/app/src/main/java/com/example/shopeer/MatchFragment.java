@@ -115,6 +115,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         // setup edit search button
         editSearchButton = v.findViewById(R.id.edit_search_button);
+        editSearchButton.setVisibility(GONE);
         editSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -190,8 +191,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     }
 
                     // if no searches exist, edit search button is disabled
-                    if (searches.isEmpty()) {
-                        editSearchButton.setVisibility(View.GONE);
+                    if (!searches.isEmpty()) {
+                        editSearchButton.setVisibility(VISIBLE);
                     }
 
                     setSearchSpinner();
