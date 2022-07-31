@@ -1,4 +1,4 @@
-// // local vm
+// local vm
 // const IP = '192.168.64.15';
 // azure vm
 // const IP = "20.230.148.126";
