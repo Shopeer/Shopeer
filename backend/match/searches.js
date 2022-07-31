@@ -130,15 +130,24 @@ function error_check_search(body) {
     if (body.search_name == null || body.activity == null || body.location_name == null || body.location_lati == null || body.location_long == null || body.max_range == null || body.max_budget == null) {
         return false
     }
-    if (!validator.isAlphanumeric(body.search_name)) {
+    if (!onlyLettersAndSpacesAndNumbers(body.search_name)) {
         return false
     }
-    if (!validator.isAlpha(body.activity)) {
+    if (!onlyLettersAndSpaces(body.activity)) {
         return false
     }
-    if (!validator.isAlpha(body.location_name)) {
+    if (!onlyLettersAndSpaces(body.location_name)) {
         return false
     }
+    // if (!validator.isAlphanumeric(body.search_name)) {
+    //     return false
+    // }
+    // if (!validator.isAlpha(body.activity)) {
+    //     return false
+    // }
+    // if (!validator.isAlpha(body.location_name)) {
+    //     return false
+    // }
     if (!validator.isFloat(String(body.location_long))) {
         return false
     }
@@ -152,6 +161,14 @@ function error_check_search(body) {
         return false
     }
     return true
+}
+
+function onlyLettersAndSpacesAndNumbers(str) {
+    return /^[A-Za-z0-9\s]*$/.test(str);
+}
+
+function onlyLettersAndSpaces(str) {
+    return /^[A-Za-z\s]*$/.test(str);
 }
 
 
