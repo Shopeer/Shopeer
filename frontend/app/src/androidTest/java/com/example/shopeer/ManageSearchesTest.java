@@ -431,7 +431,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.profileCards)).check(matches(isDisplayed()));
     }
 
-    //@After
+    @After
     public void testCleanup() {
         // delete user
         deleteUser(name);

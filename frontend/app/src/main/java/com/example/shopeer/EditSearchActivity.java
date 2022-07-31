@@ -149,7 +149,7 @@ public class EditSearchActivity extends AppCompatActivity {
                 if (a.equals("entertainment")) {
                     activityEntertainmentButton.setChecked(true);
                 }
-                else if (a.equals("bulk buy")) {
+                else if (a.equals("bulkbuy")) {
                     activityBulkBuyButton.setChecked(true);
                 }
                 else if (a.equals("groceries")) {
@@ -417,7 +417,7 @@ public class EditSearchActivity extends AppCompatActivity {
             activities.add("entertainment");
         }
         if (activityBulkBuyButton.isChecked()) {
-            activities.add("bulk buy");
+            activities.add("bulkbuy");
         }
 
         return activities;

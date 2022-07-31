@@ -98,6 +98,16 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         // Browse and Manage Peers testing
         isBrowseManagePeersTest = getActivity().getIntent().getBooleanExtra("isBMPTest", false);
+        if (isBrowseManagePeersTest) {
+            this.email = "BMPTest@test.com";
+        }
+
+        // setup search spinner
+        searchSpinner = v.findViewById(R.id.search_spinner);
+
+        // setup suggestion list profile cards
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        rv = v.findViewById(R.id.profile_cards_rv);
 
         getSearchList();
 
@@ -133,20 +143,20 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             }
         });
 
-        // setup search spinner
-        searchSpinner = v.findViewById(R.id.search_spinner);
-
-
-        // setup suggestion list profile cards
-        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        rv = v.findViewById(R.id.profile_cards_rv);
-
         return v;
     }
 
     ////////////////////////////////////// handle searches /////////////////////////////////////////
 
-    private ArrayList<SearchObject> getSearchList() {
+    private void getSearchList() {
+        if (isBrowseManagePeersTest) {
+            // dummy search
+            searches.clear();
+            searches.add(new SearchObject("my search", null, 0, 0, 0, 0, null));
+            setSearchSpinner();
+            return;
+        }
+
         String url = searchUrl + this.email;
         Log.d(TAG, "GET search: " + url);
         try {
@@ -207,7 +217,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     private void setSearchSpinner() {
@@ -366,7 +375,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                         // set my own profile info
                         String myName = response.getString("name");
                         String myEmail = response.getString("email");
-                        myProfile = new ProfileObject(myName, myEmail, null, null);
+                        myProfile = new ProfileObject(myEmail, myName, null, null);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
