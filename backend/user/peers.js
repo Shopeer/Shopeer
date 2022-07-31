@@ -1,6 +1,6 @@
 require('http');
 var express = require("express")
-express()
+//express()
 
 const user_peers_router = express.Router()
 
@@ -80,13 +80,17 @@ user_peers_router.delete("/peers", async (req, res) => {
         }
 
         if (find_cursor.peers.includes(target_peer_email)) {
-            var debug_res = await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
-            // var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(debug_res)
+            var profile = await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
+            var target = await user_collection.updateOne({ email: target_peer_email }, { $pull: { peers: profile_email } })
+            if (profile.modifiedCount === 1 && target.modifiedCount === 1) {
+                res.status(200).json({response: "Peers removed from each others' peerlists."})
+
+            }
+            
         } else {
             console.log("Peer already not in existence")
             // var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(404).send(find_cursor)
+            res.status(404).json({response: "Target peer not found."})
         }
     }
     catch (err) {
@@ -107,19 +111,18 @@ user_peers_router.get("/blocked", async (req, res) => {
             res.status(404).json({response: "User not found."})
             return
         }
-        console.log("block list is ")
-        console.log(find_cursor.blocked)
         ret_array = await get_object_array_from_email_array(find_cursor.blocked)
         // console.log(ret_array)
         if (!ret_array) {
             res.status(400).json({response: "Failed to get blocked list."})
             return
         }
-        if (ret_array.length > 0 ) {
-            res.status(200).send(ret_array)
-        } else {
-            res.status(404).send("could not find specified emails")
-        }
+        // if (ret_array.length > 0 ) {
+        //     res.status(200).send(find_cursor.blocked)
+        // } else {
+        //     res.status(404).send("could not find specified emails")
+        // }
+        res.status(200).send(find_cursor.blocked)
         
     }
     catch (err) {
@@ -137,20 +140,28 @@ user_peers_router.get("/blocked", async (req, res) => {
 user_peers_router.post("/blocked", async (req, res) => {
     var profile_email = req.query.email
     var target_peer_email = req.query.target_peer_email
+    
     try {
+        if (profile_email == target_peer_email) {
+            res.status(409).json({response: "Cannot operate on self."})
+            return
+        }
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        var target_cursor = await user_collection.findOne({ email: target_peer_email })
         if (!find_cursor) {
             res.status(404).json({response: "User not found."})
             return
         }
-
+        if (!target_cursor) {
+            res.status(404).json({response: "Target user not found."})
+            return
+        }
         if (find_cursor.blocked.includes(target_peer_email)) {
-            console.log("Peer already in added")
-            res.status(409).send(find_cursor)
+            res.status(409).json({response: "User already in blocklist."})
         } else {
             
-            await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
-            await user_collection.updateOne({ email: profile_email }, { $pull: { peers: target_peer_email } })
+            await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email, received_invites: target_peer_email, peers: target_peer_email } })
+            await user_collection.updateOne({ email: target_peer_email }, { $pull: { invites: profile_email, received_invites: profile_email, peers: profile_email } })
             await user_collection.updateOne({ email: profile_email }, { $push: { blocked: target_peer_email } })
             res.status(201).send(await user_collection.findOne({ email: profile_email }))
         }
@@ -171,8 +182,13 @@ user_peers_router.delete("/blocked", async (req, res) => {
     var target_peer_email = req.query.target_peer_email
     try {
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        var target_cursor = await user_collection.findOne({ email: target_peer_email })
         if (!find_cursor) {
             res.status(404).json({response: "User not found."})
+            return
+        }
+        if (!target_cursor) {
+            res.status(404).json({response: "Target user not found."})
             return
         }
 
@@ -183,7 +199,7 @@ user_peers_router.delete("/blocked", async (req, res) => {
             // res.status(200).send("Success")
         } else {
             // var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(404).send("Target peer is not in blocklist")
+            res.status(404).json({response: "Target peer is not in blocklist."})
             // res.status(200).send("Fail")
         }
     }
@@ -232,18 +248,14 @@ user_peers_router.get("/invitations/received", async (req, res) => {
             return
         }
         ret_array = await get_object_array_from_email_array(find_cursor.received_invites)
-        if (!ret_array) {
-            res.status(400).json({response: "Failed to get received invitations."})
-            return
-        }
-        if (ret_array.length > 0 ) {
-            res.status(200).send(ret_array)
-        } else {
-            res.status(404).send("could not find specified emails")
-        }
-
-        console.log(ret_array)
+        // if (!ret_array) {
+        //     res.status(400).json({response: "Failed to get received invitations."})
+        //     return
+        // }
         res.status(200).send(ret_array)
+
+        // console.log(ret_array)
+        // res.status(200).send(ret_array)
     }
     catch (err) {
         console.log(err)
@@ -263,10 +275,10 @@ async function get_object_array_from_email_array(email_array) {
     //     array.push(return_cursor)
     // }
 
+    // works but makes error-checking difficult.
     var return_arr = await user_collection.find({ email: { $in: email_array } }).toArray()
 
-    
-    console.log(return_arr)
+    // console.log(return_arr)
     if (!return_arr) {
         throw "Error: invalid email"
     }
@@ -282,29 +294,44 @@ user_peers_router.post("/invitations", async (req, res) => {
     var profile_email = req.query.email
     var target_peer_email = req.query.target_peer_email
     try {
+        if (profile_email == target_peer_email) {
+            res.status(409).json({response: "Cannot operate on self."})
+            return
+        }
         var find_cursor = await user_collection.findOne({ email: profile_email })
+        var target_cursor = await user_collection.findOne({ email: target_peer_email})
         if (!find_cursor) {
             res.status(404).json({response: "User not found."})
             return
         }
+        if (!target_cursor) {
+            res.status(404).json({response: "Target user not found."})
+            return
+        }
+        if (target_cursor.blocked.includes(profile_email)) {
+            console.log("This user is blocked.")
+            res.status(400).send({response: "The target user cannot be invited."})
+            return
+        }
+        if (find_cursor.peers.includes(target_peer_email)) {
+            console.log("Target already in peerlist")
+            res.status(409).send({response: "Target already in peerlist."})
+            return
+        }
         if (find_cursor.invites.includes(target_peer_email)) {
-            console.log("Peer already in added")
-            res.status(409).send(find_cursor)
+            console.log("Target already in invitation list")
+            res.status(409).send({response: "Target already in invitation list."})
+            
         } else {
-            var target_cursor = await user_collection.findOne({ email: target_peer_email })
-            // if (!find_cursor) {
-            //     res.status(404).json({response: "User not found."})
-            //     return
-            // }
             if (target_cursor.invites.includes(profile_email)) {
                 await user_collection.updateOne({ email: profile_email }, { $push: { peers: target_peer_email }, $pull: { invites: target_peer_email, received_invites: target_peer_email } })
                 await user_collection.updateOne({ email: target_peer_email }, { $push: { peers: profile_email }, $pull: { invites: profile_email, received_invites: profile_email } })
-                res.status(201).send("Success, both are now peers")
+                res.status(201).json({response: "Success, both are now peers."})
             } else {
                 await user_collection.updateOne({ email: profile_email }, { $push: { invites: target_peer_email } })
                 await user_collection.updateOne({ email: target_peer_email }, { $push: { received_invites: profile_email } })
                 // var find_cursor = await user_collection.findOne({ email: profile_email })
-                res.status(200).send(find_cursor)
+                res.status(200).json({response: "Success, invitation sent."})
             }
         }
     }
@@ -326,12 +353,13 @@ user_peers_router.delete("/invitations", async (req, res) => {
 
         if (find_cursor.invites.includes(target_peer_email)) {
             await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
+            await user_collection.updateOne({ email: target_peer_email }, { $pull: { received_invites: profile_email } })
             // var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(200).send(find_cursor)
+            res.status(200).send(await user_collection.findOne({ email: profile_email }))
             // res.status(200).send("Success")
         } else {
             //var find_cursor = await user_collection.findOne({ email: profile_email })
-            res.status(400).send(find_cursor)
+            res.status(404).json({response: "Target user not found."})
             // res.status(200).send("Fail")
         }
     }
