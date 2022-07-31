@@ -118,8 +118,8 @@ public class ProfileFragment extends Fragment {
     private void getProfileInfo() {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-            String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail();
-//            String url = profileUrl + MainActivity.email;
+//            String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail();
+            String url = profileUrl + MainActivity.email;
             Log.d(TAG, "trying to get profile info " + url);
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override

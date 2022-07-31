@@ -101,17 +101,17 @@ import java.util.ArrayList;
 @RunWith(AndroidJUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ModifyProfileTest {
+    final String email = "test@email.com";
+    final String TAG = "ModifyProfile Test";
+    final String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
+
+    final Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
     static Intent intent;
     static {
         intent = new Intent(ApplicationProvider.getApplicationContext(), MainActivity.class);
         intent.putExtra("email", "test@email.com");
     }
-
-    final String email = "test@gmail.com";
-    final String TAG = "ModifyProfile Test";
-    final String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
-
-    final Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     private View decorView;
 
@@ -171,8 +171,7 @@ public class ModifyProfileTest {
     @Test
     public void A_isProfileFragment() {
         // clicks on profile fragment
-//        goToProfile();
-        onView(withText("Profile")).perform(click());
+        goToProfile();
 
         // checks components of profile fragment
         onView(withId(R.id.profileName_textView)).check(matches(isDisplayed()));
@@ -203,25 +202,25 @@ public class ModifyProfileTest {
         return x.getClass().getPackage().getName();
     }
 
-//    @Test
-//    public void C_acceptPermission() {
-//        //stubs the image picker
-//        intending(not(isInternal())).respondWith(stubImagePicker());
-//
-//        //check if camera icon exist
-//        goToProfile();
-//        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
-//        assertHasNoDrawable(R.id.profilePic_imageView);
-//
-//        //clicks camera icon
-//        onView(withId(R.id.camera_imageView)).perform(click());
-//
-//        //Allow Permission
-//        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
-//
-//        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
-//        assertHasDrawable(R.id.profilePic_imageView, R.drawable.temp_profile);
-//    }
+    @Test
+    public void C_acceptPermission() {
+        //stubs the image picker
+        intending(not(isInternal())).respondWith(stubImagePicker());
+
+        //check if camera icon exist
+        goToProfile();
+        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
+        assertHasNoDrawable(R.id.profilePic_imageView);
+
+        //clicks camera icon
+        onView(withId(R.id.camera_imageView)).perform(click());
+
+        //Allow Permission
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
+        assertHasDrawable(R.id.profilePic_imageView, R.drawable.temp_profile);
+    }
 
     private Instrumentation.ActivityResult stubImagePicker() {
         // Build the result to return when the activity is launched.
@@ -285,6 +284,7 @@ public class ModifyProfileTest {
 
         onView(withId(R.id.updateProfileButton)).perform(click());
         numClicks ++;
+        onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
         onView(withId(R.id.profileName_textView)).check(matches(withText("espresso")));
         onView(withId(R.id.profileBio_textView)).check(matches(withText("edited with espresso")));
 
