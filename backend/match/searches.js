@@ -22,9 +22,9 @@ app.get("/searches", async (req, res) => {
                 res.status(404).json({ response: "User not found." })
                 return
             }
-            var temp_arry = await find_cursor.searches
-            console.log(temp_arry)
-            res.status(200).send(temp_arry)
+            var search_arry = await find_cursor.searches
+            console.log(search_arry)
+            res.status(200).send(search_arry)
 
         }
         catch (err) {

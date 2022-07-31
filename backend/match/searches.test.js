@@ -81,7 +81,50 @@ describe('Tests for Searches Submodule', function () {
     });
 
 
+    it('GET /match/searches User not found.', async function () {
 
+   
+
+      const response = await request(app)
+        .get('/match/searches')
+        .query({
+          email: "null@null.com"
+        })
+      expect(response.status).toEqual(404);
+      expect(response.text).toEqual("User not found.")
+    });
+
+    it('GET /match/searches success', async function () {
+
+      const old_search_name = "ChangedSearchName"
+      const new_search_name = "NewChangedSearchName"
+      await request(app)
+        .post('/user/registration')
+        .query({
+          email: "GetSearch@gmail.com",
+          name: "GetSearch"
+        })
+
+      var old_search_object = create_search_object({
+        search_name: old_search_name,
+        activity: "asdf",
+        location_name: "asdf",
+        location_long: 49.49,
+        location_lati: 49.49,
+        max_range: 3,
+        max_budget: 300
+      })
+
+      await user_collection.updateOne({ email: "GetSearch@gmail.com" }, { $push: { searches: old_search_object } })
+
+      const response = await request(app)
+        .get('/match/searches')
+        .query({
+          email: "GetSearch@gmail.com"
+        })
+      expect(response.status).toEqual(400);
+      expect(response.text).toEqual(String(old_search_object))
+    });
 
 
 
