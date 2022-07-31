@@ -1,13 +1,17 @@
 package profile;
 
 import static androidx.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.isInternal;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
@@ -19,27 +23,37 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import androidx.activity.result.ActivityResult;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.intent.Intents;
+import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
@@ -54,7 +68,10 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.shopeer.EditSearchActivity;
 import com.example.shopeer.MainActivity;
+import com.example.shopeer.ProfileFragment;
 import com.example.shopeer.R;
+import com.example.shopeer.RoomObject;
+import com.example.shopeer.SearchObject;
 import com.google.android.gms.location.ActivityTransitionEvent;
 import com.google.android.material.navigation.NavigationView;
 
@@ -62,12 +79,18 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
 
 @RunWith(AndroidJUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -89,8 +112,10 @@ public class ModifyProfileTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
 
+
     @Before
     public void testSetup() {
+        Intents.init();
         //setup to test Toast message
         activityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<MainActivity>() {
             @Override
@@ -135,17 +160,17 @@ public class ModifyProfileTest {
         bottomNavigationItemView.perform(click());
     }
 
-//    @Test
-//    public void A_isProfileFragment() {
-//        // clicks on profile fragment
-//        goToProfile();
-//
-//        // checks components of profile fragment
-//        onView(withId(R.id.profileName_textView)).check(matches(isDisplayed()));
-//        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
-//        onView(withId(R.id.profileBio_textView)).check(matches(isDisplayed()));
-//        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
-//    }
+    @Test
+    public void A_isProfileFragment() {
+        // clicks on profile fragment
+        goToProfile();
+
+        // checks components of profile fragment
+        onView(withId(R.id.profileName_textView)).check(matches(isDisplayed()));
+        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
+        onView(withId(R.id.profileBio_textView)).check(matches(isDisplayed()));
+        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
+    }
 //
 //    @Test
 //    public void B_declinePermission() {
@@ -164,55 +189,91 @@ public class ModifyProfileTest {
 //                .check(matches(isDisplayed()));
 //    }
 
+    private String getPackageName() {
+        RoomObject x = new RoomObject("a","a", "a", "a", 1);
+        return x.getClass().getPackage().getName();
+    }
+
+    @Test
+    public void C_acceptPermission() {
+        //check if camera icon exist
+        goToProfile();
+        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
+
+        // stub the image
+        // Build the result to return when the activity is launched.
+        Intent resultData = new Intent();
+        Bundle bundle = new Bundle();
+        ArrayList<Parcelable> parcels = new ArrayList<>();
+//        Uri uri1 = Uri.parse("android.resource://com.example.shopeer/drawable/temp_profile.jpeg");
+        Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/drawable/temp_profile.jpeg");
+        Log.d(TAG, "temp profile URI: " + uri1);
+
+        Parcelable parcelable1 = (Parcelable) uri1;
+        parcels.add(parcelable1);
+        bundle.putParcelableArrayList(Intent.EXTRA_STREAM, parcels);
+        // Create the Intent that will include the bundle.
+//        resultData.putExtras(bundle);
+        resultData.putExtra(Intent.EXTRA_STREAM, parcelable1);
+
+        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
+        intending(not(isInternal())).respondWith(result);
+//        intending(not(isInternal())).respondWith(new Instrumentation.ActivityResult(ProfileFragment.RESULT_OK, resultData));
+
+        //clicks camera icon
+        onView(withId(R.id.camera_imageView)).perform(click());
+        //Allow Permission
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
+    }
+
 //    @Test
-//    public void C_acceptPermission() {
-//        //check if camera icon exist
+//    public void D_invalidName() {
 //        goToProfile();
+//        onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
+//        onView(withId(R.id.edit_imageView)).perform(click());
 //
-//        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
-//        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
-//        //clicks camera icon
-//        onView(withId(R.id.camera_imageView)).perform(click());
-//        //Deny Permission
-//        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
+//        onView(withText("UPDATE")).check(matches(isDisplayed()));
+//
+//        // Edits text
+//        onView(withId(R.id.profileName_input)).perform(clearText());
+//        onView(withId(R.id.profileName_input)).perform(typeText("|!?()"));
+//        closeSoftKeyboard();
+//        onView(withId(R.id.profileBio_input)).perform(clearText());
+//        onView(withId(R.id.profileBio_input)).perform(typeText("edited with espresso"));
+//        closeSoftKeyboard();
+//
+//        onView(withId(R.id.updateProfileButton)).perform(click());
+//        //check toast message
+//        onView(withText("Invalid Name"))
+//                .inRoot(withDecorView(not(decorView)))
+//                .check(matches(isDisplayed()));
 //    }
 
-    @Test
-    public void D_editProfile() {
-        goToProfile();
-        onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
-        onView(withId(R.id.edit_imageView)).perform(click());
-
-        onView(withText("UPDATE")).check(matches(isDisplayed()));
-
-        // Edits text
-        onView(withId(R.id.profileName_input)).perform(clearText());
-        onView(withId(R.id.profileName_input)).perform(typeText("|!?()"));
-        onView(withId(R.id.profileBio_input)).perform(clearText());
-        onView(withId(R.id.profileBio_input)).perform(typeText("edited with espresso"));
-
-        onView(withId(R.id.updateProfileButton)).perform(click());
-        //check toast message
-        onView(withText("Invalid Name"))
-                .inRoot(withDecorView(not(decorView)))
-                .check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void E_invalidName() {
-        // Edits text
-        onView(withId(R.id.profileName_input)).perform(clearText());
-        onView(withId(R.id.profileName_input)).perform(typeText("espresso"));
-        onView(withId(R.id.profileBio_input)).perform(clearText());
-        onView(withId(R.id.profileBio_input)).perform(typeText("edited with espresso"));
-
-        onView(withId(R.id.updateProfileButton)).perform(click());
-        onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
-    }
-//
 //    @Test
-//    public void F_successfulChange() {
+//    public void E_validName() {
+//        int numClicks = 0;
+//        goToProfile();
+//        numClicks ++;
+//        onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
+//        onView(withId(R.id.edit_imageView)).perform(click());
+//        numClicks ++;
 //
+//        onView(withText("UPDATE")).check(matches(isDisplayed()));
+//
+//        // Edits text
+//        onView(withId(R.id.profileName_input)).perform(clearText());
+//        onView(withId(R.id.profileName_input)).perform(typeText("espresso"));
+//        closeSoftKeyboard();
+//        onView(withId(R.id.profileBio_input)).perform(clearText());
+//        onView(withId(R.id.profileBio_input)).perform(typeText("edited with espresso"));
+//        closeSoftKeyboard();
+//
+//        onView(withId(R.id.updateProfileButton)).perform(click());
+//        numClicks ++;
+//        onView(withId(R.id.profileName_textView)).check(matches(withText("espresso")));
+//        onView(withId(R.id.profileBio_textView)).check(matches(withText("edited with espresso")));
+//
+//        assertTrue("number of clicks must be <=5", numClicks <=5);
 //    }
 
     @After
@@ -239,6 +300,7 @@ public class ModifyProfileTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Intents.release();
     }
 
     private static Matcher<View> childAtPosition(

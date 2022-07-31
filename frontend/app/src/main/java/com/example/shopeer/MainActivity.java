@@ -42,9 +42,6 @@ public class MainActivity extends AppCompatActivity {
             navController.navigate(R.id.profileFragment);
         else if (ROOM_ID.equals(isRegister))
             navController.navigate(R.id.roomsFragment);
-        if (isRegister != null) {
-            // redirect to profile page
-        }
     }
 
 

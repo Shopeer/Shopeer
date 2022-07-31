@@ -64,7 +64,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
                     return;
                 }
                 try{
-                    String url = profileUrl + GoogleSignIn.getLastSignedInAccount(UpdateProfileActivity.this).getEmail();
+//                    String url = profileUrl + GoogleSignIn.getLastSignedInAccount(UpdateProfileActivity.this).getEmail();
+                    String url = profileUrl + MainActivity.email;
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("name", nameInput.getText().toString());
                     jsonObject.put("description", bioInput.getText().toString());

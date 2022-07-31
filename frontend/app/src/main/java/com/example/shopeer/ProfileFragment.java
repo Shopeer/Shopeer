@@ -1,6 +1,7 @@
 package com.example.shopeer;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -51,7 +52,6 @@ import java.io.UnsupportedEncodingException;
  */
 public class ProfileFragment extends Fragment {
     final static String TAG = "ProfileFragment"; // good practice for debugging
-    private static final int RESULT_OK = -1;
     private TextView profileName;
     private TextView profileBio;
     private ImageView profilePic;
@@ -63,7 +63,7 @@ public class ProfileFragment extends Fragment {
     private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if(result.getResultCode() == RESULT_OK) {
+                if(result.getResultCode() == Activity.RESULT_OK) {
                     Uri imageUri = result.getData().getData();
                     try{
                         InputStream inputStream = getActivity().getContentResolver().openInputStream(imageUri);
@@ -119,11 +119,12 @@ public class ProfileFragment extends Fragment {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
             String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail();
+//            String url = profileUrl + MainActivity.email;
             Log.d(TAG, "trying to get profile info " + url);
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Log.d(TAG, "get profile " + response);
+//                    Log.d(TAG, "get profile " + response);
                         try {
                             JSONObject jsonResponse = new JSONObject(response);
                             profileName.setText(jsonResponse.getString("name"));
@@ -252,10 +253,10 @@ public class ProfileFragment extends Fragment {
 
     public Bitmap decodeImage(String encodedImage) {
         try{
-            Log.d(TAG, "decodeImage: " + encodedImage);
+//            Log.d(TAG, "decodeImage: " + encodedImage);
             byte [] encodeByte = Base64.decode(encodedImage,Base64.DEFAULT);
             Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            Log.d(TAG, "decodeImage: " + bitmap);
+//            Log.d(TAG, "decodeImage: " + bitmap);
             return bitmap;
         }
         catch(Exception e){
