@@ -16,21 +16,13 @@ app.get("/searches", async (req, res) => {
     if (!validator.isEmail(profile_email)) {
         res.status(400).send("Error: Invalid email")
     } else {
-        try {
-            var find_cursor = await user_collection.findOne({ email: profile_email })
-            if (!find_cursor) {
-                res.status(404).json({ response: "User not found." })
-                return
-            }
-            var search_arry = await find_cursor.searches
-            console.log(search_arry)
-            res.status(200).send(search_arry)
-
+        var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({ response: "User not found." })
+            return
         }
-        catch (err) {
-            console.log(err)
-            res.status(400).send(err)
-        }
+        var search_arry = await find_cursor.searches
+        res.status(200).send(search_arry)
     }
 })
 
@@ -80,9 +72,9 @@ app.put("/searches", async (req, res) => {
     var profile_email = req.query.email
 
     if (!validator.isEmail(profile_email)) {
-        res.status(413).json("Error: Invalid Email")
+        res.status(400).json("Error: Invalid Email")
     } else if (!error_check_search(req.body)) {
-        res.status(412).json("Bad fields")
+        res.status(400).json("Bad fields")
     } else {
         var old_search_name = req.query.search_name
         var new_search_name = req.body.search_name
@@ -135,7 +127,7 @@ function create_search_object(body) {
 }
 
 function error_check_search(body) {
-
+    console.log("i got there")
     if (body.search_name == null || body.activity == null || body.location_name == null || body.location_lati == null || body.location_long == null || body.max_range == null || body.max_budget == null) {
         return false
     }
@@ -143,6 +135,7 @@ function error_check_search(body) {
         return false
     }
     if (!validator.isAlpha(body.activity)) {
+        console.log("i got here")
         return false
     }
     if (!validator.isAlpha(body.location_name)) {

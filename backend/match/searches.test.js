@@ -83,7 +83,7 @@ describe('Tests for Searches Submodule', function () {
 
     it('GET /match/searches User not found.', async function () {
 
-   
+
 
       const response = await request(app)
         .get('/match/searches')
@@ -91,7 +91,7 @@ describe('Tests for Searches Submodule', function () {
           email: "null@null.com"
         })
       expect(response.status).toEqual(404);
-      expect(response.text).toEqual("User not found.")
+      expect(JSON.parse(response.text).response).toEqual("User not found.")
     });
 
     it('GET /match/searches success', async function () {
@@ -122,8 +122,8 @@ describe('Tests for Searches Submodule', function () {
         .query({
           email: "GetSearch@gmail.com"
         })
-      expect(response.status).toEqual(400);
-      expect(response.text).toEqual(String(old_search_object))
+      expect(response.status).toEqual(200);
+      expect(JSON.parse(response.text)).toEqual([old_search_object])
     });
 
 
@@ -255,7 +255,6 @@ describe('Tests for Searches Submodule', function () {
         expect(JSON.parse(response.text).response).toEqual("Added new search")
       })
 
-
       it('POST /match/searches search exists', async function () {
         await request(app)
           .post('/user/registration')
@@ -295,6 +294,7 @@ describe('Tests for Searches Submodule', function () {
         expect(JSON.parse(response.text).response).toEqual("Search already exists")
       })
     })
+
   })
 
   describe('DELETE /match/searches', function () {
@@ -615,7 +615,7 @@ describe('Tests for Searches Submodule', function () {
           max_budget: 300
         })
         var old_search_object_2 = create_search_object({
-          search_name: old_search_name+"a",
+          search_name: old_search_name + "a",
           activity: "asdf",
           location_name: "asdf",
           location_long: 49.49,
@@ -625,7 +625,7 @@ describe('Tests for Searches Submodule', function () {
         })
 
         var new_search_object = create_search_object({
-          search_name: old_search_name+"a",
+          search_name: old_search_name + "a",
           activity: "asdf",
           location_name: "asdf",
           location_long: 49.49,
@@ -650,8 +650,129 @@ describe('Tests for Searches Submodule', function () {
       })
     })
 
-    describe('PUT /match/searches bad fields', function () {
-
+    describe("/match/searches bad fields tests", function() {
+      it('PUT /match/searches illegal email', async function () {
+        const response = await request(app)
+          .put('/match/searches')
+          .query({
+            email: "!@#$"
+          })
+          .set('Accept', 'application/json')
+        expect(response.status).toEqual(400);
+        expect(JSON.parse(response.text)).toEqual("Error: Invalid Email")
+      });
+      it('PUT /match/searches illegal email', async function () {
+        const response = await request(app)
+          .put('/match/searches')
+          .query({
+            email: "asdf@gmail.com"
+          })
+          .send({
+            search_name: "!@#$"
+          })
+          .set('Accept', 'application/json')
+        expect(response.status).toEqual(400);
+        expect(JSON.parse(response.text)).toEqual("Bad fields")
+      });
+      it('PUT /match/searches bad activity', async function () {
+        const response = await request(app)
+          .put('/match/searches')
+          .query({
+            email: "asdf@gmail.com"
+          })
+          .send({
+            search_name: "asdf",
+            activity: "!@#$"
+          })
+          .set('Accept', 'application/json')
+        expect(response.status).toEqual(400);
+        expect(JSON.parse(response.text)).toEqual("Bad fields")
+      });
+      it('PUT /match/searches illegal email', async function () {
+        const response = await request(app)
+          .put('/match/searches')
+          .query({
+            email: "asdf@gmail.com"
+          })
+          .send({
+            search_name: "asdf",
+            activity: "asdf",
+            location_name: "!@#$"
+          })
+          .set('Accept', 'application/json')
+        expect(response.status).toEqual(400);
+        expect(JSON.parse(response.text)).toEqual("Bad fields")
+      });
+      it('PUT /match/searches illegal email', async function () {
+        const response = await request(app)
+          .put('/match/searches')
+          .query({
+            email: "asdf@gmail.com"
+          })
+          .send({
+            search_name: "asdf",
+            activity: "asdf",
+            location_name: "asdf",
+            location_long: 1234
+          })
+          .set('Accept', 'application/json')
+        expect(response.status).toEqual(400);
+        expect(JSON.parse(response.text)).toEqual("Bad fields")
+      });
+      it('PUT /match/searches illegal email', async function () {
+        const response = await request(app)
+          .put('/match/searches')
+          .query({
+            email: "asdf@gmail.com"
+          })
+          .send({
+            search_name: "asdf",
+            activity: "asdf",
+            location_name: "asdf",
+            location_long: 12.34,
+            location_lati: 1234
+          })
+          .set('Accept', 'application/json')
+        expect(response.status).toEqual(400);
+        expect(JSON.parse(response.text)).toEqual("Bad fields")
+      });
+      it('PUT /match/searches illegal email', async function () {
+        const response = await request(app)
+          .put('/match/searches')
+          .query({
+            email: "asdf@gmail.com"
+          })
+          .send({
+            search_name: "asdf",
+            activity: "asdf",
+            location_name: "asdf",
+            location_long: 12.34,
+            location_lati: 12.34,
+            max_range: 12.34
+          })
+          .set('Accept', 'application/json')
+        expect(response.status).toEqual(400);
+        expect(JSON.parse(response.text)).toEqual("Bad fields")
+      });
+      it('PUT /match/searches illegal email', async function () {
+        const response = await request(app)
+          .put('/match/searches')
+          .query({
+            email: "asdf@gmail.com"
+          })
+          .send({
+            search_name: "asdf",
+            activity: "asdf",
+            location_name: "asdf",
+            location_long: 12.34,
+            location_lati: 12.34,
+            max_range: 1234,
+            max_budget: 12.34
+          })
+          .set('Accept', 'application/json')
+        expect(response.status).toEqual(400);
+        expect(JSON.parse(response.text)).toEqual("Bad fields")
+      });
     })
   })
 
