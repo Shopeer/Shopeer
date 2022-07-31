@@ -5,16 +5,7 @@ const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 // reuse original application?
-const roomsRouter = require('../chat/room');
-app.use('/chat/room', roomsRouter)
-const mssgRouter = require('../chat/message');
-app.use('/chat/message', mssgRouter)
-const user_profile_router = require('../user/profile.js');
-app.use('*', user_profile_router);
-app.use('/user', user_profile_router)
-const user_peers_router = require('../user/peers.js');
-app.use('*', user_peers_router);
-app.use('/user', user_peers_router)
+const app = require('../config/app')
 
 const invalidRoomId = "clearlyfakeid"
 const fakeRoomId = "62e2feb74ce5451dd12322a4"
@@ -57,6 +48,7 @@ const testRoom_2 = {
 var roomIds = [];
 
 beforeAll(() => {
+  resetDatabase()
   return initializeDatabase()
 });
 
@@ -80,7 +72,9 @@ async function initializeDatabase() {
     await request(app).post('/user/invitations').query({ email: testUserC.email, target_peer_email: testUserA.email})
     // create two chatrooms, one with A/C and one with A/B
     var room = await request(app).post('/chat/room').set('Accept', 'application/json').send( testRoom )
+    // console.log(room.body)
     var room_2 = await request(app).post('/chat/room').set('Accept', 'application/json').send( testRoom_2 )
+    // console.log(room_2.body)
     roomIds.push(room.body.insertedId)
     roomIds.push(room_2.body.insertedId)
     
@@ -167,7 +161,7 @@ describe("Get all rooms scenario", () => {
 
   it('should return 404 for nonexisting user', async function () {
     // first try to delete the user, just in case
-    await request(app).delete('/user/registration').query({ room_id: nonexistingUser })
+    await request(app).delete('/user/registration').query({ email: nonexistingUser })
     
     const response = await request(app).get('/chat/room/all').query({ email: nonexistingUser }).set('Accept', 'application/json')
     expect(response.body).toEqual({"response": "User not found."});

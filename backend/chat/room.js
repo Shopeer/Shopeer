@@ -9,7 +9,7 @@ var ObjectId = require("mongodb").ObjectId;
 
 module.exports = router;
 const coll = client.db("shopeer_database").collection("room_collection");
-const user_collection = client.db("shopeer_database").collection("user_collection");
+var user_collection = require('../config/mongodb_connection')
 /**************** Room submodule **************** */
 
 /**

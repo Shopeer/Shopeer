@@ -9,8 +9,7 @@ const {MongoClient} = require("mongodb")
 const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
 const mongoClient = new MongoClient(uri)
 
-const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
-
+var user_collection = require('../config/mongodb_connection')
 // Peers Submodule
 // Get Peers GET https://shopeer.com/user/peers?user_id=[user_id]
 // Returns a list of all peers

@@ -1,15 +1,10 @@
 const request = require('supertest');
 const express = require('express');
 const app = express()
-// reuse original application?
-const user_profile_router = require('../user/profile.js');
-app.use('*', user_profile_router);
-app.use('/user', user_profile_router)
 
-const user_peers_router = require('../user/peers.js');
-const MongoClient = require('mongo-mock/lib/mongo_client.js');
-app.use('*', user_peers_router);
-app.use('/user', user_peers_router)
+// reuse original application?
+const app = require('../config/app')
+
 
 /**database is initialized as follows:
  * Rob: 0
