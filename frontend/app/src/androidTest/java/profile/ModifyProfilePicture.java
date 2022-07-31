@@ -1,44 +1,29 @@
 package profile;
 
-import static androidx.test.InstrumentationRegistry.getTargetContext;
-import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.Intents.intending;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.isInternal;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
 import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasAnyDrawable;
-import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasDrawable;
 import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasNoDrawable;
-import static com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogNegativeButton;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import android.Manifest;
 import android.app.Activity;
 import android.app.Instrumentation;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -46,21 +31,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import androidx.activity.result.ActivityResult;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.intent.Intents;
-import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
-import androidx.test.uiautomator.UiDevice;
-import androidx.test.uiautomator.UiObject;
-import androidx.test.uiautomator.UiObjectNotFoundException;
-import androidx.test.uiautomator.UiSelector;
 
 import com.adevinta.android.barista.interaction.PermissionGranter;
 import com.android.volley.Request;
@@ -69,38 +47,26 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.shopeer.EditSearchActivity;
 import com.example.shopeer.MainActivity;
-import com.example.shopeer.ProfileFragment;
 import com.example.shopeer.R;
 import com.example.shopeer.RoomObject;
-import com.example.shopeer.SearchObject;
-import com.google.android.gms.location.ActivityTransitionEvent;
-import com.google.android.material.navigation.NavigationView;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 
 @RunWith(AndroidJUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ModifyProfileTest {
+public class ModifyProfilePicture {
     static Intent intent;
     static {
         intent = new Intent(ApplicationProvider.getApplicationContext(), MainActivity.class);
@@ -118,6 +84,9 @@ public class ModifyProfileTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
 
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
+
     @Before
     public void testSetup() {
         Intents.init();
@@ -128,9 +97,6 @@ public class ModifyProfileTest {
                 decorView = activity.getWindow().getDecorView();
             }
         });
-
-        // setup picture
-//        savePickedImage();
 
         // setup new user
         String url = profileUrl + email + "&name=Modify Profile Test";
@@ -168,60 +134,31 @@ public class ModifyProfileTest {
         bottomNavigationItemView.perform(click());
     }
 
-    @Test
-    public void A_isProfileFragment() {
-        // clicks on profile fragment
-//        goToProfile();
-        onView(withText("Profile")).perform(click());
-
-        // checks components of profile fragment
-        onView(withId(R.id.profileName_textView)).check(matches(isDisplayed()));
-        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
-        onView(withId(R.id.profileBio_textView)).check(matches(isDisplayed()));
-        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void B_declinePermission() {
-        //check if camera icon exist
-        goToProfile();
-
-        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
-        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
-        //clicks camera icon
-        onView(withId(R.id.camera_imageView)).perform(click());
-        //Deny Permission
-        PermissionGranter.denyPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
-        //check toast message
-        onView(withText("Enable permissions to set photo"))
-                .inRoot(withDecorView(not(decorView)))
-                .check(matches(isDisplayed()));
-    }
-
     private String getPackageName() {
         RoomObject x = new RoomObject("a","a", "a", "a", 1);
         return x.getClass().getPackage().getName();
     }
 
-//    @Test
-//    public void C_acceptPermission() {
-//        //stubs the image picker
-//        intending(not(isInternal())).respondWith(stubImagePicker());
-//
-//        //check if camera icon exist
-//        goToProfile();
-//        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
-//        assertHasNoDrawable(R.id.profilePic_imageView);
-//
-//        //clicks camera icon
-//        onView(withId(R.id.camera_imageView)).perform(click());
-//
-//        //Allow Permission
-//        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
-//
-//        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
+    @Test
+    public void C_acceptPermission() {
+        //check if camera icon exist
+        goToProfile();
+        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
+        assertHasNoDrawable(R.id.profilePic_imageView);
+
+        //stubs the image picker
+        intending(not(isInternal())).respondWith(stubImagePicker());
+
+        //clicks camera icon
+        onView(withId(R.id.camera_imageView)).perform(click());
+
+        //Allow Permission
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
+        assertHasAnyDrawable(R.id.profilePic_imageView);
 //        assertHasDrawable(R.id.profilePic_imageView, R.drawable.temp_profile);
-//    }
+    }
 
     private Instrumentation.ActivityResult stubImagePicker() {
         // Build the result to return when the activity is launched.
@@ -239,56 +176,6 @@ public class ModifyProfileTest {
         resultData.putExtras(bundle);
 
         return new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
-    }
-
-    @Test
-    public void D_invalidName() {
-        goToProfile();
-        onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
-        onView(withId(R.id.edit_imageView)).perform(click());
-
-        onView(withText("UPDATE")).check(matches(isDisplayed()));
-
-        // Edits text
-        onView(withId(R.id.profileName_input)).perform(clearText());
-        onView(withId(R.id.profileName_input)).perform(typeText("|!?()"));
-        closeSoftKeyboard();
-        onView(withId(R.id.profileBio_input)).perform(clearText());
-        onView(withId(R.id.profileBio_input)).perform(typeText("edited with espresso"));
-        closeSoftKeyboard();
-
-        onView(withId(R.id.updateProfileButton)).perform(click());
-        //check toast message
-        onView(withText("Invalid Name"))
-                .inRoot(withDecorView(not(decorView)))
-                .check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void E_validName() {
-        int numClicks = 0;
-        goToProfile();
-        numClicks ++;
-        onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
-        onView(withId(R.id.edit_imageView)).perform(click());
-        numClicks ++;
-
-        onView(withText("UPDATE")).check(matches(isDisplayed()));
-
-        // Edits text
-        onView(withId(R.id.profileName_input)).perform(clearText());
-        onView(withId(R.id.profileName_input)).perform(typeText("espresso"));
-        closeSoftKeyboard();
-        onView(withId(R.id.profileBio_input)).perform(clearText());
-        onView(withId(R.id.profileBio_input)).perform(typeText("edited with espresso"));
-        closeSoftKeyboard();
-
-        onView(withId(R.id.updateProfileButton)).perform(click());
-        numClicks ++;
-        onView(withId(R.id.profileName_textView)).check(matches(withText("espresso")));
-        onView(withId(R.id.profileBio_textView)).check(matches(withText("edited with espresso")));
-
-        assertTrue("number of clicks must be <=5", numClicks <=5);
     }
 
     @After
