@@ -1,4 +1,4 @@
-package espressoTests;
+package espressotests;
 
 import android.content.res.Resources;
 import android.view.View;

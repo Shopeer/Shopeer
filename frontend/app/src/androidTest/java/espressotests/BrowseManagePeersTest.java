@@ -1,4 +1,4 @@
-package espressoTests;
+package espressotests;
 
 import com.android.volley.toolbox.JsonArrayRequest;
 
