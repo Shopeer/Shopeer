@@ -44,7 +44,7 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
         var main_user_cursor = await user_collection.findOne({ email: profile_email })
 
         if (main_user_cursor.searches.length === 0) {
-            var arr = await get_viable_matches(main_user_cursor)
+            var arr = await recommend(main_user_cursor)
             res.status(200).send(arr)
             return 
         }
@@ -108,6 +108,21 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
 
 
 })
+
+
+// this function is for users with no searches 
+// TODO It recommends users based on their match history
+async function recommend(user) {
+    
+    var viable = await get_viable_matches(user)
+    if (viable.length === 0 ) {
+        console.log("make some friends")
+        return []
+    }
+    return viable
+
+
+}
 
 // this function excludes the user's peers, invites, and blocklist, as well as anyone who has blocked this user
 async function get_viable_matches(user) {
