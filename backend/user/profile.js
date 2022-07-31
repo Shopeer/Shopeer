@@ -70,20 +70,20 @@ user_profile_router.put("/profile", async (req, res) => {
 // Response: user_id
 user_profile_router.post("/registration", async (req, res) => {
     var profile = req.query
-
     if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
     } else if (!validator.isAlpha(profile.name)) {
         res.status(400).send("Error: Invalid name")
     } else {
         profile_email = profile.email
+
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor) {
             res.status(409).send("User already exists")
         } else {
             var user_object = create_user_object(profile)
             var result_debug = await user_collection.insertOne(user_object)
-            res.status(200).send("Success")
+            res.status(201).send("Success")
         }
     }
 })
@@ -98,9 +98,11 @@ user_profile_router.delete("/registration", async (req, res) => {
     
     if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
-    } else if (!validator.isAlpha(profile.name)) {
-        res.status(400).send("Error: Invalid name")
-    } else {
+    } 
+    // else if (!validator.isAlpha(profile.name)) {
+    //     res.status(400).send("Error: Invalid name")
+    // } 
+    else {
             var status_code
             var text_res
             var delete_return = await user_collection.deleteMany({ email: profile_email })
