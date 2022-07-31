@@ -3,6 +3,7 @@ package com.example.shopeer;
 import java.util.ArrayList;
 
 public class SearchObject implements Comparable{
+    private static SearchObject currentSearch = null;
 
     private String searchName;
     private String location;
@@ -59,4 +60,15 @@ public class SearchObject implements Comparable{
     public int compareTo(Object o) {
         return this.toString().compareToIgnoreCase(o.toString());
     }
+
+    public static SearchObject getCurrentSearch() {
+        return currentSearch;
+    }
+
+    public static void setCurrentSearch(SearchObject search) {
+        currentSearch = search;
+    }
+
 }
+
+

@@ -149,7 +149,7 @@ public class EditSearchActivity extends AppCompatActivity {
                 if (a.equals("entertainment")) {
                     activityEntertainmentButton.setChecked(true);
                 }
-                else if (a.equals("bulk buy")) {
+                else if (a.equals("bulkbuy")) {
                     activityBulkBuyButton.setChecked(true);
                 }
                 else if (a.equals("groceries")) {
@@ -226,6 +226,10 @@ public class EditSearchActivity extends AppCompatActivity {
                 // alpha and numbers only, done by textedit
                 // duplicate name check by server on request
                 String nameInput = searchName.getText().toString();
+                if (nameInput.compareTo("") == 0) {
+                    Toast.makeText(EditSearchActivity.this, "please set search name", Toast.LENGTH_SHORT).show();
+                    canSave = false;
+                }
 
                 // by Google Places
                 String locationInput = searchLocation.getText().toString();
@@ -236,6 +240,10 @@ public class EditSearchActivity extends AppCompatActivity {
 
                 // pos int only, by textedit
                 int rangeInput = Integer.parseInt(distanceNumber.getText().toString());
+                if (rangeInput >= 100) {
+                    Toast.makeText(EditSearchActivity.this, "set distance range below 100 km", Toast.LENGTH_SHORT).show();
+                    canSave = false;
+                }
 
                 // at least one activity chosen
                 ArrayList<String> activitiesInput = getActivitySelection();
@@ -298,7 +306,10 @@ public class EditSearchActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(JSONObject response) {
                     Log.d(TAG, "post_search response: " + response);
-                    Toast.makeText(EditSearchActivity.this, "saved " + nameInput + " search", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(EditSearchActivity.this, "saved " + nameInput + " search", Toast.LENGTH_SHORT).show();
+
+                    SearchObject.setCurrentSearch(new SearchObject(nameInput, locationInput, latInput, lonInput, rangeInput, budgetInput, activitiesInput));
+
                     Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
                     intent.putExtra("email", MainActivity.email);
                     startActivity(intent);
@@ -311,7 +322,7 @@ public class EditSearchActivity extends AppCompatActivity {
                     if (statusCode == 409) {
                         // search with same name already exists
                         Log.e(TAG, "onErrorResponse post_search: " + error.toString() + "\nerr code: " + statusCode);
-                        Toast.makeText(EditSearchActivity.this, "error: search with same name already exists", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditSearchActivity.this, "search with same name already exists", Toast.LENGTH_SHORT).show();
                     }
                     else {
                         Log.e(TAG, "onErrorResponse post_search: " + error.toString() + "\nerr code: " + statusCode);
@@ -360,7 +371,10 @@ public class EditSearchActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(JSONObject response) {
                     Log.d(TAG, "post_search response: " + response);
-                    Toast.makeText(EditSearchActivity.this, "saved " + nameInput + " search", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(EditSearchActivity.this, "saved " + nameInput + " search", Toast.LENGTH_SHORT).show();
+
+                    SearchObject.setCurrentSearch(new SearchObject(nameInput, locationInput, latInput, lonInput, rangeInput, budgetInput, activitiesInput));
+
                     Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
                     intent.putExtra("email", MainActivity.email);
                     startActivity(intent);
@@ -373,7 +387,7 @@ public class EditSearchActivity extends AppCompatActivity {
                     if (statusCode == 409) {
                         // search with same name already exists
                         Log.e(TAG, "onErrorResponse PUT_search: " + error.toString() + "\nerr code: " + statusCode);
-                        Toast.makeText(EditSearchActivity.this, "error: search with same name already exists", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditSearchActivity.this, "search with same name already exists", Toast.LENGTH_SHORT).show();
                     }
                     else {
                         Log.e(TAG, "onErrorResponse post_search: " + error.toString() + "\nerr code: " + statusCode);
@@ -403,7 +417,7 @@ public class EditSearchActivity extends AppCompatActivity {
             activities.add("entertainment");
         }
         if (activityBulkBuyButton.isChecked()) {
-            activities.add("bulk buy");
+            activities.add("bulkbuy");
         }
 
         return activities;

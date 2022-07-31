@@ -22,8 +22,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static NavController navController;
 
-    public HashSet<SearchObject> searches = new HashSet<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -86,13 +86,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        this.email = getActivity().getIntent().getStringExtra("email");
-
-        // Browse and Manage Peers testing
-        isBrowseManagePeersTest = getActivity().getIntent().getBooleanExtra("isBMPTest", false);
-
-        getSearchList();
     }
 
     @Override
@@ -100,6 +93,23 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_match, container, false);
+
+        this.email = getActivity().getIntent().getStringExtra("email");
+
+        // Browse and Manage Peers testing
+        isBrowseManagePeersTest = getActivity().getIntent().getBooleanExtra("isBMPTest", false);
+        if (isBrowseManagePeersTest) {
+            this.email = "BMPTest@test.com";
+        }
+
+        // setup search spinner
+        searchSpinner = v.findViewById(R.id.search_spinner);
+
+        // setup suggestion list profile cards
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        rv = v.findViewById(R.id.profile_cards_rv);
+
+        getSearchList();
 
         // setup add search button
         addSearchButton = v.findViewById(R.id.add_search_button);
@@ -115,6 +125,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         // setup edit search button
         editSearchButton = v.findViewById(R.id.edit_search_button);
+        editSearchButton.setVisibility(GONE);
         editSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -132,19 +143,20 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             }
         });
 
-        // setup search spinner
-        searchSpinner = v.findViewById(R.id.search_spinner);
-
-        // setup suggestion list profile cards
-        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        rv = v.findViewById(R.id.profile_cards_rv);
-
         return v;
     }
 
     ////////////////////////////////////// handle searches /////////////////////////////////////////
 
-    private ArrayList<SearchObject> getSearchList() {
+    private void getSearchList() {
+        if (isBrowseManagePeersTest) {
+            // dummy search
+            searches.clear();
+            searches.add(new SearchObject("my search", null, 0, 0, 0, 0, null));
+            setSearchSpinner();
+            return;
+        }
+
         String url = searchUrl + this.email;
         Log.d(TAG, "GET search: " + url);
         try {
@@ -189,9 +201,10 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     }
 
                     // if no searches exist, edit search button is disabled
-                    if (searches.isEmpty()) {
-                        editSearchButton.setVisibility(View.GONE);
+                    if (!searches.isEmpty()) {
+                        editSearchButton.setVisibility(VISIBLE);
                     }
+
                     setSearchSpinner();
                 }
             }, new Response.ErrorListener() {
@@ -204,7 +217,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     private void setSearchSpinner() {
@@ -213,6 +225,24 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         searchSpinner.setAdapter(adapter);
         searchSpinner.setOnItemSelectedListener(this);
+
+        SearchObject prevSearch = SearchObject.getCurrentSearch();
+        if (prevSearch != null) {
+            int searchIndex = searches.indexOf(prevSearch);
+            for (int i = 0; i < searches.size(); i++) {
+
+                SearchObject s = searches.get(i);
+                Log.e(TAG, "trying to find prev search index out of all searches: " + s.getSearchName());
+                if (s.getSearchName().compareTo(prevSearch.getSearchName()) == 0) {
+                    searchIndex = i;
+                    break;
+                }
+            }
+            Log.e(TAG, "prevSearch was: " + prevSearch.getSearchName() + " index: " + searchIndex);
+            if (searchIndex >= 0) {
+                searchSpinner.setSelection(searchIndex, true);
+            }
+        }
     }
 
     ////////////////////////////////////// handle suggestions //////////////////////////////////////
@@ -278,6 +308,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         currentSearch = (SearchObject)parent.getItemAtPosition(pos);
+        SearchObject.setCurrentSearch(currentSearch);
+        Log.e(TAG, "currentSearch set as: " + currentSearch.getSearchName());
 
         if (isBrowseManagePeersTest){
             Log.d(TAG, "Browse Manage Peers Test");
@@ -343,7 +375,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                         // set my own profile info
                         String myName = response.getString("name");
                         String myEmail = response.getString("email");
-                        myProfile = new ProfileObject(myName, myEmail, null, null);
+                        myProfile = new ProfileObject(myEmail, myName, null, null);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
