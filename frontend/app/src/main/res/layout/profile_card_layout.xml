@@ -3,63 +3,102 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="350dp"
+    android:layout_height="500dp"
     android:layout_margin="20dp">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
         android:background="@color/chat_grey"
         android:padding="5dp">
 
-        <ImageView
-            android:id="@+id/peer_profile_pic"
+
+        <TableLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/friend_button"
+            android:layout_height="match_parent">
 
-            tools:srcCompat="@tools:sample/avatars" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
 
-        <TextView
-            android:id="@+id/peer_name_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/peer_profile_pic"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:gravity="center"
-            android:text="Name" />
+                <Button
+                    android:id="@+id/friend_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-1dp"
+                    android:text="friend" />
 
-        <Button
-            android:id="@+id/friend_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/block_button"
-            android:text="friend" />
+                <Button
+                    android:id="@+id/block_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="block" />
 
-        <Button
-            android:id="@+id/block_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:text="block" />
+            </TableRow>
 
-        <Button
-            android:id="@+id/unfriend_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_toRightOf="@id/friend_button"
-            android:text="remove invite" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <Button
+                    android:id="@+id/unfriend_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/friend_button"
+                    android:text="remove invite" />
 
-        <Button
-            android:id="@+id/unblock_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/block_button"
-            android:layout_alignParentRight="true"
-            android:text="unblock" />
+                <Button
+                    android:id="@+id/unblock_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/block_button"
+                    android:layout_alignParentRight="true"
+                    android:text="unblock" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:id="@+id/peer_profile_photo"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentBottom="true"
+
+                    android:gravity="center"
+                    tools:srcCompat="@tools:sample/avatars" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+                <TextView
+                    android:id="@+id/peer_name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/peer_profile_photo"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:gravity="center"
+                    android:text="Name" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <TextView
+                    android:id="@+id/peer_description_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+
+                    android:text="[nothing]" />
+            </TableRow>
+        </TableLayout>
 
 
     </RelativeLayout>

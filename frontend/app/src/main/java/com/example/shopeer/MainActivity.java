@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     public static String PROFILE_ID = "2";
     public static String email;
 
+    public static NavController navController;
+
     public HashSet<SearchObject> searches = new HashSet<>();
 
     @Override
@@ -29,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
         // initialize the bottom nav bar
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_view);
-        NavController navController = Navigation.findNavController(this, R.id.nav_fragment);
+        navController = Navigation.findNavController(this, R.id.nav_fragment);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         // get the user email

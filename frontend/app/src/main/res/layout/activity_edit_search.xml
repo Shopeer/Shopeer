@@ -46,6 +46,8 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPersonName"
+                android:maxLength="30"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
                 android:text="my search" />
 
         </TableRow>
@@ -117,6 +119,8 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="number"
+                android:digits="0123456789"
+                android:maxLength="3"
                 android:text="10"/>
 
         </TableRow>
@@ -163,6 +167,8 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="number"
+                android:digits="0123456789"
+                android:maxLength="9"
                 android:text="100"/>
 
         </TableRow>

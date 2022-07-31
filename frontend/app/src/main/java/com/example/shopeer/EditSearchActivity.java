@@ -92,10 +92,9 @@ public class EditSearchActivity extends AppCompatActivity {
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getLatLng());
-                //searchLocation.setText(place.getName()); //TODO: uncomment this later when location name is in backend
+                searchLocation.setText(place.getName()); //TODO: uncomment this later when location name is in backend
                 locationLat = place.getLatLng().latitude;
                 locationLon = place.getLatLng().longitude;
-                searchLocation.setText("lat: " + locationLat + "\nlon: " + locationLon);
             }
 
             @Override
@@ -133,16 +132,13 @@ public class EditSearchActivity extends AppCompatActivity {
             this.locationLat = intent.getDoubleExtra("lat", -1);
             this.locationLon = intent.getDoubleExtra("lon", -1);
 
-            if (intent.getStringExtra("locationName").equals("")) {
+            if (intent.getStringExtra("locationName").equals("") || intent.getStringExtra("locationName") == null) {
                 // set to lat lon if no location name set
                 searchLocation.setText("lat: " + this.locationLat + "\nlon: " + this.locationLon);
             }
             else {
                 searchLocation.setText(intent.getStringExtra("locationName"));
             }
-            // for now, just make all locations as lat lon, delete this line when location name is added to backend
-            searchLocation.setText("lat: " + this.locationLat + "\nlon: " + this.locationLon);
-
 
             distanceNumber.setText(Integer.toString(intent.getIntExtra("range", 0)));
             budgetNumber.setText(Integer.toString(intent.getIntExtra("budget", 0)));
@@ -172,10 +168,9 @@ public class EditSearchActivity extends AppCompatActivity {
 
     private void setDefaultLocation(){
         // defaults to north pole in beginning
-        //searchLocation.setText("North Pole");
+        searchLocation.setText("North Pole");
         locationLat = 90;
         locationLon = 135;
-        searchLocation.setText("lat: " + this.locationLat + "\nlon: " + this.locationLon);
     }
 
     private void setDeleteButton() {
@@ -191,7 +186,7 @@ public class EditSearchActivity extends AppCompatActivity {
                 }
                 else {
                     Log.d(TAG, "deleting a existing search " + oldSearchName);
-                    String url = searchUrl + MainActivity.email + "&search=" + oldSearchName;
+                    String url = searchUrl + MainActivity.email + "&search_name=" + oldSearchName;
                     Log.d(TAG, "onClick: " + url);
                     try {
                         RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);
@@ -228,22 +223,28 @@ public class EditSearchActivity extends AppCompatActivity {
                 // get inputs and do error checking
                 boolean canSave = true;
 
+                // alpha and numbers only, done by textedit
+                // duplicate name check by server on request
                 String nameInput = searchName.getText().toString();
 
-                // TODO: integrate locationInput functionality later
-                // String locationInput = searchLocation.getText().toString();
+                // by Google Places
+                String locationInput = searchLocation.getText().toString();
 
+                // by Google Places
                 double latInput = locationLat;
                 double lonInput = locationLon;
 
+                // pos int only, by textedit
                 int rangeInput = Integer.parseInt(distanceNumber.getText().toString());
 
+                // at least one activity chosen
                 ArrayList<String> activitiesInput = getActivitySelection();
                 if (activitiesInput.isEmpty()) {
-                    Toast.makeText(EditSearchActivity.this, "choose at least one activity", Toast.LENGTH_LONG).show();
+                    Toast.makeText(EditSearchActivity.this, "choose at least one activity", Toast.LENGTH_SHORT).show();
                     canSave = false;
                 }
 
+                // pos int only, by textedit
                 int budgetInput = Integer.parseInt(budgetNumber.getText().toString());
 
                 // send request
@@ -253,65 +254,141 @@ public class EditSearchActivity extends AppCompatActivity {
                 else {
                     String url = searchUrl + MainActivity.email + "&search=";
                     if (!isNewSearch) {
-                        url += oldSearchName;
+                        updateSearch(nameInput, locationInput, latInput, lonInput, rangeInput, activitiesInput, budgetInput);
                     }
-                    Log.d(TAG, "onClick: " + url);
-                    try {
-                        //TODO: change to be for POST to search
-                        RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);
-
-                        // create json
-                        JSONObject search = new JSONObject();
-                        search.put("search_name", nameInput);
-
-                        JSONArray activity = new JSONArray(activitiesInput);
-                        search.put("activity",activity);
-
-                        JSONArray location = new JSONArray();
-                        location.put(latInput);
-                        location.put(lonInput);
-
-                        search.put("location", location);
-
-                        search.put("max_range", rangeInput);
-
-                        search.put("max_budget", budgetInput);
-
-                        JSONObject body = new JSONObject();
-                        body.put("search", search);
-                        Log.d(TAG, "post_search request body: " + body);
-
-                        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, body, new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                Log.d(TAG, "post_search response: " + response);
-                                Toast.makeText(EditSearchActivity.this, "saved " + nameInput + " search", Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
-                                intent.putExtra("email", MainActivity.email);
-                                startActivity(intent);
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.e(TAG, "onErrorResponse post_search: " + error.toString());
-                                Toast.makeText(EditSearchActivity.this, "error: could not save search", Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(SERVER_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                        requestQueue.add(jsonObjReq);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    else {
+                        createSearch(nameInput, locationInput, latInput, lonInput, rangeInput, activitiesInput, budgetInput);
                     }
 
                 }
 
             }
         });
+    }
 
+    // create search is POST
+    private void createSearch(String nameInput, String locationInput, double latInput, double lonInput, int rangeInput, ArrayList<String> activitiesInput, int budgetInput) {
+        String url = searchUrl + MainActivity.email;
+        Log.d(TAG, "create POST_search: " + url);
+        try {
+            //TODO: change to be for POST to search
+            RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);
 
+            // create json
+            JSONObject search = new JSONObject();
+            search.put("search_name", nameInput);
+
+            JSONArray activity = new JSONArray(activitiesInput);
+            search.put("activity",activity);
+
+            search.put("location_name", locationInput);
+
+            search.put("location_long", lonInput);
+            search.put("location_lati", latInput);
+
+            search.put("max_range", rangeInput);
+
+            search.put("max_budget", budgetInput);
+
+            JSONObject body = new JSONObject();
+            body.put("search", search);
+            Log.d(TAG, "POST_search request body: " + body);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, body, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.d(TAG, "post_search response: " + response);
+                    Toast.makeText(EditSearchActivity.this, "saved " + nameInput + " search", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
+                    intent.putExtra("email", MainActivity.email);
+                    startActivity(intent);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    int statusCode = Integer.valueOf(String.valueOf(error.networkResponse.statusCode));
+
+                    if (statusCode == 409) {
+                        // search with same name already exists
+                        Log.e(TAG, "onErrorResponse post_search: " + error.toString() + "\nerr code: " + statusCode);
+                        Toast.makeText(EditSearchActivity.this, "error: search with same name already exists", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Log.e(TAG, "onErrorResponse post_search: " + error.toString() + "\nerr code: " + statusCode);
+                        Toast.makeText(EditSearchActivity.this, "error: could not save search", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(SERVER_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            requestQueue.add(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
+
+    // updating existing search is PUT request
+    private void updateSearch(String nameInput, String locationInput, double latInput, double lonInput, int rangeInput, ArrayList<String> activitiesInput, int budgetInput) {
+        String url = searchUrl + MainActivity.email + "&search=" + oldSearchName;
+
+        Log.d(TAG, "update existing PUT_search: " + url);
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(EditSearchActivity.this);
+
+            // create json
+            JSONObject search = new JSONObject();
+            search.put("search_name", nameInput);
+
+            JSONArray activity = new JSONArray(activitiesInput);
+            search.put("activity",activity);
+
+            search.put("location_name", locationInput);
+
+            search.put("location_long", lonInput);
+            search.put("location_lati", latInput);
+
+            search.put("max_range", rangeInput);
+
+            search.put("max_budget", budgetInput);
+
+            JSONObject body = new JSONObject();
+            body.put("search", search);
+            Log.d(TAG, "PUT_search request body: " + body);
+
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.PUT, url, body, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.d(TAG, "post_search response: " + response);
+                    Toast.makeText(EditSearchActivity.this, "saved " + nameInput + " search", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
+                    intent.putExtra("email", MainActivity.email);
+                    startActivity(intent);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    int statusCode = Integer.valueOf(String.valueOf(error.networkResponse.statusCode));
+
+                    if (statusCode == 409) {
+                        // search with same name already exists
+                        Log.e(TAG, "onErrorResponse PUT_search: " + error.toString() + "\nerr code: " + statusCode);
+                        Toast.makeText(EditSearchActivity.this, "error: search with same name already exists", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Log.e(TAG, "onErrorResponse post_search: " + error.toString() + "\nerr code: " + statusCode);
+                        Toast.makeText(EditSearchActivity.this, "error: could not save search", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(SERVER_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            requestQueue.add(jsonObjReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * checks which activities were selected (no ranking yet) adn returns String array of them
