@@ -1,4 +1,4 @@
-package com.example.shopeer;
+package espressoTests;
 
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
@@ -36,6 +36,7 @@ import android.view.ViewParent;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -46,6 +47,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.shopeer.MainActivity;
+import com.example.shopeer.R;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -329,7 +332,7 @@ public class ManageSearchesTest {
     //@Test // 1
     public void A_emptyMatchPage() {
         // edit search button disabled
-        onView(withId(R.id.edit_search_button)).check(matches(not(isDisplayed())));
+        onView(ViewMatchers.withId(R.id.edit_search_button)).check(matches(not(isDisplayed())));
 
         // no profile cards showing
         onView(withId(R.id.profileCards)).check(doesNotExist());
