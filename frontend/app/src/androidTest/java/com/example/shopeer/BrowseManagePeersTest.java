@@ -107,7 +107,7 @@ public class BrowseManagePeersTest {
     //@Test // 1
     public void A_registeredUserWithActiveSearch() {
         // spinner has a search
-        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("my search"))));
+        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("mySearch"))));
     }
 
     //@Test // 2

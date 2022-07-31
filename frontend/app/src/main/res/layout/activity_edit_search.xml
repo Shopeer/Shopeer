@@ -48,7 +48,7 @@
                 android:inputType="textPersonName"
                 android:maxLength="30"
                 android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 "
-                android:text="my search" />
+                android:text="mySearch" />
 
         </TableRow>
 
@@ -126,34 +126,64 @@
         </TableRow>
 
         <TableRow
-            android:id="@+id/activity_row"
+            android:id="@+id/activity_row1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/distance_row">
 
             <CheckBox
-                android:id="@+id/activity_groceries_radioButton"
+                android:id="@+id/activity_groceries_checkBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="groceries" />
 
             <CheckBox
-                android:id="@+id/activity_entertainment_radioButton"
+                android:id="@+id/activity_entertainment_checkBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="entertainment" />
             <CheckBox
-                android:id="@+id/activity_bulkBuy_radioButton"
+                android:id="@+id/activity_bulkBuy_checkBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="bulk buy" />
         </TableRow>
 
         <TableRow
+            android:id="@+id/activity_row2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/activity_row1">
+
+            <CheckBox
+                android:id="@+id/activity_hiking_checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="hiking" />
+
+            <CheckBox
+                android:id="@+id/activity_restaurants_checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="restaurants" />
+            <CheckBox
+                android:id="@+id/activity_fashion_checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="fashion" />
+
+            <CheckBox
+                android:id="@+id/activity_books_checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="books" />
+        </TableRow>
+
+        <TableRow
             android:id="@+id/budget_row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/activity_row">
+            android:layout_below="@id/activity_row2">
 
             <TextView
                 android:id="@+id/textView8"

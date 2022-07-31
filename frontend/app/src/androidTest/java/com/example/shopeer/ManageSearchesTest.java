@@ -82,7 +82,7 @@ public class ManageSearchesTest {
     // cannot split each action of the test into separate test cases because app state is not
     // persistent across test cases (always a new activity starts on each test case)
     @Test // full test
-    public void ManageSearchesTest(){
+    public void R_ManageSearchesTest_full(){
         A_emptyMatchPage();
         B_createSearch();
         C_invalidSaveNoActivitySet();
@@ -102,6 +102,230 @@ public class ManageSearchesTest {
         Q_deleteSearch();
     }
 
+    /////////////////////////////////// "individual" step test case /////////////////////////////////
+    @Test // 1
+    public void A_emptyMatchPage_accum() {
+        A_emptyMatchPage();
+    }
+
+    @Test // 2
+    public void B_createSearch_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+    }
+
+    @Test // 3
+    public void C_invalidSaveNoActivitySet_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+    }
+
+    @Test // 4
+    public void D_validSave_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+    }
+
+    @Test // 5
+    public void E_createAnotherSearch_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+    }
+
+    @Test // 6
+    public void F_invalidSaveDuplicateName_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+    }
+
+    @Test // 7
+    public void G_invalidSaveEmptyName_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+    }
+
+    @Test // 8
+    public void H_validSave_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+        H_validSave();
+    }
+
+    @Test // 9
+    public void I_editSearch_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+        H_validSave();
+        I_editSearch();
+    }
+
+    @Test // 10
+    public void J_editName_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+        H_validSave();
+        I_editSearch();
+        J_editName();
+    }
+
+    @Test // 11
+    public void K_editLocation_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+        H_validSave();
+        I_editSearch();
+        J_editName();
+        K_editLocation();
+    }
+
+    @Test // 12
+    public void L_invalidDistance_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+        H_validSave();
+        I_editSearch();
+        J_editName();
+        K_editLocation();
+        L_invalidDistance();
+    }
+
+    @Test // 13
+    public void M_invalidDistance_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+        H_validSave();
+        I_editSearch();
+        J_editName();
+        K_editLocation();
+        L_invalidDistance();
+        M_invalidDistance();
+    }
+
+    @Test // 14
+    public void N_invalidBudget_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+        H_validSave();
+        I_editSearch();
+        J_editName();
+        K_editLocation();
+        L_invalidDistance();
+        M_invalidDistance();
+        N_invalidBudget();
+    }
+
+    @Test // 15
+    public void O_validSave_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+        H_validSave();
+        I_editSearch();
+        J_editName();
+        K_editLocation();
+        L_invalidDistance();
+        M_invalidDistance();
+        N_invalidBudget();
+        O_validSave();
+    }
+
+    @Test // 16
+    public void P_editSearch_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+        H_validSave();
+        I_editSearch();
+        J_editName();
+        K_editLocation();
+        L_invalidDistance();
+        M_invalidDistance();
+        N_invalidBudget();
+        O_validSave();
+        P_editSearch();
+    }
+
+    @Test // 17
+    public void Q_deleteSearch_accum() {
+        A_emptyMatchPage();
+        B_createSearch();
+        C_invalidSaveNoActivitySet();
+        D_validSave();
+        E_createAnotherSearch();
+        F_invalidSaveDuplicateName();
+        G_invalidSaveEmptyName();
+        H_validSave();
+        I_editSearch();
+        J_editName();
+        K_editLocation();
+        L_invalidDistance();
+        M_invalidDistance();
+        N_invalidBudget();
+        O_validSave();
+        P_editSearch();
+        Q_deleteSearch();
+    }
+
+    /////////////////////////////////// individual test step methods ///////////////////////////////
+
     //@Test // 1
     public void A_emptyMatchPage() {
         // edit search button disabled
@@ -116,12 +340,16 @@ public class ManageSearchesTest {
         onView(withId(R.id.add_search_button)).perform(click());
 
         // default values for creating a new search
-        onView(withId(R.id.search_name_text)).check(matches(withText("my search")));
+        onView(withId(R.id.search_name_text)).check(matches(withText("mySearch")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
         onView(withId(R.id.distance_number)).check(matches(withText("10")));
-        onView(withId(R.id.activity_bulkBuy_radioButton)).check(matches(isNotChecked()));
-        onView(withId(R.id.activity_groceries_radioButton)).check(matches(isNotChecked()));
-        onView(withId(R.id.activity_entertainment_radioButton)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_groceries_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_hiking_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.budget_number)).check(matches(withText("100")));
     }
 
@@ -145,7 +373,7 @@ public class ManageSearchesTest {
     //@Test // 4
     public void D_validSave() {
         // select an activity and save
-        onView(withId(R.id.activity_groceries_radioButton)).perform(click());
+        onView(withId(R.id.activity_groceries_checkBox)).perform(click());
         onView(withId(R.id.save_search_button)).perform(click());
 
         // wait for page to load
@@ -157,7 +385,7 @@ public class ManageSearchesTest {
 
         onView(withId(R.id.edit_search_button)).check(matches(isDisplayed()));
 
-        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("my search"))));
+        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("mySearch"))));
 
         onView(withId(R.id.profileCards)).check(matches(isDisplayed()));
     }
@@ -167,19 +395,23 @@ public class ManageSearchesTest {
         onView(withId(R.id.add_search_button)).perform(click());
 
         // default values for creating a new search
-        onView(withId(R.id.search_name_text)).check(matches(withText("my search")));
+        onView(withId(R.id.search_name_text)).check(matches(withText("mySearch")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
         onView(withId(R.id.distance_number)).check(matches(withText("10")));
-        onView(withId(R.id.activity_bulkBuy_radioButton)).check(matches(isNotChecked()));
-        onView(withId(R.id.activity_groceries_radioButton)).check(matches(isNotChecked()));
-        onView(withId(R.id.activity_entertainment_radioButton)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_groceries_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_hiking_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.budget_number)).check(matches(withText("100")));
     }
 
     //@Test // 6
     public void F_invalidSaveDuplicateName() {
         // select entertainment activity
-        onView(withId(R.id.activity_entertainment_radioButton)).perform(click());
+        onView(withId(R.id.activity_entertainment_checkBox)).perform(click());
 
         onView(withId(R.id.save_search_button)).perform(click());
 
@@ -235,27 +467,31 @@ public class ManageSearchesTest {
 
     //@Test // 9
     public void I_editSearch() {
-        // select "my search"
+        // select "mySearch"
         onView(withId(R.id.search_spinner)).perform(click());
-        onData(hasToString("my search")).perform(click());
-        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("my search"))));
+        onData(hasToString("mySearch")).perform(click());
+        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("mySearch"))));
 
         // edit should show previous search values
         onView(withId(R.id.edit_search_button)).perform(click());
 
-        onView(withId(R.id.search_name_text)).check(matches(withText("my search")));
+        onView(withId(R.id.search_name_text)).check(matches(withText("mySearch")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
         onView(withId(R.id.distance_number)).check(matches(withText("10")));
-        onView(withId(R.id.activity_bulkBuy_radioButton)).check(matches(isNotChecked()));
-        onView(withId(R.id.activity_groceries_radioButton)).check(matches(isChecked()));
-        onView(withId(R.id.activity_entertainment_radioButton)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_groceries_checkBox)).check(matches(isChecked()));
+        onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_hiking_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.budget_number)).check(matches(withText("100")));
     }
 
     //@Test // 10
     public void J_editName() {
-        onView(withId(R.id.search_name_text)).perform(replaceText("Costco fruits"));
-        onView(withId(R.id.search_name_text)).check(matches(withText("Costco fruits")));
+        onView(withId(R.id.search_name_text)).perform(replaceText("Costco"));
+        onView(withId(R.id.search_name_text)).check(matches(withText("Costco")));
     }
 
     //@Test // 11
@@ -263,8 +499,8 @@ public class ManageSearchesTest {
         onView(withId(R.id.autocomplete_fragment)).perform(click()) ;
 
         // Google Places autocomplete search bar
-        final int PLACES_AUTOCOMPLETE_SEARCH_BAR_ID = 2131231128;
-        final int PLACES_AUTOCOMPLETE_LIST_ID = 2131231121;
+        final int PLACES_AUTOCOMPLETE_SEARCH_BAR_ID = 2131231133;
+        final int PLACES_AUTOCOMPLETE_LIST_ID = 2131231126;
 
         onView(withId(PLACES_AUTOCOMPLETE_SEARCH_BAR_ID)).perform(typeTextIntoFocusedView("costco"), closeSoftKeyboard());
         onView(allOf(withId(PLACES_AUTOCOMPLETE_LIST_ID),
@@ -328,7 +564,7 @@ public class ManageSearchesTest {
 
         // back on match page
         onView(withId(R.id.edit_search_button)).check(matches(isDisplayed()));
-        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("Costco fruits"))));
+        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("Costco"))));
         onView(withId(R.id.profileCards)).check(matches(isDisplayed()));
     }
 
@@ -345,9 +581,13 @@ public class ManageSearchesTest {
         onView(withId(R.id.search_name_text)).check(matches(withText("movies")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
         onView(withId(R.id.distance_number)).check(matches(withText("10")));
-        onView(withId(R.id.activity_bulkBuy_radioButton)).check(matches(isNotChecked()));
-        onView(withId(R.id.activity_groceries_radioButton)).check(matches(isNotChecked()));
-        onView(withId(R.id.activity_entertainment_radioButton)).check(matches(isChecked()));
+        onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_groceries_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isChecked()));
+        onView(withId(R.id.activity_hiking_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
+        onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.budget_number)).check(matches(withText("100")));
     }
 
@@ -365,8 +605,8 @@ public class ManageSearchesTest {
         // back on match page
         onView(withId(R.id.edit_search_button)).check(matches(isDisplayed()));
 
-        // "Costco fruits" is selected
-        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("Costco fruits"))));
+        // "Costco" is selected
+        onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("Costco"))));
 
         onView(withId(R.id.profileCards)).check(matches(isDisplayed()));
     }

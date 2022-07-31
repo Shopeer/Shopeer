@@ -152,7 +152,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         if (isBrowseManagePeersTest) {
             // dummy search
             searches.clear();
-            searches.add(new SearchObject("my search", null, 0, 0, 0, 0, null));
+            searches.add(new SearchObject("mySearch", null, 0, 0, 0, 0, null));
             setSearchSpinner();
             return;
         }

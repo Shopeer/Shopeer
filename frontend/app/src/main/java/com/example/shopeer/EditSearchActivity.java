@@ -45,9 +45,13 @@ public class EditSearchActivity extends AppCompatActivity {
     private EditText searchName;
     private TextView searchLocation;
     private EditText distanceNumber;
-    private CheckBox activityGroceriesButton;
-    private CheckBox activityEntertainmentButton;
-    private CheckBox activityBulkBuyButton;
+    private CheckBox activityGroceriesCheckBox;
+    private CheckBox activityEntertainmentCheckBox;
+    private CheckBox activityBulkBuyCheckBox;
+    private CheckBox activityHikingCheckBox;
+    private CheckBox activityRestaurantsCheckBox;
+    private CheckBox activityFashionCheckBox;
+    private CheckBox activityBooksCheckBox;
     private EditText budgetNumber;
     private Button deleteButton;
     private Button saveButton;
@@ -90,9 +94,8 @@ public class EditSearchActivity extends AppCompatActivity {
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                // TODO: Get info about the selected place.
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getLatLng());
-                searchLocation.setText(place.getName()); //TODO: uncomment this later when location name is in backend
+                searchLocation.setText(place.getName());
                 locationLat = place.getLatLng().latitude;
                 locationLon = place.getLatLng().longitude;
             }
@@ -112,9 +115,13 @@ public class EditSearchActivity extends AppCompatActivity {
         distanceNumber = findViewById(R.id.distance_number);
         budgetNumber = findViewById(R.id.budget_number);
 
-        activityGroceriesButton = findViewById(R.id.activity_groceries_radioButton);
-        activityEntertainmentButton = findViewById(R.id.activity_entertainment_radioButton);
-        activityBulkBuyButton = findViewById(R.id.activity_bulkBuy_radioButton);
+        activityGroceriesCheckBox = findViewById(R.id.activity_groceries_checkBox);
+        activityEntertainmentCheckBox = findViewById(R.id.activity_entertainment_checkBox);
+        activityBulkBuyCheckBox = findViewById(R.id.activity_bulkBuy_checkBox);
+        activityHikingCheckBox = findViewById(R.id.activity_hiking_checkBox);
+        activityRestaurantsCheckBox = findViewById(R.id.activity_restaurants_checkBox);
+        activityFashionCheckBox = findViewById(R.id.activity_fashion_checkBox);
+        activityBooksCheckBox = findViewById(R.id.activity_books_checkBox);
 
         deleteButton = findViewById(R.id.delete_search_button);
         saveButton = findViewById(R.id.save_search_button);
@@ -147,13 +154,25 @@ public class EditSearchActivity extends AppCompatActivity {
             ArrayList<String> acts = intent.getStringArrayListExtra("activities");
             for (String a : acts) {
                 if (a.equals("entertainment")) {
-                    activityEntertainmentButton.setChecked(true);
+                    activityEntertainmentCheckBox.setChecked(true);
                 }
-                else if (a.equals("bulkbuy")) {
-                    activityBulkBuyButton.setChecked(true);
+                else if (a.compareToIgnoreCase("bulkbuy") == 0) {
+                    activityBulkBuyCheckBox.setChecked(true);
                 }
-                else if (a.equals("groceries")) {
-                    activityGroceriesButton.setChecked(true);
+                else if (a.compareToIgnoreCase("groceries") == 0) {
+                    activityGroceriesCheckBox.setChecked(true);
+                }
+                else if (a.compareToIgnoreCase("hiking") == 0) {
+                    activityHikingCheckBox.setChecked(true);
+                }
+                else if (a.compareToIgnoreCase("restaurants") == 0) {
+                    activityRestaurantsCheckBox.setChecked(true);
+                }
+                else if (a.compareToIgnoreCase("fashion") == 0) {
+                    activityFashionCheckBox.setChecked(true);
+                }
+                else if (a.compareToIgnoreCase("books") == 0) {
+                    activityBooksCheckBox.setChecked(true);
                 }
             }
 
@@ -410,14 +429,26 @@ public class EditSearchActivity extends AppCompatActivity {
     private ArrayList<String> getActivitySelection() {
         ArrayList<String> activities = new ArrayList<String>();
 
-        if (activityGroceriesButton.isChecked()) {
+        if (activityGroceriesCheckBox.isChecked()) {
             activities.add("groceries");
         }
-        if (activityEntertainmentButton.isChecked()) {
+        if (activityEntertainmentCheckBox.isChecked()) {
             activities.add("entertainment");
         }
-        if (activityBulkBuyButton.isChecked()) {
+        if (activityBulkBuyCheckBox.isChecked()) {
             activities.add("bulkbuy");
+        }
+        if (activityHikingCheckBox.isChecked()) {
+            activities.add("hiking");
+        }
+        if (activityRestaurantsCheckBox.isChecked()) {
+            activities.add("restaurants");
+        }
+        if (activityFashionCheckBox.isChecked()) {
+            activities.add("fashion");
+        }
+        if (activityBooksCheckBox.isChecked()) {
+            activities.add("books");
         }
 
         return activities;
