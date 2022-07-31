@@ -121,7 +121,6 @@ function create_user_object(body) {
         email: body.email,
         description: body.description,
         photo: body.photo,
-        // FCM_token: body.FCM_token,
         searches: [],
         peers: [],
         invites: [],
