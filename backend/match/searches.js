@@ -79,12 +79,12 @@ app.put("/searches", async (req, res) => {
 
     if (!validator.isEmail(profile_email)) {
         res.status(400).json("Error: Invalid Email")
-    } else if (!error_check_search(body)) {
+    } else if (!error_check_search(req.body)) {
         res.status(400).json("Bad fields")
     } else {
         var search_id = req.query.search
-        var new_search_name = req.body.search.search_name
-        var search_object = create_search_object(req.body.search)
+        var new_search_name = req.body.search_name
+        var search_object = create_search_object(req.body)
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor == null) {
             res.status(404).json({ response: 'User not found' })
