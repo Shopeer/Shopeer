@@ -23,6 +23,16 @@
     - rooms.js
     - message.js
 
+### How to run backend tests
+```
+cd /Shopeer/backend
+npm test
+```
+
+### Location of .yml files that run all your back-end test in GitHub Actions.
+```
+/Shopeer/.github/workflows/github-actions-db.yml
+```
 
 ## Designated test modules and use cases
 - the two back-end modules specified by TA for your project are: 
