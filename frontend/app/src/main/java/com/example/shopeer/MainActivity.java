@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         // get the user email
         Intent intent = getIntent();
         email = intent.getStringExtra("email");
-        Log.d(TAG, email);
+//        Log.d(TAG, email);
 
         String isRegister = intent.getStringExtra("page");
         if (PROFILE_ID.equals(isRegister))

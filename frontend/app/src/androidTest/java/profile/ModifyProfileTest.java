@@ -89,6 +89,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -112,6 +115,9 @@ public class ModifyProfileTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
 
+//    @Rule
+//    public IntentsTestRule<MainActivity> intentsTestRule = new IntentsTestRule<>(MainActivity.class);
+
 
     @Before
     public void testSetup() {
@@ -123,6 +129,9 @@ public class ModifyProfileTest {
                 decorView = activity.getWindow().getDecorView();
             }
         });
+
+        // setup picture
+//        savePickedImage();
 
         // setup new user
         String url = profileUrl + email + "&name=Modify Profile Test";
@@ -171,22 +180,41 @@ public class ModifyProfileTest {
         onView(withId(R.id.profileBio_textView)).check(matches(isDisplayed()));
         onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
     }
-//
-//    @Test
-//    public void B_declinePermission() {
-//        //check if camera icon exist
-//        goToProfile();
-//
-//        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
-//        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
-//        //clicks camera icon
-//        onView(withId(R.id.camera_imageView)).perform(click());
-//        //Deny Permission
-//        PermissionGranter.denyPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
-//        //check toast message
-//        onView(withText("Enable permissions to set photo"))
-//                .inRoot(withDecorView(not(decorView)))
-//                .check(matches(isDisplayed()));
+
+    @Test
+    public void B_declinePermission() {
+        //check if camera icon exist
+        goToProfile();
+
+        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
+        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
+        //clicks camera icon
+        onView(withId(R.id.camera_imageView)).perform(click());
+        //Deny Permission
+        PermissionGranter.denyPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+        //check toast message
+        onView(withText("Enable permissions to set photo"))
+                .inRoot(withDecorView(not(decorView)))
+                .check(matches(isDisplayed()));
+    }
+
+//    private void savePickedImage() {
+//        Bitmap bm = BitmapFactory.decodeResource(intentsTestRule.getActivity().getResources(), R.drawable.temp_profile);
+//        assertTrue(bm!=null);
+//        File dir = intentsTestRule.getActivity().getExternalCacheDir();
+//        File file = new File(dir.getPath(), "image.jpeg");
+//        Log.d(TAG, "savePickedImage: " + file.getAbsolutePath());
+//        FileOutputStream outputStream = null;
+//        try {
+//            outputStream = new FileOutputStream(file);
+//            bm.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+//            outputStream.flush();
+//            outputStream.close();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 //    }
 
     private String getPackageName() {
@@ -194,60 +222,63 @@ public class ModifyProfileTest {
         return x.getClass().getPackage().getName();
     }
 
-    @Test
-    public void C_acceptPermission() {
-        //check if camera icon exist
-        goToProfile();
-        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
+//    @Test
+//    public void C_acceptPermission() {
+//        //check if camera icon exist
+//        goToProfile();
+//        onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
+//
+//        intending(not(isInternal())).respondWith(stubImagePicker());
+//
+//        //clicks camera icon
+//        onView(withId(R.id.camera_imageView)).perform(click());
+//        //Allow Permission
+//        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
+//    }
 
-        // stub the image
+    private Instrumentation.ActivityResult stubImagePicker() {
         // Build the result to return when the activity is launched.
         Intent resultData = new Intent();
         Bundle bundle = new Bundle();
         ArrayList<Parcelable> parcels = new ArrayList<>();
-//        Uri uri1 = Uri.parse("android.resource://com.example.shopeer/drawable/temp_profile.jpeg");
         Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/drawable/temp_profile.jpeg");
+//        File dir = intentsTestRule.getActivity().getExternalCacheDir();
+//        File file = new File(dir.getPath(), "image.jpeg");
+//        Uri uri1 = Uri.fromFile(file);
         Log.d(TAG, "temp profile URI: " + uri1);
 
         Parcelable parcelable1 = (Parcelable) uri1;
         parcels.add(parcelable1);
         bundle.putParcelableArrayList(Intent.EXTRA_STREAM, parcels);
         // Create the Intent that will include the bundle.
-//        resultData.putExtras(bundle);
-        resultData.putExtra(Intent.EXTRA_STREAM, parcelable1);
+        resultData.putExtras(bundle);
+//        resultData.putExtra(Intent.EXTRA_STREAM, parcelable1);
 
-        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
-        intending(not(isInternal())).respondWith(result);
-//        intending(not(isInternal())).respondWith(new Instrumentation.ActivityResult(ProfileFragment.RESULT_OK, resultData));
-
-        //clicks camera icon
-        onView(withId(R.id.camera_imageView)).perform(click());
-        //Allow Permission
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
+        return new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
     }
 
-//    @Test
-//    public void D_invalidName() {
-//        goToProfile();
-//        onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
-//        onView(withId(R.id.edit_imageView)).perform(click());
-//
-//        onView(withText("UPDATE")).check(matches(isDisplayed()));
-//
-//        // Edits text
-//        onView(withId(R.id.profileName_input)).perform(clearText());
-//        onView(withId(R.id.profileName_input)).perform(typeText("|!?()"));
-//        closeSoftKeyboard();
-//        onView(withId(R.id.profileBio_input)).perform(clearText());
-//        onView(withId(R.id.profileBio_input)).perform(typeText("edited with espresso"));
-//        closeSoftKeyboard();
-//
-//        onView(withId(R.id.updateProfileButton)).perform(click());
-//        //check toast message
-//        onView(withText("Invalid Name"))
-//                .inRoot(withDecorView(not(decorView)))
-//                .check(matches(isDisplayed()));
-//    }
+    @Test
+    public void D_invalidName() {
+        goToProfile();
+        onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
+        onView(withId(R.id.edit_imageView)).perform(click());
+
+        onView(withText("UPDATE")).check(matches(isDisplayed()));
+
+        // Edits text
+        onView(withId(R.id.profileName_input)).perform(clearText());
+        onView(withId(R.id.profileName_input)).perform(typeText("|!?()"));
+        closeSoftKeyboard();
+        onView(withId(R.id.profileBio_input)).perform(clearText());
+        onView(withId(R.id.profileBio_input)).perform(typeText("edited with espresso"));
+        closeSoftKeyboard();
+
+        onView(withId(R.id.updateProfileButton)).perform(click());
+        //check toast message
+        onView(withText("Invalid Name"))
+                .inRoot(withDecorView(not(decorView)))
+                .check(matches(isDisplayed()));
+    }
 
 //    @Test
 //    public void E_validName() {
