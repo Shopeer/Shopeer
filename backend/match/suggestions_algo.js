@@ -9,7 +9,7 @@ const app = require('../config/app')
 
 var user_collection = require('../config/mongodb_connection')
 
-//const activities = ["groceries", "entertainment", "bulk buy", "hiking", "restaurants", "fashion", "books"]
+//const activities = ["groceries", "entertainment", "bulkbuy", "hiking", "restaurants", "fashion", "books"]
 
 
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -42,6 +42,7 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
     try {
         
         var main_user_cursor = await user_collection.findOne({ email: profile_email })
+        console.log(main_user_cursor)
         var email_score_pair_array = await get_scores(main_user_cursor)
         var user_object_array = []
         for (const pair of email_score_pair_array) {
@@ -136,7 +137,7 @@ async function get_scores(user) {
                 },
                 {
                   "$match": {
-                    "searches.activity": this_search.activity,
+                    "searches.activity": {$in: this_search.activity},
                     "email": potential_match.email
                   }
                 },
@@ -149,7 +150,7 @@ async function get_scores(user) {
               ])).toArray()
             
             if ( search_matches.length > 0 ) {
-                console.log("\n" + potential_match.email + " also has at least one search for " + this_search.activity)
+                console.log("\n" + potential_match.email + " has also searched for one of " + this_search.activity)
                 user_score += await get_search_similarity_score(this_search, search_matches)
             } else {
                 console.log("no similar searches found \n")
@@ -178,15 +179,17 @@ async function get_scores(user) {
 }
 
 async function get_search_similarity_score(this_search, search_matches) {
-    console.log("\nevaluating search similarity:")
+    
     score = 0
     for (let i = 0; i < search_matches.length; i++ ) {
         var search_match = search_matches[i].searches
+        console.log("\nevaluating search similarity: " + this_search.search_name + " and " + search_match.search_name)
+
         var loc = await getLocationScore(this_search, search_match)
         if (loc == -1 ) {
             // location score is -1 if max_range is exceeded. 
             // In this case, this particular search no longer provides a potential match
-            console.log("too far away!")
+            
             return 0
         }
         score += loc
@@ -215,12 +218,14 @@ async function getBudgetScore(this_search, search_match) {
 // otherwise, returns a score between 0 and 100 that linearly decreases as distance increases
 async function getLocationScore(this_search, search_match) {
     var distance = getDistanceFromLatLonInKm(this_search.location_lati, this_search.location_long, search_match.location_lati, search_match.location_long) 
+    console.log("distance is " + distance)
     if (distance > this_search.max_range || distance > search_match.max_range) {
+        console.log("too far away!")
         return -1
     }
     var score = Math.max(-100 / this_search.max_range * distance + 100, 0 )
     console.log("\n max range is " + this_search.max_range)
-    console.log("distance is " + distance)
+    
     console.log("location score: " + score)
     return score
 
