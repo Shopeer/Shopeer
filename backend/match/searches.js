@@ -127,7 +127,6 @@ function create_search_object(body) {
 }
 
 function error_check_search(body) {
-    console.log("i got there")
     if (body.search_name == null || body.activity == null || body.location_name == null || body.location_lati == null || body.location_long == null || body.max_range == null || body.max_budget == null) {
         return false
     }
@@ -135,7 +134,6 @@ function error_check_search(body) {
         return false
     }
     if (!validator.isAlpha(body.activity)) {
-        console.log("i got here")
         return false
     }
     if (!validator.isAlpha(body.location_name)) {
@@ -166,9 +164,9 @@ app.delete("/searches", async (req, res) => {
     var profile_email = req.query.email
     var search = req.query.search_name
     if (!validator.isEmail(profile_email)) {
-        res.status(400).json("Error: Invalid Email")
+        res.status(400).json({response: "Error: Invalid Email"})
     } else if (!validator.isAlphanumeric(search)) {
-        res.status(400).json("Error: Search")
+        res.status(400).json({response: "Error: Search"})
     } else {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (!find_cursor) {

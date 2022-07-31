@@ -392,7 +392,28 @@ describe('Tests for Searches Submodule', function () {
       })
     })
     describe('DELETE /match/searches bad fields', function () {
-
+      it('DELETE /match/searches bad email', async function () {
+        const response = await request(app)
+          .delete('/match/searches')
+          .query({
+            email: "Searchmail.com",
+            search_name: "asdff"
+          })
+          .set('Accept', 'application/json')
+        expect(response.status).toEqual(400);
+        expect(JSON.parse(response.text).response).toEqual("Error: Invalid Email")
+      })
+      it('DELETE /match/searches bad search', async function () {
+        const response = await request(app)
+          .delete('/match/searches')
+          .query({
+            email: "Search@gmail.com",
+            search_name: "as!@#dff"
+          })
+          .set('Accept', 'application/json')
+        expect(response.status).toEqual(400);
+        expect(JSON.parse(response.text).response).toEqual("Error: Search")
+      })
     })
 
   })
@@ -650,7 +671,7 @@ describe('Tests for Searches Submodule', function () {
       })
     })
 
-    describe("/match/searches bad fields tests", function() {
+    describe("/match/searches bad fields tests", function () {
       it('PUT /match/searches illegal email', async function () {
         const response = await request(app)
           .put('/match/searches')
@@ -668,7 +689,13 @@ describe('Tests for Searches Submodule', function () {
             email: "asdf@gmail.com"
           })
           .send({
-            search_name: "!@#$"
+            search_name: "!@#$",
+            activity: "asdf",
+            location_name: "asdf",
+            location_long: 12.34,
+            location_lati: 12.34,
+            max_range: 1234,
+            max_budget: 1234
           })
           .set('Accept', 'application/json')
         expect(response.status).toEqual(400);
@@ -682,7 +709,12 @@ describe('Tests for Searches Submodule', function () {
           })
           .send({
             search_name: "asdf",
-            activity: "!@#$"
+            activity: "!@#$",
+            location_name: "asdf",
+            location_long: 12.34,
+            location_lati: 12.34,
+            max_range: 1234,
+            max_budget: 1234
           })
           .set('Accept', 'application/json')
         expect(response.status).toEqual(400);
@@ -697,7 +729,11 @@ describe('Tests for Searches Submodule', function () {
           .send({
             search_name: "asdf",
             activity: "asdf",
-            location_name: "!@#$"
+            location_name: "!@#$",
+            location_long: 12.34,
+            location_lati: 12.34,
+            max_range: 1234,
+            max_budget: 1234
           })
           .set('Accept', 'application/json')
         expect(response.status).toEqual(400);
@@ -713,7 +749,10 @@ describe('Tests for Searches Submodule', function () {
             search_name: "asdf",
             activity: "asdf",
             location_name: "asdf",
-            location_long: 1234
+            location_long: "12a34",
+            location_lati: 12.34,
+            max_range: 1234,
+            max_budget: 1234
           })
           .set('Accept', 'application/json')
         expect(response.status).toEqual(400);
@@ -730,7 +769,9 @@ describe('Tests for Searches Submodule', function () {
             activity: "asdf",
             location_name: "asdf",
             location_long: 12.34,
-            location_lati: 1234
+            location_lati: "1a234",
+            max_range: 1234,
+            max_budget: 1234
           })
           .set('Accept', 'application/json')
         expect(response.status).toEqual(400);
@@ -748,7 +789,8 @@ describe('Tests for Searches Submodule', function () {
             location_name: "asdf",
             location_long: 12.34,
             location_lati: 12.34,
-            max_range: 12.34
+            max_range: 12.34,
+            max_budget: 1234
           })
           .set('Accept', 'application/json')
         expect(response.status).toEqual(400);
