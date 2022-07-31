@@ -52,7 +52,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,8 +80,8 @@ public class ManageSearchesTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
 
-    @Before
-    public void testSetup() {
+    @BeforeClass
+    public static void testSetup() {
         createUser(name);
     }
 
@@ -123,8 +125,6 @@ public class ManageSearchesTest {
         Intents.release();
 
         onView(withId(R.id.search_name_text)).check(matches(withText("my search")));
-
-
     }
 
     @Test // 3
@@ -199,8 +199,8 @@ public class ManageSearchesTest {
      */
 
 
-    @After
-    public void testCleanup() {
+    @AfterClass
+    public static void testCleanup() {
         // delete user
         deleteUser(name);
     }

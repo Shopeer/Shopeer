@@ -299,6 +299,9 @@ public class EditSearchActivity extends AppCompatActivity {
                 public void onResponse(JSONObject response) {
                     Log.d(TAG, "post_search response: " + response);
                     Toast.makeText(EditSearchActivity.this, "saved " + nameInput + " search", Toast.LENGTH_SHORT).show();
+
+                    SearchObject.setCurrentSearch(new SearchObject(nameInput, locationInput, latInput, lonInput, rangeInput, budgetInput, activitiesInput));
+
                     Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
                     intent.putExtra("email", MainActivity.email);
                     startActivity(intent);
@@ -361,6 +364,9 @@ public class EditSearchActivity extends AppCompatActivity {
                 public void onResponse(JSONObject response) {
                     Log.d(TAG, "post_search response: " + response);
                     Toast.makeText(EditSearchActivity.this, "saved " + nameInput + " search", Toast.LENGTH_SHORT).show();
+
+                    SearchObject.setCurrentSearch(new SearchObject(nameInput, locationInput, latInput, lonInput, rangeInput, budgetInput, activitiesInput));
+
                     Intent intent = new Intent(EditSearchActivity.this, MainActivity.class);
                     intent.putExtra("email", MainActivity.email);
                     startActivity(intent);
