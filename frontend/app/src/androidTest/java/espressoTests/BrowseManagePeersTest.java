@@ -42,7 +42,6 @@ import com.android.volley.toolbox.Volley;
 import com.example.shopeer.ChatActivity;
 import com.example.shopeer.MainActivity;
 import com.example.shopeer.R;
-import com.example.shopeer.Util;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,14 +86,7 @@ public class BrowseManagePeersTest {
     // cannot split each action of the test into separate test cases because app state is not
     // persistent across test cases (always a new activity starts on each test case)
     @Test // full test
-    public void BrowseManagePeerTest() {
-        // load time
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+    public void L_BrowseManagePeerTest_full() {
         A_registeredUserWithActiveSearch();
         B_AProfileCardShowing();
         C_blockA();
@@ -108,6 +100,120 @@ public class BrowseManagePeersTest {
         K_matchWithC();
     }
 
+    /////////////////////////////////// "individual" step test case /////////////////////////////////
+    // the lack of app state persistence means previous steps must be repeated, hence they are "accumulated"
+
+    @Test // 1
+    public void A_registeredUserWithActiveSearch_accum() {
+        A_registeredUserWithActiveSearch();
+    }
+
+    @Test // 2
+    public void B_AProfileCardShowing_accum() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+    }
+
+    @Test // 3
+    public void C_blockA_accum() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+        C_blockA();
+    }
+
+    @Test // 4
+    public void D_swipeRightBProfileCardShowing_accum() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+        C_blockA();
+        D_swipeRightBProfileCardShowing();
+    }
+
+    @Test // 5
+    public void E_sendInviteToB_accum() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+        C_blockA();
+        D_swipeRightBProfileCardShowing();
+        E_sendInviteToB();
+    }
+
+    @Test // 6
+    public void F_swipeLeftAProfileCardShowing_accum() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+        C_blockA();
+        D_swipeRightBProfileCardShowing();
+        E_sendInviteToB();
+        F_swipeLeftAProfileCardShowing();
+    }
+
+    @Test // 7
+    public void G_unblockA_accum() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+        C_blockA();
+        D_swipeRightBProfileCardShowing();
+        E_sendInviteToB();
+        F_swipeLeftAProfileCardShowing();
+        G_unblockA();
+    }
+
+    @Test // 8
+    public void H_swipeRightBProfileCardShowing_accum() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+        C_blockA();
+        D_swipeRightBProfileCardShowing();
+        E_sendInviteToB();
+        F_swipeLeftAProfileCardShowing();
+        G_unblockA();
+        H_swipeRightBProfileCardShowing();
+    }
+
+    @Test // 9
+    public void I_removeInviteToB_accum() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+        C_blockA();
+        D_swipeRightBProfileCardShowing();
+        E_sendInviteToB();
+        F_swipeLeftAProfileCardShowing();
+        G_unblockA();
+        H_swipeRightBProfileCardShowing();
+        I_removeInviteToB();
+    }
+
+    @Test // 10
+    public void J_swipeRightCProfileCardShowing_accum() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+        C_blockA();
+        D_swipeRightBProfileCardShowing();
+        E_sendInviteToB();
+        F_swipeLeftAProfileCardShowing();
+        G_unblockA();
+        H_swipeRightBProfileCardShowing();
+        I_removeInviteToB();
+        J_swipeRightCProfileCardShowing();
+    }
+
+    @Test // 11
+    public void K_matchWithC_accum() {
+        A_registeredUserWithActiveSearch();
+        B_AProfileCardShowing();
+        C_blockA();
+        D_swipeRightBProfileCardShowing();
+        E_sendInviteToB();
+        F_swipeLeftAProfileCardShowing();
+        G_unblockA();
+        H_swipeRightBProfileCardShowing();
+        I_removeInviteToB();
+        J_swipeRightCProfileCardShowing();
+        K_matchWithC();
+    }
+
+    /////////////////////////////////// individual test step methods ///////////////////////////////
     //@Test // 1
     public void A_registeredUserWithActiveSearch() {
         // spinner has a search
@@ -130,6 +236,13 @@ public class BrowseManagePeersTest {
     //@Test // 3
     public void C_blockA() {
         onView(profileCards.atPositionOnView(swipe, R.id.block_button)).perform(click());
+
+        // loading
+        try {
+            sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // A's pc is not showing since blocked, unblocked enabled
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(not((isDisplayed()))));
@@ -163,6 +276,13 @@ public class BrowseManagePeersTest {
     public void E_sendInviteToB() {
         onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).perform(click());
 
+        // loading
+        try {
+            sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
         onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("B")));
         onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(withText("B's description")));
@@ -193,6 +313,13 @@ public class BrowseManagePeersTest {
     //@Test // 7
     public void G_unblockA() {
         onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).perform(click());
+
+        // loading
+        try {
+            sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // A's pc is showing, friend and block enabled
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
@@ -225,6 +352,13 @@ public class BrowseManagePeersTest {
     //@Test // 9
     public void I_removeInviteToB() {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).perform(click());
+
+        // loading
+        try {
+            sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // B's pc is showing, friend and block enabled
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));

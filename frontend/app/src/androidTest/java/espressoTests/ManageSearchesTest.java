@@ -106,6 +106,8 @@ public class ManageSearchesTest {
     }
 
     /////////////////////////////////// "individual" step test case /////////////////////////////////
+    // the lack of app state persistence means previous steps must be repeated, hence they are "accumulated"
+
     @Test // 1
     public void A_emptyMatchPage_accum() {
         A_emptyMatchPage();
