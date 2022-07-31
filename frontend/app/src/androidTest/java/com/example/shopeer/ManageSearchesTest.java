@@ -84,7 +84,6 @@ public class ManageSearchesTest {
     final static String name = "SMTest";
     final static String TAG = "ManageSearches Test";
     final static String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
-
     final static String emailAddr = "@test.com";
 
     final static Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
@@ -99,7 +98,6 @@ public class ManageSearchesTest {
     public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
 
     private static View mainDecorView;
-
 
     @Before
     public void testSetup() {
@@ -140,7 +138,7 @@ public class ManageSearchesTest {
         }
     }
 
-    @Test
+    @Test // full test
     public void ManageSearchesTest(){
         A_emptyMatchPage();
         B_createSearch();
@@ -161,7 +159,7 @@ public class ManageSearchesTest {
         Q_deleteSearch();
     }
 
-    @Test // 1
+    //@Test // 1
     public void A_emptyMatchPage() {
         // edit search button disabled
         onView(withId(R.id.edit_search_button)).check(matches(not(isDisplayed())));
@@ -173,7 +171,7 @@ public class ManageSearchesTest {
 
     }
 
-    @Test // 2
+    //@Test // 2
     public void B_createSearch() {
         onView(withId(R.id.add_search_button)).perform(click());
 
@@ -187,7 +185,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.budget_number)).check(matches(withText("100")));
     }
 
-    @Test // 3
+    //@Test // 3
     public void C_invalidSaveNoActivitySet() {
         onView(withId(R.id.save_search_button)).perform(click());
 
@@ -204,7 +202,7 @@ public class ManageSearchesTest {
         }
     }
 
-    @Test // 4
+    //@Test // 4
     public void D_validSave() {
         // select an activity and save
         onView(withId(R.id.activity_groceries_radioButton)).perform(click());
@@ -224,7 +222,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.profileCards)).check(matches(isDisplayed()));
     }
 
-    @Test // 5
+    //@Test // 5
     public void E_createAnotherSearch() {
         onView(withId(R.id.add_search_button)).perform(click());
 
@@ -238,7 +236,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.budget_number)).check(matches(withText("100")));
     }
 
-    @Test // 6
+    //@Test // 6
     public void F_invalidSaveDuplicateName() {
         // select entertainment activity
         onView(withId(R.id.activity_entertainment_radioButton)).perform(click());
@@ -258,7 +256,7 @@ public class ManageSearchesTest {
         }
     }
 
-    @Test // 7
+    //@Test // 7
     public void G_invalidSaveEmptyName() {
 
         onView(withId(R.id.search_name_text)).perform(replaceText(""));
@@ -277,7 +275,7 @@ public class ManageSearchesTest {
         }
     }
 
-    @Test // 8
+    //@Test // 8
     public void H_validSave() {
         onView(withId(R.id.search_name_text)).perform(replaceText("movies"));
         onView(withId(R.id.save_search_button)).perform(click());
@@ -295,7 +293,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.profileCards)).check(matches(isDisplayed()));
     }
 
-    @Test // 9
+    //@Test // 9
     public void I_editSearch() {
         // select "my search"
         onView(withId(R.id.search_spinner)).perform(click());
@@ -314,13 +312,13 @@ public class ManageSearchesTest {
         onView(withId(R.id.budget_number)).check(matches(withText("100")));
     }
 
-    @Test // 10
+    //@Test // 10
     public void J_editName() {
         onView(withId(R.id.search_name_text)).perform(replaceText("Costco fruits"));
         onView(withId(R.id.search_name_text)).check(matches(withText("Costco fruits")));
     }
 
-    @Test // 11
+    //@Test // 11
     public void K_editLocation() {
         onView(withId(R.id.autocomplete_fragment)).perform(click()) ;
 
@@ -337,7 +335,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.search_location_text)).check(matches(withText("Costco Wholesale")));
     }
 
-    @Test // 12
+    //@Test // 12
     public void L_invalidDistance() {
         // over max distance range
         onView(withId(R.id.distance_number)).perform(replaceText("300"));
@@ -358,7 +356,7 @@ public class ManageSearchesTest {
         }
     }
 
-    @Test // 13
+    //@Test // 13
     public void M_invalidDistance() {
         // negative distance range
         onView(withId(R.id.distance_number)).perform(replaceText(""));
@@ -368,16 +366,16 @@ public class ManageSearchesTest {
         onView(withId(R.id.distance_number)).check(matches(withText("30")));
     }
 
-    @Test // 14
+    //@Test // 14
     public void N_invalidBudget() {
         onView(withId(R.id.budget_number)).perform(replaceText(""));
-        onView(withId(R.id.budget_number)).perform(typeText("-80"));
+        onView(withId(R.id.budget_number)).perform(typeText("-80"), closeSoftKeyboard());
 
         // cannot input "-" into budget_number
         onView(withId(R.id.budget_number)).check(matches(withText("80")));
     }
 
-    @Test // 15
+    //@Test // 15
     public void O_validSave() {
         onView(withId(R.id.save_search_button)).perform(click());
 
@@ -394,7 +392,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.profileCards)).check(matches(isDisplayed()));
     }
 
-    @Test // 16
+    //@Test // 16
     public void P_editSearch() {
         // select "movies"
         onView(withId(R.id.search_spinner)).perform(click());
@@ -413,7 +411,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.budget_number)).check(matches(withText("100")));
     }
 
-    @Test // 17
+    //@Test // 17
     public void Q_deleteSearch() {
         onView(withId(R.id.delete_search_button)).perform(click());
 
@@ -430,22 +428,10 @@ public class ManageSearchesTest {
         // "Costco fruits" is selected
         onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("Costco fruits"))));
 
-        // "movies" search does not exist
-        onData(hasToString("movies")).check(doesNotExist());
-
         onView(withId(R.id.profileCards)).check(matches(isDisplayed()));
     }
 
-
-
-
-    //test spinner is on the right search
-    /*
-    https://stackoverflow.com/questions/31420839/android-espresso-check-selected-spinner-text
-     */
-
-
-    @After
+    //@After
     public void testCleanup() {
         // delete user
         deleteUser(name);
