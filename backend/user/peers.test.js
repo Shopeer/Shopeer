@@ -130,6 +130,18 @@ const nonexistentEmail= "nonexisting_test_email@test.com"
     expect(response.body).toEqual({"response":"User not found."});
     expect(response.status).toEqual(404);
   });
+<<<<<<< HEAD
+=======
+  it('should return 404-target-not-found for non-existing target', async function () {
+    // first try to delete the user from the database, just in case.
+    await request(app).delete('/user/registration').query({email: nonexistentEmail })
+    // attempt to delete a random email from this nonexisting user's sent-invitations list
+    const response = await request(app).delete('/user/peers').query({ email: emails[0], target_peer_email: nonexistentEmail }).set('Accept', 'application/json')
+    
+    expect(response.body).toEqual({"response":"Target user not found."});
+    expect(response.status).toEqual(404);
+  });
+>>>>>>> bfdb8634659b2ffcd59a55e4d0dfb1a5ab1e7749
 
   it('should return 404-targetpeer-not-found for target peer not in peerlist', async function () {
     // attempt to delete jim from rob's peerlist
