@@ -84,7 +84,8 @@ async function recommend(user) {
 
 // this function excludes the user's peers, invites, and blocklist, as well as anyone who has blocked this user
 async function get_viable_matches(user) {
-    var excluded_user_emails = user.peers.concat(user.invites, user.blocked)
+    //var excluded_user_emails = user.peers.concat(user.invites, user.blocked)
+    var excluded_user_emails = user.peers
     
     var viable_matches = await (user_collection.find(
         { email: { $ne: user.email, $nin: excluded_user_emails }, 
