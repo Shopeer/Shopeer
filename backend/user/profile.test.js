@@ -328,17 +328,6 @@ describe('Tests for Profile Submodule', function () {
       expect(response.text).toEqual("Error: Invalid email");
     });
 
-    it('DELETE /registration - invalid name', async function () {
-      const response = await request(app)
-        .delete('/user/registration')
-        .query({
-          email: emails[0],
-          name: "!@#$"
-        })
-      expect(response.status).toEqual(400);
-      expect(response.text).toEqual("Error: Invalid name");
-    });
-
     it('DELETE /registration - invalid email', async function () {
       const response = await request(app)
         .delete('/user/registration')
@@ -350,16 +339,6 @@ describe('Tests for Profile Submodule', function () {
       expect(response.text).toEqual("Error: Invalid email");
     });
 
-    it('DELETE /registration - invalid name', async function () {
-      const response = await request(app)
-        .delete('/user/registration')
-        .query({
-          email: emails[0],
-          name: ""
-        })
-      expect(response.status).toEqual(400);
-      expect(response.text).toEqual("Error: Invalid name");
-    });
 
     it('DELETE /registration - null email', async function () {
       const response = await request(app)
@@ -372,16 +351,6 @@ describe('Tests for Profile Submodule', function () {
       expect(response.text).toEqual("Error: Invalid email");
     });
 
-    it('DELETE /registration - null name', async function () {
-      const response = await request(app)
-        .delete('/user/registration')
-        .query({
-          email: emails[0],
-          name: null
-        })
-      expect(response.status).toEqual(400);
-      expect(response.text).toEqual("Error: Invalid name");
-    });
   })
 });
 

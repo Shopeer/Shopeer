@@ -12,7 +12,8 @@ if (process.env.NODE_ENV) {
 } else {
     require("dotenv").config();
 }
-console.log("ENV is: " + process.env.NODE_ENV)
+
+console.debug("ENV is: " + process.env.NODE_ENV)
 
 if (process.env.NODE_ENV == "test") {
     var {dummyVar,getUser} = require("../user/profile_mock")
