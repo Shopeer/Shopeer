@@ -110,7 +110,7 @@ afterAll(() => {
 
 describe('Tests for algorithm submodule', function () {
 
-    it('Anns match list, expect [Bob]', async function () {
+    it.only('Anns match list, expect [Bob]', async function () {
         const response = await request(app)
             .get('/match/suggestions')
             .query({
