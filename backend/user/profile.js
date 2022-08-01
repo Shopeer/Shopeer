@@ -98,8 +98,6 @@ user_profile_router.delete("/registration", async (req, res) => {
     
     if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
-    } else if (!validator.isAlpha(profile.name)) {
-        res.status(400).send("Error: Invalid name")
     } else {
             var status_code
             var text_res
