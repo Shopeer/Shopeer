@@ -33,11 +33,6 @@ user_profile_router.get("/profile", async (req, res) => {
 // Response: success/fail
 
 user_profile_router.put("/profile", async (req, res) => {
-  // var profile_email = req.query.email
-  // var profile_name = req.query.name
-  // var profile_description = req.query.description
-  // var profile_photo = req.query.photo
-
   if (req.query.email == "jimothy@gmail.com") {
     res
       .status(200)
@@ -71,30 +66,11 @@ user_profile_router.post("/registration", async (req, res) => {
   }
 })
 
-// commented out as this function is not currently used
-// function create_user_object(body) {
-//   var user_object = {
-//     name: body.name,
-//     email: body.email,
-//     description: body.description,
-//     photo: body.photo,
-//     FCM_token: body.FCM_token,
-//     searches: [],
-//     peers: [],
-//     invites: [],
-//     received_invites: [],
-//     blocked: []
-//   }
-//   return user_object
-// }
-
 
 // Delete User DELETE https://shopeer.com/user/registration?user_id=[user_id]
 // Removes the user from User Database and clears all info regarding the user
 // Body (Parameter): <user_email>
 // Response: success/fail
-
-
 user_profile_router.delete("/registration", async (req, res) => {
   if (req.query.email == "jimothy@gmail.com") {
     res
@@ -107,26 +83,20 @@ user_profile_router.delete("/registration", async (req, res) => {
   }
 })
 
-/**
- * Add FCM token to user profile object PUT https://shopeer.com/user/registration/FCM?email=[email]
- * Body: FCM_token
- * Returns: success/fail
- */
-//curl -X "PUT" -H "Content-Type: application/json" -d '{"FCM_token": "test token" }' localhost:8081/user/registration/FCM?email="hello@gmail.com"
-user_profile_router.put("/registration/FCM", async (req, res) => {
-  if (req.query.email == "jimothy@gmail.com" & req.query.FCM_token == "asdfqwer") {
-    res
-      .status(200)
-      .send("Success");
-  } else {
-    res
-      .status(400)
-      .send("Error")
-  }
-})
+async function getUser(profile_email) {
+  require("dotenv").config()
+  const { MongoClient } = require("mongodb")
+  // const uri = "mongodb://admin:shopeer@20.230.148.126:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+  const uri = "mongodb://" + process.env.DB_USER + ":" + process.env.DB_PASS + "@20.230.148.126:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+  const mongoClient = new MongoClient(uri)
+  // const user_collection = mongoClient.db("shopeer_database").collection("user_collection")
+  const user_test_collection = mongoClient.db("shopeer_database").collection("test_collection")
+  mongoClient.connect()
+
+  var find_cursor = user_test_collection.findOne({ email: profile_email })
+
+  return find_cursor
+}
 
 
-
-
-module.exports = user_profile_router;
-
+module.exports = { user_profile_router, getUser };

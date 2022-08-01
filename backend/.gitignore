@@ -1,2 +1,4 @@
-node_modules
-.prettierignore
+node_modules/
+coverage/
+backend/node_modules/
+backend/coverage/
