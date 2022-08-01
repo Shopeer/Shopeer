@@ -131,7 +131,6 @@ const nonexistentEmail= "nonexisting_test_email@test.com"
     expect(response.status).toEqual(404);
   });
   it('should return 404-target-not-found for non-existing target', async function () {
-    const nonexistentEmail= "nonexisting_test_email@test.com"
     // first try to delete the user from the database, just in case.
     await request(app).delete('/user/registration').query({email: nonexistentEmail })
     // attempt to delete a random email from this nonexisting user's sent-invitations list
