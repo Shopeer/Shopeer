@@ -2,7 +2,9 @@
 
 const express = require("express");
 const router = express.Router();
-const uri = "mongodb://127.0.0.1:27017";
+const uri = "mongodb://admin:shopeer@20.230.148.126:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+
+// const uri = "mongodb://127.0.0.1:27017";
 const { MongoClient } = require("mongodb");
 const client = new MongoClient(uri);
 var ObjectId = require("mongodb").ObjectId;

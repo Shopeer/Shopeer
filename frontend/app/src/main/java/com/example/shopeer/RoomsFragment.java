@@ -35,6 +35,8 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
     RecyclerView recyclerView;
     private ArrayList<RoomObject> roomList;
 
+    private View view;
+
     private final String roomsUrl = "http://20.230.148.126:8080/chat/room/all?email=" + MainActivity.email;
 
     /**
@@ -63,6 +65,8 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
         // fetch data of peers and add to peerList
         fetchAllRooms();
         Log.d(TAG, roomList.toString());
+
+        view = v;
         return v;
     }
 
@@ -92,7 +96,7 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                                     }
                                     Log.d(TAG, "received rooms");
                                     // initialize recycler view
-                                    recyclerView = getView().findViewById(R.id.recyclerView);
+                                    recyclerView = view.findViewById(R.id.recyclerView);
                                     RoomRecyclerAdapter recyclerAdapter = new RoomRecyclerAdapter(roomList, RoomsFragment.this);
                                     recyclerView.setAdapter(recyclerAdapter);
                                     recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

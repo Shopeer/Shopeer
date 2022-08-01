@@ -19,6 +19,14 @@
             android:paddingTop="10dp"
             android:paddingBottom="5dp">
 
+            <ImageView
+                android:id="@+id/backButton"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:layout_centerVertical="true"
+                android:src="@drawable/icon_arrow" />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/RoomPeerPictureCardView"
                 android:layout_width="50dp"
