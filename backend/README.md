@@ -26,6 +26,7 @@
 ### How to run backend tests
 ```
 cd /Shopeer/backend
+npm install
 npm test
 ```
 
