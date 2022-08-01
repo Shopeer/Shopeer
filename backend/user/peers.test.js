@@ -326,6 +326,17 @@ describe("Retract a sent invitation scenario", () => {
     expect(response.body).toEqual({"response":"User not found."});
     expect(response.status).toEqual(404);
   });
+  
+  it('should return 404-target-not-found for non-existing target', async function () {
+    const nonexistentEmail= "nonexisting_test_email@test.com"
+    // first try to delete the user from the database, just in case.
+    await request(app).delete('/user/registration').query({email: nonexistentEmail })
+    // attempt to delete a random email from this nonexisting user's sent-invitations list
+    const response = await request(app).delete('/user/invitations').query({ email: emails[0], target_peer_email: nonexistentEmail }).set('Accept', 'application/json')
+    
+    expect(response.body).toEqual({"response":"Target user not found."});
+    expect(response.status).toEqual(404);
+  });
 
   it('should return 404-targetinvite-not-found for target invite not in sent invitations list', async function () {
     // attempt to delete jim from rob's invitations list. Jim is not currently in rob's invitations list
