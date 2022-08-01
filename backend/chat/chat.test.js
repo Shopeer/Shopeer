@@ -1,12 +1,12 @@
 const request = require('supertest');
 const express = require('express');
 var bodyParser = require('body-parser')
-const app = express()
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+// const app = express()
+
 // reuse original application?
 const app = require('../config/app')
-
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
 const invalidRoomId = "clearlyfakeid"
 const fakeRoomId = "62e2feb74ce5451dd12322a4"
 const nonexistingUser = "nonexistingchatuser@test.com"
