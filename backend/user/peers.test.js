@@ -45,11 +45,11 @@ var emails = [rob_email, bob_email, tim_email, jim_email, tam_email, pam_email]
 var names = [rob_name, bob_name, tim_name, jim_name, tam_name, pam_name]
 
 
-beforeEach(() => {
+beforeAll(() => {
   resetDatabase()
   return initializeDatabase()
 });
-afterEach(() => {
+afterAll(() => {
   return resetDatabase()
 });
 // afterAll(() => {
@@ -81,7 +81,7 @@ async function resetDatabase() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-describe.only("Get all peers scenario", () => {
+describe("Get all peers scenario", () => {
 
   it('should return 404 for non-existing user', async function () {
     const nonexistentEmail = "nonexisting_test_email@test.com"
@@ -89,7 +89,7 @@ describe.only("Get all peers scenario", () => {
     await request(app).delete('/user/registration').query({email: nonexistentEmail })
     // attempt to get a nonexisting user's peerlist
     const response = await request(app).get('/user/peers').query({ email: nonexistentEmail }).set('Accept', 'application/json')
-    
+    console.log(response.body)
     expect(response.body).toEqual({"response":"User not found."});
     expect(response.status).toEqual(404);
   });
@@ -405,6 +405,14 @@ describe("Block user scenario", () => {
     const response = await request(app).post('/user/blocked').query({ email: emails[3], target_peer_email: emails[4] }).set('Accept', 'application/json')
     expect(response.status).toEqual(409);
     expect(response.body).toEqual({"response":"User already in blocklist."});
+    
+  });
+
+  it('should return 409 if user attempts to block self', async function () {
+    // jim already has tam blocked. if he tries again he should get a conflict
+    const response = await request(app).post('/user/blocked').query({ email: emails[3], target_peer_email: emails[3] }).set('Accept', 'application/json')
+    expect(response.status).toEqual(409);
+    expect(response.body).toEqual({"response":"Cannot operate on self."});
   });
 
   it('should successfully block someone who was previously a peer', async function () {
@@ -456,6 +464,17 @@ describe("Unblock user scenario", () => {
     const response = await request(app).delete('/user/blocked').query({ email: nonexistentEmail, target_peer_email: emails[0] }).set('Accept', 'application/json')
     
     expect(response.body).toEqual({"response":"User not found."});
+    expect(response.status).toEqual(404);
+  });
+
+  it('should return 404-user-not-found for non-existing target', async function () {
+    const nonexistentEmail= "nonexisting_test_email@test.com"
+    // first try to delete the user from the database, just in case.
+    await request(app).delete('/user/registration').query({email: nonexistentEmail })
+    // attempt to delete a random email from this nonexisting user's sent-invitations list
+    const response = await request(app).delete('/user/blocked').query({ email: emails[0], target_peer_email: nonexistentEmail}).set('Accept', 'application/json')
+    
+    expect(response.body).toEqual({"response":"Target user not found."});
     expect(response.status).toEqual(404);
   });
 
