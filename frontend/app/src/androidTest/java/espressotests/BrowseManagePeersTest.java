@@ -65,7 +65,6 @@ public class BrowseManagePeersTest {
     final static String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
     private static final String blockUrl = "http://20.230.148.126:8080/user/blocked?email=";
     private static final String invitationUrl = "http://20.230.148.126:8080/user/invitations?email=";
-//    private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
     private static final String roomsUrl = "http://20.230.148.126:8080/chat/room";
 
     final RecyclerViewUtil.RecyclerViewMatcher profileCards = RecyclerViewUtil.withRecyclerView(R.id.profile_cards_rv);
