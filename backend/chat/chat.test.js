@@ -7,6 +7,10 @@ var bodyParser = require('body-parser')
 const app = require('../config/app')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+<<<<<<< HEAD:backend/chat/chat.test.js
+=======
+
+>>>>>>> be17-github-workflow:backend/chat/chat.tes.js
 const invalidRoomId = "clearlyfakeid"
 const fakeRoomId = "62e2feb74ce5451dd12322a4"
 const nonexistingUser = "nonexistingchatuser@test.com"
@@ -59,7 +63,7 @@ afterAll(() => {
 
 async function initializeDatabase() {
   try {
-    console.log("Initializing...")
+    // console.log("Initializing...")
     // register some users
     await request(app).post('/user/registration').query({ name: testUserA.name, email: testUserA.email})
     await request(app).post('/user/registration').query({ name: testUserB.name, email: testUserB.email})
@@ -72,14 +76,14 @@ async function initializeDatabase() {
     await request(app).post('/user/invitations').query({ email: testUserC.email, target_peer_email: testUserA.email})
     // create two chatrooms, one with A/C and one with A/B
     var room = await request(app).post('/chat/room').set('Accept', 'application/json').send( testRoom )
-    // console.log(room.body)
+    // // console.log(room.body)
     var room_2 = await request(app).post('/chat/room').set('Accept', 'application/json').send( testRoom_2 )
-    // console.log(room_2.body)
+    // // console.log(room_2.body)
     roomIds.push(room.body.insertedId)
     roomIds.push(room_2.body.insertedId)
     
   } catch (err) {
-    console.log(err)
+    // console.log(err)
   }
 }
 async function resetDatabase() {
@@ -87,7 +91,7 @@ async function resetDatabase() {
     // this deletes all rooms created during these tests
     for ( let i = 0; i < roomIds.length; i++ ) {
       await request(app).delete('/chat/room').query({ room_id: roomIds[i] })
-      // console.log(doc.body)
+      // // console.log(doc.body)
     }
     // delete user registrations
     await request(app).delete('/user/registration').query({ email: testUserA.email })
@@ -96,7 +100,7 @@ async function resetDatabase() {
     await request(app).delete('/user/registration').query({ email: testUserD.email })
     
   } catch (err) {
-    console.log(err)
+    // console.log(err)
   }
 }
 
@@ -149,8 +153,8 @@ describe("Send message scenario", () => {
         && mssg.text == testMessageB.text
         && mssg.time == testMessageB.time) 
       )
-      console.log("message found:")
-      console.log(messageFound)
+      // console.log("message found:")
+      // console.log(messageFound)
       expect (messageFound.length).toEqual(1)
       
     });
