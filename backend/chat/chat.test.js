@@ -7,10 +7,6 @@ var bodyParser = require('body-parser')
 const app = require('../config/app')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
-<<<<<<< HEAD:backend/chat/chat.test.js
-=======
-
->>>>>>> be17-github-workflow:backend/chat/chat.tes.js
 const invalidRoomId = "clearlyfakeid"
 const fakeRoomId = "62e2feb74ce5451dd12322a4"
 const nonexistingUser = "nonexistingchatuser@test.com"
