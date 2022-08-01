@@ -115,6 +115,10 @@ user_profile_router.delete("/registration", async (req, res) => {
     }
 })
 
+// function does_user_exist(){
+
+// }
+
 function create_user_object(body) {
     var user_object = {
         name: body.name,
@@ -130,5 +134,12 @@ function create_user_object(body) {
     return user_object
 }
 
-module.exports = user_profile_router;
+
+async function getUser(profile_email) {
+    return await user_collection.findOne({ email: profile_email })
+}
+
+
+module.exports = {user_profile_router, getUser};
+
 

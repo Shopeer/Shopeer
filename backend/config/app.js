@@ -8,7 +8,7 @@ app.get("/", (req, res) => {
 })
 
 // User Module Router
-const user_profile_router = require('../user/profile.js');
+const {user_profile_router, getUser} = require('../user/profile.js');
 app.use('*', user_profile_router);
 app.use('/user', user_profile_router)
 
