@@ -1,4 +1,4 @@
-package espressoTests;
+package espressotests;
 
 import com.android.volley.toolbox.JsonArrayRequest;
 
@@ -68,7 +68,7 @@ public class BrowseManagePeersTest {
     private static final String searchUrl = "http://20.230.148.126:8080/match/searches?email=";
     private static final String roomsUrl = "http://20.230.148.126:8080/chat/room";
 
-    final Util.RecyclerViewMatcher profileCards = Util.withRecyclerView(R.id.profile_cards_rv);
+    final RecyclerViewUtil.RecyclerViewMatcher profileCards = RecyclerViewUtil.withRecyclerView(R.id.profile_cards_rv);
     private static int swipe; // +1 right, -1 left
 
     final Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();

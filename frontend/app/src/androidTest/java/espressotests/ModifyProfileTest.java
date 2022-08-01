@@ -1,4 +1,4 @@
-package espressoTests;
+package espressotests;
 
 import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;

@@ -11,8 +11,6 @@ import android.util.Log;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.HashSet;
-
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
@@ -35,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         // get the user email
         Intent intent = getIntent();
         email = intent.getStringExtra("email");
-//        Log.d(TAG, email);
+        Log.d(TAG, email);
 
         String isRegister = intent.getStringExtra("page");
         if (PROFILE_ID.equals(isRegister))

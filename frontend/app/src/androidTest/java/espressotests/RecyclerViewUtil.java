@@ -1,4 +1,4 @@
-package espressoTests;
+package espressotests;
 
 import android.content.res.Resources;
 import android.view.View;
@@ -9,7 +9,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class Util {
+public class RecyclerViewUtil {
     /**
      * Created by dannyroa on 5/10/15.
      * Sourced from: https://github.com/dannyroa/espresso-samples.git
