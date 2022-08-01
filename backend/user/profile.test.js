@@ -1,13 +1,6 @@
 
-// const user_profile_router = require('./profile_mock')
-// const user_peers_router = require('./peers_mock')
-
-const request = require('supertest');
-const express = require('express');
-const validator = require('validator')
+const request = require('supertest')
 const app = require('../config/app')
-
-
 var user_collection = require('../config/mongodb_connection')
 
 const rob_email = 'robithy_test_user@test.com'
