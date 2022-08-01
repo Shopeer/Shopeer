@@ -209,7 +209,7 @@ describe('Tests for Profile Submodule', function () {
           email: pam_email,
           name: pam_name
         })
-      expect(response.status).toEqual(200);
+      expect(response.status).toEqual(201);
       expect(response.text).toEqual("Success");
     });
 

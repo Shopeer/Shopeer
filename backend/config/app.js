@@ -24,7 +24,4 @@ app.use('/match', suggestions_algo_router)
 const roomsRouter = require('../chat/room');
 app.use('/chat/room', roomsRouter)
 
-const mssgRouter = require('../chat/message');
-app.use('/chat/message', mssgRouter)
-
 module.exports = app
