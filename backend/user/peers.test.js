@@ -136,7 +136,7 @@ const nonexistentEmail= "nonexisting_test_email@test.com"
     // attempt to delete a random email from this nonexisting user's sent-invitations list
     const response = await request(app).delete('/user/peers').query({ email: emails[0], target_peer_email: nonexistentEmail }).set('Accept', 'application/json')
     
-    expect(response.body).toEqual({"response":"Target user not found."});
+    expect(response.body).toEqual({"response":"Target peer not found."});
     expect(response.status).toEqual(404);
   });
 
