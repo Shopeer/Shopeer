@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-** Designated test modules and use cases
-=======
 # Shopeer Backend
 
 ## Directory Structure & Test file locations
@@ -29,6 +26,7 @@
 ### How to run backend tests
 ```
 cd /Shopeer/backend
+npm install
 npm test
 ```
 
@@ -38,7 +36,6 @@ npm test
 ```
 
 ## Designated test modules and use cases
->>>>>>> dev-test
 - the two back-end modules specified by TA for your project are: 
     - User
     - Matches
