@@ -39,10 +39,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.VolleyLog;
-
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -319,13 +315,13 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             this.suggestions = new ArrayList<ProfileObject>();
 
             // A is nobody
-            ProfileObject A = createDummyProfileObj("A");
+            createDummyProfileObj("A");
 
             // B sent a block
-            ProfileObject B = createDummyProfileObj("B");
+            createDummyProfileObj("B");
 
             // C sent invite
-            ProfileObject C = createDummyProfileObj("C");
+            createDummyProfileObj("C");
 
             this.manageBlocked = new HashSet<>();
             this.manageInvites = new HashSet<>();

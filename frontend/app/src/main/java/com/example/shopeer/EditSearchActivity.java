@@ -279,7 +279,6 @@ public class EditSearchActivity extends AppCompatActivity {
                     Log.d(TAG, "bad input, cannot save yet");
                 }
                 else {
-                    String url = searchUrl + MainActivity.email + "&search=";
                     if (!isNewSearch) {
                         updateSearch(nameInput, locationInput, latInput, lonInput, rangeInput, activitiesInput, budgetInput);
                     }

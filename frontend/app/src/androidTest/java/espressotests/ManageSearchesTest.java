@@ -334,7 +334,7 @@ public class ManageSearchesTest {
     //@Test // 1
     public void A_emptyMatchPage() {
         // edit search button disabled
-        onView(ViewMatchers.withId(R.id.edit_search_button)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.edit_search_button)).check(matches(not(isDisplayed())));
 
         // no profile cards showing
         onView(withId(R.id.profileCards)).check(doesNotExist());
