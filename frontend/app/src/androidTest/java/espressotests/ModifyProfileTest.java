@@ -18,10 +18,7 @@ import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.
 import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasNoDrawable;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import android.Manifest;
 import android.app.Activity;

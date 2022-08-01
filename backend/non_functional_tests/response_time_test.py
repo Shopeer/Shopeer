@@ -68,8 +68,8 @@ def test_get_search():
     email = USERNAME + str(time.time()%20) + EMAIL_TAG
     # Call Api function to get searches
     params = {"email":email}
-    res = requests.get(SUGG_URL, params=params)
-    print(res)
+    requests.get(SUGG_URL, params=params)
+    # print(res)
 
 
 if __name__ == '__main__':
