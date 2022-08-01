@@ -11,8 +11,6 @@ import android.util.Log;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.HashSet;
-
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
@@ -20,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     public static String PROFILE_ID = "2";
     public static String email;
 
-    public HashSet<SearchObject> searches = new HashSet<>();
+    public static NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         // initialize the bottom nav bar
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_view);
-        NavController navController = Navigation.findNavController(this, R.id.nav_fragment);
+        navController = Navigation.findNavController(this, R.id.nav_fragment);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         // get the user email
@@ -42,9 +40,6 @@ public class MainActivity extends AppCompatActivity {
             navController.navigate(R.id.profileFragment);
         else if (ROOM_ID.equals(isRegister))
             navController.navigate(R.id.roomsFragment);
-        if (isRegister != null) {
-            // redirect to profile page
-        }
     }
 
 

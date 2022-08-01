@@ -1,6 +1,12 @@
 package com.example.shopeer;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+import android.util.Log;
+
 public class ProfileObject {
+    private static final String TAG = "Profile Obj";
 
     private String email;
     private String name;
@@ -22,11 +28,28 @@ public class ProfileObject {
         return this.name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public String getDescription() {
+        return this.description;
     }
 
-    public String getPhoto() {
-        return this.photo;
+    public Bitmap getPhotoBitmap() {
+        if (photo != null) {
+            return decodeImage(photo);
+        }
+        return null;
+    }
+
+    private Bitmap decodeImage(String encodedImage) {
+        try{
+            Log.d(TAG, "decodeImage: " + encodedImage);
+            byte [] encodeByte = Base64.decode(encodedImage,Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            Log.d(TAG, "decodeImage: " + bitmap);
+            return bitmap;
+        }
+        catch(Exception e){
+            e.getMessage();
+            return null;
+        }
     }
 }

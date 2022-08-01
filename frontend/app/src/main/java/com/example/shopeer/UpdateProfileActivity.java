@@ -3,12 +3,14 @@ package com.example.shopeer;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -24,6 +26,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UpdateProfileActivity extends AppCompatActivity {
     private static final String TAG = "UpdateProfileActivity";
@@ -55,8 +59,13 @@ public class UpdateProfileActivity extends AppCompatActivity {
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!isNameValid(nameInput.getText().toString())) {
+                    Toast.makeText(UpdateProfileActivity.this, "Invalid Name", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 try{
-                    String url = profileUrl + GoogleSignIn.getLastSignedInAccount(UpdateProfileActivity.this).getEmail();
+//                    String url = profileUrl + GoogleSignIn.getLastSignedInAccount(UpdateProfileActivity.this).getEmail();
+                    String url = profileUrl + MainActivity.email;
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("name", nameInput.getText().toString());
                     jsonObject.put("description", bioInput.getText().toString());
@@ -107,6 +116,16 @@ public class UpdateProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * @param name
+     * @return True if the name contains no special characters
+     */
+    private boolean isNameValid(String name) {
+        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(name);
+        return !m.find(); //m.find returns true if there is a special character
+    }
+
     private void getProfileInfo() {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -119,7 +138,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
                         JSONObject jsonResponse = new JSONObject(response);
                         nameInput.setText(jsonResponse.getString("name"));
                         bioInput.setText(jsonResponse.getString("description"));
-                        profilePic.setImageResource(R.drawable.temp_profile);
+                        Bitmap profilephoto = ProfileFragment.newInstance().decodeImage(jsonResponse.getString("photo"));
+                        profilePic.setImageBitmap(profilephoto);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

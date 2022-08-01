@@ -1,6 +1,9 @@
 package com.example.shopeer;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -8,6 +11,7 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -45,7 +49,6 @@ import java.io.UnsupportedEncodingException;
  */
 public class ProfileFragment extends Fragment {
     final static String TAG = "ProfileFragment"; // good practice for debugging
-    private static final int RESULT_OK = -1;
     private TextView profileName;
     private TextView profileBio;
     private ImageView profilePic;
@@ -57,7 +60,7 @@ public class ProfileFragment extends Fragment {
     private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if(result.getResultCode() == RESULT_OK) {
+                if(result.getResultCode() == Activity.RESULT_OK) {
                     Uri imageUri = result.getData().getData();
                     try{
                         InputStream inputStream = getActivity().getContentResolver().openInputStream(imageUri);
@@ -72,6 +75,18 @@ public class ProfileFragment extends Fragment {
                 }
             }
     );
+
+    private ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission is granted
+                    Log.d(TAG, "Editing profile pic");
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    pickImage.launch(intent);
+                } else {
+                    Toast.makeText(getContext(), "Enable permissions to set photo", Toast.LENGTH_LONG).show();
+                }
+            });
 
     /**
      * Use this factory method to create a new instance of
@@ -112,12 +127,13 @@ public class ProfileFragment extends Fragment {
     private void getProfileInfo() {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-            String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail();
+//            String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail();
+            String url = profileUrl + MainActivity.email;
             Log.d(TAG, "trying to get profile info " + url);
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Log.d(TAG, "get profile " + response);
+//                    Log.d(TAG, "get profile " + response);
                         try {
                             JSONObject jsonResponse = new JSONObject(response);
                             profileName.setText(jsonResponse.getString("name"));
@@ -145,12 +161,25 @@ public class ProfileFragment extends Fragment {
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "Editing profile pic");
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                pickImage.launch(intent);
+                Log.d(TAG, "Checking permissions to access photos");
+                // ask for permission
+                try {
+                    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
+                        Log.d(TAG, "Editing profile pic");
+                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        pickImage.launch(intent);
+                    } else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        Toast.makeText(getContext(), "Enable permissions to set photo", Toast.LENGTH_LONG).show();
+                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    } else {
+                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
+
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -209,7 +238,7 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    private String encodeImage(Bitmap bitmap) {
+    public String encodeImage(Bitmap bitmap) {
         int previewWidth = 150;
         int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
         Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
@@ -219,12 +248,12 @@ public class ProfileFragment extends Fragment {
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
 
-    private Bitmap decodeImage(String encodedImage) {
+    public Bitmap decodeImage(String encodedImage) {
         try{
-            Log.d(TAG, "decodeImage: " + encodedImage);
+//            Log.d(TAG, "decodeImage: " + encodedImage);
             byte [] encodeByte = Base64.decode(encodedImage,Base64.DEFAULT);
             Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            Log.d(TAG, "decodeImage: " + bitmap);
+//            Log.d(TAG, "decodeImage: " + bitmap);
             return bitmap;
         }
         catch(Exception e){
