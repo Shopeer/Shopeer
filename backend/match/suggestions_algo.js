@@ -38,11 +38,11 @@ function deg2rad(deg) {
 // Response: List of peer objects {peer_id, name, bio, profile_picture} / empty list on fail
 suggestions_algo_router.get("/suggestions", async (req, res) => {
     var profile_email = req.query.email
-    // console.log(req.query)
+    // // console.log(req.query)
     try {
-        console.log(profile_email)
+        // console.log(profile_email)
         var main_user_cursor = await user_collection.findOne({ email: profile_email })
-        console.log(main_user_cursor)
+        // console.log(main_user_cursor)
         if (main_user_cursor.searches.length === 0) {
             var arr = await recommend(main_user_cursor)
             res.status(200).send(arr)
@@ -60,7 +60,7 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
         return
     }
     catch (err) {
-        console.log(err)
+        // console.log(err)
         res.status(400).send(err)
     }
 
@@ -74,7 +74,7 @@ async function recommend(user) {
 
     var viable = await get_viable_matches(user)
     if (viable.length === 0) {
-        console.log("make some friends")
+        // console.log("make some friends")
         return []
     }
     return viable
@@ -98,9 +98,9 @@ async function get_viable_matches(user) {
             blocked: { $nin: [user.email] }
         }))
         .toArray()
-    // console.log(viable_matches)
-    console.log("excluded")
-    // console.log(excluded_user_emails)
+    // // console.log(viable_matches)
+    // console.log("excluded")
+    // // console.log(excluded_user_emails)
     return viable_matches
 }
 
@@ -116,12 +116,12 @@ async function get_scores(user) {
     for (let i = 0; i < viable_matches.length; i++) {
         var potential_match = viable_matches[i]
         var user_score = 0
-        console.log("\n\n+++++++++++ EVALUATING POTENTIAL MATCH " + potential_match.email + " +++++++++++")
+        // console.log("\n\n+++++++++++ EVALUATING POTENTIAL MATCH " + potential_match.email + " +++++++++++")
 
         for (let j = 0; j < user.searches.length; j++) {
 
             var this_search = user.searches[j]
-            console.log("\n---looking for similar searches to " + this_search.search_name)
+            // console.log("\n---looking for similar searches to " + this_search.search_name)
             // the following aggregation returns the searches in potenial_match.searchlist 
             // that have the same activity as this_search
             // in the following array format:
@@ -146,14 +146,14 @@ async function get_scores(user) {
             ])).toArray()
 
             if (search_matches.length > 0) {
-                console.log("\n" + potential_match.email + " has also searched for one of " + this_search.activity)
+                // console.log("\n" + potential_match.email + " has also searched for one of " + this_search.activity)
                 user_score += await get_search_similarity_score(this_search, search_matches)
             } else {
-                console.log("no similar searches found \n")
+                // console.log("no similar searches found \n")
                 continue
             }
         }
-        console.log("\n ++++++++ TOTAL SCORE IS " + user_score)
+        // console.log("\n ++++++++ TOTAL SCORE IS " + user_score)
         user_scores.push({ "email": potential_match.email, "score": user_score })
         //user_scores = await getSuggestionScorePairs(user_scores, viable_matches)
     }
@@ -168,8 +168,8 @@ async function get_scores(user) {
         // a must be equal to b
         return 0;
     })
-    console.log("sorted scores:")
-    console.log(user_scores)
+    // console.log("sorted scores:")
+    // console.log(user_scores)
 
     return user_scores
 }
@@ -179,7 +179,7 @@ async function get_search_similarity_score(this_search, search_matches) {
     score = 0
     for (let i = 0; i < search_matches.length; i++) {
         var search_match = search_matches[i].searches
-        console.log("\nevaluating search similarity: " + this_search.search_name + " and " + search_match.search_name)
+        // console.log("\nevaluating search similarity: " + this_search.search_name + " and " + search_match.search_name)
 
         var loc = await getLocationScore(this_search, search_match)
         if (loc == -1) {
@@ -203,9 +203,9 @@ async function getBudgetScore(this_search, search_match) {
     var max_budget_difference = Math.max(100, this_search.max_budget)
     var difference = Math.abs(this_search.max_budget - search_match.max_budget)
     var score = Math.max(-100 / max_budget_difference * difference + 100, 0)
-    console.log("\n" + this_search.search_name + " budget: " + this_search.max_budget)
-    console.log(search_match.search_name + " budget: " + search_match.max_budget)
-    console.log("budget score: " + score)
+    // console.log("\n" + this_search.search_name + " budget: " + this_search.max_budget)
+    // console.log(search_match.search_name + " budget: " + search_match.max_budget)
+    // console.log("budget score: " + score)
     return score
 
 }
@@ -214,15 +214,15 @@ async function getBudgetScore(this_search, search_match) {
 // otherwise, returns a score between 0 and 100 that linearly decreases as distance increases
 async function getLocationScore(this_search, search_match) {
     var distance = getDistanceFromLatLonInKm(this_search.location_lati, this_search.location_long, search_match.location_lati, search_match.location_long)
-    console.log("distance is " + distance)
+    // console.log("distance is " + distance)
     if (distance > this_search.max_range || distance > search_match.max_range) {
-        console.log("too far away!")
+        // console.log("too far away!")
         return -1
     }
     var score = Math.max(-100 / this_search.max_range * distance + 100, 0)
-    console.log("\n max range is " + this_search.max_range)
+    // console.log("\n max range is " + this_search.max_range)
 
-    console.log("location score: " + score)
+    // console.log("location score: " + score)
     return score
 
 
