@@ -58,48 +58,6 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
 
         res.status(200).send(user_object_array)
         return
-        // var target_searches = main_user_cursor.searches
-
-        // var remaining_user_cursor = await user_collection.find({ email: { $ne: profile_email } })
-
-        // var remaining_user_array = await remaining_user_cursor.toArray()
-
-        // var match_list = []
-
-        // console.log("----------")
-        // for (let i = 0; i < remaining_user_array.length; i++) {
-        //     var each_search_array = remaining_user_array[i].searches
-        //     var each_email = remaining_user_array[i].email
-        //     console.log(each_search_array)
-        //     var each_score = 0;
-        //     for (let j = 0; j < each_search_array.length; j++) {
-        //         if (target_searches.activity == each_search_array[j].activity) {
-        //             each_score++
-        //         }
-        //     }
-        //     match_list.push([each_email, each_score])
-        //     console.log(each_score)
-        //     console.log(match_list)
-        // }
-
-        // // Bubble sort
-        // for (let i = 0; i < match_list.length - 1; i++) {
-        //     console.log(match_list[i][1])
-        //     console.log(match_list[i + 1][1])
-        //     if (match_list[i][1] < match_list[i + 1][1]) {
-        //         temp = match_list[i + 1]
-        //         match_list[i + 1] = match_list[i]
-        //         match_list[i] = temp
-        //     }
-        // }
-
-        // const array = match_list
-        // customSlice = array => array.slice(0, 1)
-        // result = array.map(customSlice);
-
-        // console.log(result)
-
-        // res.status(200).send(result)
     }
     catch (err) {
         console.log(err)
@@ -261,26 +219,6 @@ async function getLocationScore(this_search, search_match) {
 
 
 }
-
-
-
-
-// search pref
-// location (long, lat)
-// range (max km)
-// activity [most prefer, ... , least prefer]
-// budget (max)
-
-
-// Write mocking tests
-// User module
-// Match module
-
-
-// Front end test
-// Browse users
-// Manage peers
-// Manage blocking
 
 module.exports = suggestions_algo_router;
 

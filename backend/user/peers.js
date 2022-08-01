@@ -12,7 +12,8 @@ if (process.env.NODE_ENV) {
 } else {
     require("dotenv").config();
 }
-console.log("ENV is: " + process.env.NODE_ENV)
+
+console.debug("ENV is: " + process.env.NODE_ENV)
 
 if (process.env.NODE_ENV == "test") {
     var {dummyVar,getUser} = require("../user/profile_mock")
@@ -116,7 +117,7 @@ user_peers_router.delete("/peers", async (req, res) => {
             }
             
         } else {
-            console.log("Peer already not in existence")
+            // console.log("Peer already not in existence")
             // var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(404).json({response: "Target peer not found."})
         }
@@ -323,17 +324,17 @@ user_peers_router.post("/invitations", async (req, res) => {
             return
         }
         if (target_cursor.blocked.includes(profile_email)) {
-            console.log("This user is blocked.")
+            // console.log("This user is blocked.")
             res.status(400).send({response: "The target user cannot be invited."})
             return
         }
         if (find_cursor.peers.includes(target_peer_email)) {
-            console.log("Target already in peerlist")
+            // console.log("Target already in peerlist")
             res.status(409).send({response: "Target already in peerlist."})
             return
         }
         if (find_cursor.invites.includes(target_peer_email)) {
-            console.log("Target already in invitation list")
+            // console.log("Target already in invitation list")
             res.status(409).send({response: "Target already in invitation list."})
             
         } else {
