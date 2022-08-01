@@ -101,61 +101,61 @@ async function resetDatabase() {
 }
 
 
-describe("Send message scenario", () => {
+// describe("Send message scenario", () => {
 
-    it('should return 404 for nonexisting room', async function () {
-      // first try to delete the room, just in case
-      await request(app).delete('/room').query({ room_id: fakeRoomId })
+//     it('should return 404 for nonexisting room', async function () {
+//       // first try to delete the room, just in case
+//       await request(app).delete('/room').query({ room_id: fakeRoomId })
       
-      const response = await request(app).post('/chat/message').query({ room_id: fakeRoomId }).set('Accept', 'application/json').send( testMessageA )
-      expect(response.body).toEqual({"response": "Room not found."});
-      expect(response.status).toEqual(404);
-    });
+//       const response = await request(app).post('/chat/message').query({ room_id: fakeRoomId }).set('Accept', 'application/json').send( testMessageA )
+//       expect(response.body).toEqual({"response": "Room not found."});
+//       expect(response.status).toEqual(404);
+//     });
   
-    it('should return 400 for invalid room id', async function () {
+//     it('should return 400 for invalid room id', async function () {
         
-        const response = await request(app).post('/chat/message').query({ room_id: invalidRoomId }).set('Accept', 'application/json').send( testMessageA )
-        expect(response.body).toEqual({"response": "Invalid room id."});
-        expect(response.status).toEqual(400);
-    });
+//         const response = await request(app).post('/chat/message').query({ room_id: invalidRoomId }).set('Accept', 'application/json').send( testMessageA )
+//         expect(response.body).toEqual({"response": "Invalid room id."});
+//         expect(response.status).toEqual(400);
+//     });
   
-    it('should return 400 for missing fields', async function () {
-      const missingFieldsMessage = {text: "there's no email or time!"}
-      const response = await request(app).post('/chat/message').query({ room_id: roomIds[0] }).set('Accept', 'application/json').send( missingFieldsMessage )
-      expect(response.body).toEqual({"response": "Missing fields."});
-      expect(response.status).toEqual(400);
-    });
-    it('should return 400 if the sender is not a member of this room', async function () {
-      const badMessage = {
-        email: "yepanotherfakeemail@test.com",
-        text: "sup!", 
-        time: "3 PM"
-      }
-      const response = await request(app).post('/chat/message').query({ room_id: roomIds[0] }).set('Accept', 'application/json').send( badMessage)
-      expect(response.body).toEqual({"response": "User is not a member of this room."});
-      expect(response.status).toEqual(400);
-    });
+//     it('should return 400 for missing fields', async function () {
+//       const missingFieldsMessage = {text: "there's no email or time!"}
+//       const response = await request(app).post('/chat/message').query({ room_id: roomIds[0] }).set('Accept', 'application/json').send( missingFieldsMessage )
+//       expect(response.body).toEqual({"response": "Missing fields."});
+//       expect(response.status).toEqual(400);
+//     });
+//     it('should return 400 if the sender is not a member of this room', async function () {
+//       const badMessage = {
+//         email: "yepanotherfakeemail@test.com",
+//         text: "sup!", 
+//         time: "3 PM"
+//       }
+//       const response = await request(app).post('/chat/message').query({ room_id: roomIds[0] }).set('Accept', 'application/json').send( badMessage)
+//       expect(response.body).toEqual({"response": "User is not a member of this room."});
+//       expect(response.status).toEqual(400);
+//     });
 
-    it('should successfully post a message', async function () {
-      // posts to room 2
-      const response = await request(app).post('/chat/message').query({ room_id: roomIds[1] }).set('Accept', 'application/json').send( testMessageB )
-      expect(response.status).toEqual(201);
-      expect(response.body.modifiedCount).toEqual(1);
-      // check that a message was posted
-      var check = await request(app).get('/chat/room/history').query({room_id: [roomIds[1] ]})
-      // filter the room history for the message that was just posted
-      const messageFound = check.body.filter(mssg => (
-        mssg.email == testMessageB.email
-        && mssg.text == testMessageB.text
-        && mssg.time == testMessageB.time) 
-      )
-      // console.log("message found:")
-      // console.log(messageFound)
-      expect (messageFound.length).toEqual(1)
+//     it('should successfully post a message', async function () {
+//       // posts to room 2
+//       const response = await request(app).post('/chat/message').query({ room_id: roomIds[1] }).set('Accept', 'application/json').send( testMessageB )
+//       expect(response.status).toEqual(201);
+//       expect(response.body.modifiedCount).toEqual(1);
+//       // check that a message was posted
+//       var check = await request(app).get('/chat/room/history').query({room_id: [roomIds[1] ]})
+//       // filter the room history for the message that was just posted
+//       const messageFound = check.body.filter(mssg => (
+//         mssg.email == testMessageB.email
+//         && mssg.text == testMessageB.text
+//         && mssg.time == testMessageB.time) 
+//       )
+//       // console.log("message found:")
+//       // console.log(messageFound)
+//       expect (messageFound.length).toEqual(1)
       
-    });
+//     });
   
-});
+// });
 
 describe("Get all rooms scenario", () => {
 
