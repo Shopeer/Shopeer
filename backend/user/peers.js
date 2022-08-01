@@ -1,20 +1,49 @@
-require('http');
 var express = require("express")
-//express()
-
 const user_peers_router = express.Router()
-
-// const { MongoClient, ObjectId } = require("mongodb")  // this is multiple return
-const {MongoClient} = require("mongodb")
-const uri = "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
-const mongoClient = new MongoClient(uri)
-
+var {router, getUser} = require('../user/profile')
 var user_collection = require('../config/mongodb_connection')
+
+
+
+if (process.env.NODE_ENV) {
+    require("dotenv").config({
+        path: `${__dirname}/../.env.${process.env.NODE_ENV}`
+    })
+} else {
+    require("dotenv").config();
+}
+console.log("ENV is: " + process.env.NODE_ENV)
+
+if (process.env.NODE_ENV == "test") {
+    var {dummyVar,getUser} = require("../user/profile_mock")
+}
+
 // Peers Submodule
 // Get Peers GET https://shopeer.com/user/peers?user_id=[user_id]
 // Returns a list of all peers
 // Param: User Id
 // Response: List of peer objects {peer_id, name, bio, profile_picture}
+user_peers_router.get("/peers", async (req, res) => {
+    var profile_email = req.query.email
+    try {
+        var array = []
+        var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({response: "User not found."})
+            return
+        }
+        for (let i = 0; i < find_cursor.peers.length; i++) {
+            var return_cursor = await user_collection.findOne({ email: find_cursor.peers[i] })
+            array.push(return_cursor)
+        }
+        res.status(200).send(array)
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
+})
+
 user_peers_router.get("/peers", async (req, res) => {
     var profile_email = req.query.email
     try {
@@ -263,21 +292,7 @@ user_peers_router.get("/invitations/received", async (req, res) => {
 })
 
 async function get_object_array_from_email_array(email_array) {
-    // console.log(email_array)
-    // var array = []
-    // for (let i = 0; i < email_array.length; i++) {
-    //     var return_cursor = await user_collection.findOne({ email: email_array[i] })
-    //     if (!return_cursor) {
-    //         throw "Error: Invalid email"
-    //     }
-    //     // console.log(return_cursor)
-    //     array.push(return_cursor)
-    // }
-
-    // works but makes error-checking difficult.
     var return_arr = await user_collection.find({ email: { $in: email_array } }).toArray()
-
-    // console.log(return_arr)
     if (!return_arr) {
         throw "Error: invalid email"
     }
@@ -329,7 +344,6 @@ user_peers_router.post("/invitations", async (req, res) => {
             } else {
                 await user_collection.updateOne({ email: profile_email }, { $push: { invites: target_peer_email } })
                 await user_collection.updateOne({ email: target_peer_email }, { $push: { received_invites: profile_email } })
-                // var find_cursor = await user_collection.findOne({ email: profile_email })
                 res.status(200).json({response: "Success, invitation sent."})
             }
         }
@@ -353,13 +367,9 @@ user_peers_router.delete("/invitations", async (req, res) => {
         if (find_cursor.invites.includes(target_peer_email)) {
             await user_collection.updateOne({ email: profile_email }, { $pull: { invites: target_peer_email } })
             await user_collection.updateOne({ email: target_peer_email }, { $pull: { received_invites: profile_email } })
-            // var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(200).send(await user_collection.findOne({ email: profile_email }))
-            // res.status(200).send("Success")
         } else {
-            //var find_cursor = await user_collection.findOne({ email: profile_email })
             res.status(404).json({response: "Target user not found."})
-            // res.status(200).send("Fail")
         }
     }
     catch (err) {

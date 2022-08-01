@@ -105,40 +105,6 @@ user_peers_router.get("/invitations", async (req, res) => {
   }
 })
 
-// // Get Received Invites 
-// // Param: User email
-// // Response: List of peer objects {peer_id, name, bio, profile_picture}
-// user_peers_router.get("/invitations/received", async (req, res) => {
-//     var profile_email = req.query.email
-//     try {
-//         var find_cursor = await user_collection.findOne({ email: profile_email })
-//         if (!find_cursor) {
-//             throw "Error: Invalid email"
-//         }
-//         ret_array = await get_object_array_from_email_array(find_cursor.received_invites)
-//         console.log(ret_array)
-//         res.status(200).send(ret_array)
-//     }
-//     catch (err) {
-//         console.log(err)
-//         res.status(400).send(err)
-//     }
-// })
-
-// async function get_object_array_from_email_array(email_array) {
-//     // console.log(email_array)
-//     var array = []
-//     for (let i = 0; i < email_array.length; i++) {
-//         var return_cursor = await user_collection.findOne({ email: email_array[i] })
-//         if (!return_cursor) {
-//             throw "Error: Invalid email"
-//         }
-//         // console.log(return_cursor)
-//         array.push(return_cursor)
-//     }
-//     // console.log(array)
-//     return array
-// }
 
 // Send Peer Invitation POST https://shopeer/match/invitations?peer_id=[id]
 // Sends an invitation to the selected peer IF user is not in peer’s Blocked_users_id. The user’s invitation is stored in peer’s “recived invitations” list in the User Collection. 

@@ -98,11 +98,7 @@ user_profile_router.delete("/registration", async (req, res) => {
     
     if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
-    } 
-    // else if (!validator.isAlpha(profile.name)) {
-    //     res.status(400).send("Error: Invalid name")
-    // } 
-    else {
+    } else {
             var status_code
             var text_res
             var delete_return = await user_collection.deleteMany({ email: profile_email })
@@ -117,13 +113,16 @@ user_profile_router.delete("/registration", async (req, res) => {
     }
 })
 
+// function does_user_exist(){
+
+// }
+
 function create_user_object(body) {
     var user_object = {
         name: body.name,
         email: body.email,
         description: body.description,
         photo: body.photo,
-        // FCM_token: body.FCM_token,
         searches: [],
         peers: [],
         invites: [],
@@ -132,30 +131,13 @@ function create_user_object(body) {
     }
     return user_object
 }
-/**
- * Add FCM token to user profile object PUT https://shopeer.com/user/registration/FCM?email=[email]
- * Body: FCM_token
- * Returns: success/fail
- */
-//curl -X "PUT" -H "Content-Type: application/json" -d '{"FCM_token": "test token" }' localhost:8081/user/registration/FCM?email="hello@gmail.com"
-// user_profile_router.put("/registration/FCM", async (req, res) => {
-//     try {
-//         var doc = await mongoClient.db("shopeer_database").collection("user_collection").updateOne(
-//             {email:req.query.email}, 
-//             {$set:{FCM_token:req.body.FCM_token}}
-//         )
-//         if (doc.matchedCount == 0) {
-//             res.status(200).send("\nThis user does not exist yet.\n")
-//         } else if (doc.modifiedCount == 0) {
-//             res.status(200).send("\nFailed to update token\n")
-//         } else {
-//             res.status(200).send("\nUpdated user's token\n")
-//         }
-//     } catch (err) {
-//         console.log(err)
-//         res.status(400).send(err)
-//     }
-// })
 
-module.exports = user_profile_router;
+
+async function getUser(profile_email) {
+    return await user_collection.findOne({ email: profile_email })
+}
+
+
+module.exports = {user_profile_router, getUser};
+
 

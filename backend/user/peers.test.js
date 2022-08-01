@@ -1,10 +1,5 @@
 const request = require('supertest');
-const express = require('express');
-const app = express()
-
-// reuse original application?
 const app = require('../config/app')
-
 
 /**database is initialized as follows:
  * Rob: 0
@@ -86,7 +81,7 @@ async function resetDatabase() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-describe("Get all peers scenario", () => {
+describe.only("Get all peers scenario", () => {
 
   it('should return 404 for non-existing user', async function () {
     const nonexistentEmail = "nonexisting_test_email@test.com"
