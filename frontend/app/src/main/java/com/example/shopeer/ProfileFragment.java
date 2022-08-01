@@ -76,6 +76,18 @@ public class ProfileFragment extends Fragment {
             }
     );
 
+    private ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission is granted
+                    Log.d(TAG, "Editing profile pic");
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    pickImage.launch(intent);
+                } else {
+                    Toast.makeText(getContext(), "Enable permissions to set photo", Toast.LENGTH_LONG).show();
+                }
+            });
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -177,18 +189,6 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
-
-    private ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // Permission is granted
-                    Log.d(TAG, "Editing profile pic");
-                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    pickImage.launch(intent);
-                } else {
-                    Toast.makeText(getContext(), "Enable permissions to set photo", Toast.LENGTH_LONG).show();
-                }
-            });
 
     private void updateProfileInBackend(String encodedImage) {
         try{

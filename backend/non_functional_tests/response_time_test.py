@@ -1,4 +1,3 @@
-from random import randrange
 import time
 import unittest
 import requests
@@ -56,7 +55,7 @@ def post_search(email):
                     "max_budget":100
                 }
             }
-    requests.post(SEARCH_URL, params=params, json=data)     
+    requests.post(SEARCH_URL, params=params, json=data)
 
 def delete_users():
     print("Deleting {x} users".format(x=NUM_USERS))
@@ -66,10 +65,11 @@ def delete_users():
         requests.delete(USER_URL, params=params)
 
 def test_get_search():
-    email = USERNAME + str(randrange(20)) + EMAIL_TAG
+    email = USERNAME + str(time.time()%20) + EMAIL_TAG
     # Call Api function to get searches
     params = {"email":email}
-    requests.get(SUGG_URL, params=params)
+    res = requests.get(SUGG_URL, params=params)
+    print(res)
 
 
 if __name__ == '__main__':
