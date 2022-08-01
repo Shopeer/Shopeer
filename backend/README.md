@@ -9,15 +9,15 @@
 
 - Match Folder
     - searches.js
-    - searches.test.js
+    - searches.test.js          (Tests for mocking and without mocking)
     - suggestions_algo.js
-    - suggestions_algo.test.js
+    - suggestions_algo.test.js  (Tests for mocking and without mocking)
 
 - User Folder
     - profile.js
-    - profile.test.js
+    - profile.test.js (Tests for mocking and without mocking)
     - peers.js
-    - peers.test.js
+    - peers.test.js   (Tests for mocking and without mocking)
 
 - Chat Folder
     - rooms.js

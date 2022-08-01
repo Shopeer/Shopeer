@@ -1,6 +1,6 @@
 var express = require("express")
 const user_peers_router = express.Router()
-var {router, find_profile} = require('../user/profile')
+var {router, getUser} = require('../user/profile')
 var user_collection = require('../config/mongodb_connection')
 
 
@@ -12,15 +12,11 @@ if (process.env.NODE_ENV) {
 } else {
     require("dotenv").config();
 }
-// for debug
 console.log("ENV is: " + process.env.NODE_ENV)
 
-// if (process.env.NODE_ENV == "test") {
-//     find_profile = require("../user/profile_mock")
-// }
-
-// profile_email = "testtest@test.com"
-// console.log(find_profile(profile_email))
+if (process.env.NODE_ENV == "test") {
+    var {dummyVar,getUser} = require("../user/profile_mock")
+}
 
 // Peers Submodule
 // Get Peers GET https://shopeer.com/user/peers?user_id=[user_id]

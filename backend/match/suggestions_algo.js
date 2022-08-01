@@ -84,33 +84,5 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
 
 })
 
-// function generate_best_matches(all_users_array) {
-//     var best_match_list
-//     var score
-
-//     console.log(best_match_list)
-
-
-//     return best_match_list
-// }
-
-
-// search pref
-// location (long, lat)
-// range (max km)
-// activity [most prefer, ... , least prefer]
-// budget (max)
-
-
-// Write mocking tests
-// User module
-// Match module
-
-
-// Front end test
-// Browse users
-// Manage peers
-// Manage blocking
-
 module.exports = suggestions_algo_router;
 

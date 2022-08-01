@@ -106,7 +106,7 @@ describe("Get all peers scenario", () => {
     expect(response.status).toEqual(200);
   });
 
-  it.only('should return an empty peerlist successfully', async function () {
+  it('should return an empty peerlist successfully', async function () {
     // attempt to get Jim's peerlist
     const response = await request(app).get('/user/peers').query({ email: emails[3] }).set('Accept', 'application/json')
     
