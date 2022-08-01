@@ -38,21 +38,21 @@ function deg2rad(deg) {
 // Response: List of peer objects {peer_id, name, bio, profile_picture} / empty list on fail
 suggestions_algo_router.get("/suggestions", async (req, res) => {
     var profile_email = req.query.email
-    console.log(req.query)
+    // console.log(req.query)
     try {
-        
+        console.log(profile_email)
         var main_user_cursor = await user_collection.findOne({ email: profile_email })
-
+        console.log(main_user_cursor)
         if (main_user_cursor.searches.length === 0) {
             var arr = await recommend(main_user_cursor)
             res.status(200).send(arr)
-            return 
+            return
         }
 
         var email_score_pair_array = await get_scores(main_user_cursor)
         var user_object_array = []
         for (const pair of email_score_pair_array) {
-            const obj = await user_collection.findOne({email: pair.email});
+            const obj = await user_collection.findOne({ email: pair.email });
             user_object_array.push(obj)
         }
 
@@ -71,9 +71,9 @@ suggestions_algo_router.get("/suggestions", async (req, res) => {
 // this function is for users with no searches 
 // TODO It recommends users based on their match history
 async function recommend(user) {
-    
+
     var viable = await get_viable_matches(user)
-    if (viable.length === 0 ) {
+    if (viable.length === 0) {
         console.log("make some friends")
         return []
     }
@@ -84,60 +84,68 @@ async function recommend(user) {
 
 // this function excludes the user's peers, invites, and blocklist, as well as anyone who has blocked this user
 async function get_viable_matches(user) {
-    var excluded_user_emails = user.peers.concat(user.invites, user.blocked)
-    
+    // var excluded_user_emails = user.peers.concat(user.invites, user.blocked)
+
+    // var viable_matches = await (user_collection.find(
+    //     {
+    //         email: { $ne: user.email, $nin: excluded_user_emails },
+    //         blocked: { $nin: [user.email] }
+    //     }))
+    //     .toArray()
     var viable_matches = await (user_collection.find(
-        { email: { $ne: user.email, $nin: excluded_user_emails }, 
-        blocked: {$nin: [user.email] } }))
+        {
+            email: { $ne: user.email },
+            blocked: { $nin: [user.email] }
+        }))
         .toArray()
     // console.log(viable_matches)
     console.log("excluded")
-    console.log(excluded_user_emails)
+    // console.log(excluded_user_emails)
     return viable_matches
 }
 
 async function get_scores(user) {
     // filter out user's peers, invitations, and blocklist. Filter out anyone who has blocked this user.
     //var blocked_by_emails = await (user_collection.find({ blocked: {$in: [user.email] }})).project( { email: 1, _id: 0 }).toArray()
-    
+
     var user_scores = [] // array contains email/score pairs
     var viable_matches = await get_viable_matches(user)
-    
-    
+
+
 
     for (let i = 0; i < viable_matches.length; i++) {
         var potential_match = viable_matches[i]
         var user_score = 0
         console.log("\n\n+++++++++++ EVALUATING POTENTIAL MATCH " + potential_match.email + " +++++++++++")
 
-        for ( let j = 0; j < user.searches.length; j++ ) {
-            
+        for (let j = 0; j < user.searches.length; j++) {
+
             var this_search = user.searches[j]
             console.log("\n---looking for similar searches to " + this_search.search_name)
             // the following aggregation returns the searches in potenial_match.searchlist 
             // that have the same activity as this_search
             // in the following array format:
             // [ {searches: {searchObject1} }, {searches: {searchObject2} } ]
-            
+
             var search_matches = await (user_collection.aggregate([
                 {
-                  "$unwind": "$searches"
+                    "$unwind": "$searches"
                 },
                 {
-                  "$match": {
-                    "searches.activity": {$in: this_search.activity},
-                    "email": potential_match.email
-                  }
+                    "$match": {
+                        "searches.activity": { $in: this_search.activity },
+                        "email": potential_match.email
+                    }
                 },
                 {
-                  "$project": {
-                    "searches": 1,
-                    _id: 0
-                  }
+                    "$project": {
+                        "searches": 1,
+                        _id: 0
+                    }
                 }
-              ])).toArray()
-            
-            if ( search_matches.length > 0 ) {
+            ])).toArray()
+
+            if (search_matches.length > 0) {
                 console.log("\n" + potential_match.email + " has also searched for one of " + this_search.activity)
                 user_score += await get_search_similarity_score(this_search, search_matches)
             } else {
@@ -146,44 +154,44 @@ async function get_scores(user) {
             }
         }
         console.log("\n ++++++++ TOTAL SCORE IS " + user_score)
-        user_scores.push({"email": potential_match.email, "score": user_score})
+        user_scores.push({ "email": potential_match.email, "score": user_score })
         //user_scores = await getSuggestionScorePairs(user_scores, viable_matches)
     }
-    
-    user_scores.sort(function compareFn(a, b) { 
+
+    user_scores.sort(function compareFn(a, b) {
         if (a.score > b.score) {
             return -1;
-          }
-          if (a.score < b.score) {
+        }
+        if (a.score < b.score) {
             return 1;
-          }
-          // a must be equal to b
-          return 0;
+        }
+        // a must be equal to b
+        return 0;
     })
-    console.log("sorted scores:" )
+    console.log("sorted scores:")
     console.log(user_scores)
 
     return user_scores
 }
 
 async function get_search_similarity_score(this_search, search_matches) {
-    
+
     score = 0
-    for (let i = 0; i < search_matches.length; i++ ) {
+    for (let i = 0; i < search_matches.length; i++) {
         var search_match = search_matches[i].searches
         console.log("\nevaluating search similarity: " + this_search.search_name + " and " + search_match.search_name)
 
         var loc = await getLocationScore(this_search, search_match)
-        if (loc == -1 ) {
+        if (loc == -1) {
             // location score is -1 if max_range is exceeded. 
             // In this case, this particular search no longer provides a potential match
-            
+
             return 0
         }
         score += loc
         var budget = await getBudgetScore(this_search, search_match)
         score += budget
-        
+
     }
     return score
 }
@@ -205,15 +213,15 @@ async function getBudgetScore(this_search, search_match) {
 // returns -1 if distance exceeds either user's max range.
 // otherwise, returns a score between 0 and 100 that linearly decreases as distance increases
 async function getLocationScore(this_search, search_match) {
-    var distance = getDistanceFromLatLonInKm(this_search.location_lati, this_search.location_long, search_match.location_lati, search_match.location_long) 
+    var distance = getDistanceFromLatLonInKm(this_search.location_lati, this_search.location_long, search_match.location_lati, search_match.location_long)
     console.log("distance is " + distance)
     if (distance > this_search.max_range || distance > search_match.max_range) {
         console.log("too far away!")
         return -1
     }
-    var score = Math.max(-100 / this_search.max_range * distance + 100, 0 )
+    var score = Math.max(-100 / this_search.max_range * distance + 100, 0)
     console.log("\n max range is " + this_search.max_range)
-    
+
     console.log("location score: " + score)
     return score
 
