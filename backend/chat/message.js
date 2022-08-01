@@ -5,6 +5,8 @@ const uri = "mongodb://127.0.0.1:27017"
 const { MongoClient } = require("mongodb")
 const client = new MongoClient(uri)
 var ObjectId = require('mongodb').ObjectId;
+
+
 // var admin = require("firebase-admin");
 
 // var serviceAccount = require("../cpen-shopeer-firebase-adminsdk-i0ot8-ffcaa4fefb.json");
@@ -36,25 +38,34 @@ router.post("/", async (req, res) => {
     var email = req.body.email
     var text = req.body.text
     var time = req.body.time
-    try {
-        // searches for a document with the following fields
-        //appends an object to the "chathistory" array
-        var doc = await coll.updateOne({ _id: ObjectId(req.query.room_id) }, {$push: {"chathistory": {mssg_id, email, text, time}}})
-        if (!doc) {
-            res.status(404).json({ response: "Room not found." })
-            return
-        }
-        console.log(doc)
-        if (doc.modifiedCount === 1) {
-            console.log(await coll.findOne({ _id: ObjectId(req.query.room_id) }))
-            res.status(201).json({ response: "Message successfully posted." })
-
-        } else {
-            res.status(400).send("failed")
-        }
-    } catch (err) {
-        console.log(err)
-        res.status(400).send(err)
+    
+    if (!ObjectId.isValid(req.query.room_id)) {
+        res.status(400).json({ response: "Invalid room id." })
+        return
     }
+    if (email == null || text == null || time == null) {
+        res.status(400).json({ response: "Missing fields." })
+        return
+    }
+    // check if room exists
+    var room = await coll.findOne( {_id: ObjectId(req.query.room_id)} )
+    if (!room) {
+        res.status(404).json({ response: "Room not found." })
+        return
+    }
+    // searches for a document with the following fields
+    //appends an object to the "chathistory" array, checking that the sender is part of this room
+    var doc = await coll.updateOne(
+        { _id: ObjectId(req.query.room_id), peerslist: {$elemMatch: {$in: [req.body.email]}} }, 
+        {$push: {"chathistory": {mssg_id, email, text, time}}})
+    if (doc.modifiedCount === 1) {
+        // console.log(await coll.findOne({ _id: ObjectId(req.query.room_id) }))
+        res.status(201).send(doc)
+    } else {
+        // we already know the room exists, 
+        // so this means that the user who sent the message is not part of the room.
+        res.status(400).json({ response: "User is not a member of this room." })
+    } 
+    
 
 })
