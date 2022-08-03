@@ -68,6 +68,10 @@ public class ManageSearchesTest {
     final static String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
     final static String emailAddr = "@test.com";
 
+    // Google Places autocomplete search bar
+    final int PLACES_AUTOCOMPLETE_SEARCH_BAR_ID = 2131231134;
+    final int PLACES_AUTOCOMPLETE_LIST_ID = 2131231127;
+
     final static Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     private static View mainDecorView;
@@ -501,10 +505,6 @@ public class ManageSearchesTest {
     //@Test // 11
     public void K_editLocation() {
         onView(withId(R.id.autocomplete_fragment)).perform(click()) ;
-
-        // Google Places autocomplete search bar
-        final int PLACES_AUTOCOMPLETE_SEARCH_BAR_ID = 2131231133;
-        final int PLACES_AUTOCOMPLETE_LIST_ID = 2131231126;
 
         onView(withId(PLACES_AUTOCOMPLETE_SEARCH_BAR_ID)).perform(typeTextIntoFocusedView("costco"), closeSoftKeyboard());
         onView(allOf(withId(PLACES_AUTOCOMPLETE_LIST_ID),

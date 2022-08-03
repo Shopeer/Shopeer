@@ -9,10 +9,9 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="match_parent"
         android:background="@color/chat_grey"
         android:padding="5dp">
-
 
         <TableLayout
             android:layout_width="match_parent"
@@ -20,33 +19,33 @@
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                >
 
                 <Button
                     android:id="@+id/friend_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="-1dp"
-                    android:text="friend" />
+                    android:text="friend"
+                    />
 
                 <Button
                     android:id="@+id/block_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:text="block" />
-
+                    android:text="block"
+                    />
             </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:gravity="center">
 
                 <Button
                     android:id="@+id/unfriend_button"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_below="@id/friend_button"
                     android:text="remove invite" />
 
@@ -60,24 +59,33 @@
             </TableRow>
 
             <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:gravity="center">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/peer_profile_photo_cardView"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
+                    app:cardCornerRadius="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
                     android:id="@+id/peer_profile_photo"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentBottom="true"
-
-                    android:gravity="center"
-                    tools:srcCompat="@tools:sample/avatars" />
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    tools:srcCompat="@tools:sample/avatars"
+                    />
+                </androidx.cardview.widget.CardView>
 
             </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:gravity="center">
 
                 <TextView
                     android:id="@+id/peer_name_text"
@@ -92,7 +100,8 @@
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:gravity="center">
 
                 <TextView
                     android:id="@+id/peer_description_text"
