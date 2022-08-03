@@ -1,4 +1,4 @@
-package espressotests;
+package com.example.shopeer;
 
 import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
@@ -13,7 +13,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
+import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasAnyDrawable;
 import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasDrawable;
 import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasNoDrawable;
 import static org.hamcrest.Matchers.allOf;
@@ -48,9 +48,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.shopeer.MainActivity;
-import com.example.shopeer.R;
-import com.example.shopeer.RoomObject;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -177,7 +174,7 @@ public class ModifyProfileTest {
         //check if camera icon exist
         goToProfile();
         onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
-        assertHasNoDrawable(R.id.profilePic_imageView);
+//        assertHasNoDrawable(R.id.profilePic_imageView);
 
         //clicks camera icon
         onView(withId(R.id.camera_imageView)).perform(click());
@@ -186,7 +183,7 @@ public class ModifyProfileTest {
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
 
         onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
-        assertHasDrawable(R.id.profilePic_imageView, R.drawable.temp_profile);
+        assertHasAnyDrawable(R.id.profilePic_imageView);
     }
 
     private Instrumentation.ActivityResult stubImagePicker() {
@@ -195,7 +192,8 @@ public class ModifyProfileTest {
         Bundle bundle = new Bundle();
         ArrayList<Parcelable> parcels = new ArrayList<>();
 //        Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/drawable/temp_profile.jpeg");
-        Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.temp_profile);
+//        Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.temp_profile);
+        Uri uri1 = Uri.parse(testContext.getExternalFilesDir("jpeg") + "temp_profile.jpeg");
         Log.d(TAG, "temp profile URI: " + uri1);
 
         Parcelable parcelable1 = (Parcelable) uri1;
