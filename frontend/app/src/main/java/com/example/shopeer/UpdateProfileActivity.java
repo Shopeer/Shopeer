@@ -86,7 +86,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG, "onErrorResponse login: " + error.toString());
+                                Log.d(TAG, "onErrorResponse login:  " + error.toString());
                             }
                         }) {
                             @Override
