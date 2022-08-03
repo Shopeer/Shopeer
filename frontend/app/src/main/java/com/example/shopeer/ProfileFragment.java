@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,6 +55,8 @@ public class ProfileFragment extends Fragment {
     private ImageView profilePic;
     private ImageView cameraButton;
     private ImageView editButton;
+    private Button logoutButton;
+    private Button deleteButton;
 
     final private String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
 
@@ -122,6 +125,8 @@ public class ProfileFragment extends Fragment {
         profilePic = v.findViewById(R.id.profilePic_imageView);
         cameraButton = v.findViewById(R.id.camera_imageView);
         editButton = v.findViewById(R.id.edit_imageView);
+        logoutButton = v.findViewById(R.id.LogoutButton);
+        deleteButton = v.findViewById(R.id.DeleteAccButton);
     }
 
     private void getProfileInfo() {
@@ -190,6 +195,15 @@ public class ProfileFragment extends Fragment {
                 Log.d(TAG, "Editing profile info");
                 Intent intent = new Intent(getContext(), UpdateProfileActivity.class);
                 startActivity(intent);
+            }
+        });
+    }
+
+    private void setLogoutButton() {
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GoogleSignIn.getClient()
             }
         });
     }
