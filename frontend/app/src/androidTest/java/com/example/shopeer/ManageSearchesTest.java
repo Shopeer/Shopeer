@@ -1,4 +1,4 @@
-package espressotests;
+package com.example.shopeer;
 
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;

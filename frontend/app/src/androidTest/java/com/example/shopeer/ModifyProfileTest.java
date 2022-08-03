@@ -193,6 +193,7 @@ public class ModifyProfileTest {
         ArrayList<Parcelable> parcels = new ArrayList<>();
 //        Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/drawable/temp_profile.jpeg");
 //        Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.temp_profile);
+//        Log.d(TAG, "image path: " + testContext.getExternalFilesDir());
         Uri uri1 = Uri.parse(testContext.getExternalFilesDir("jpeg") + "temp_profile.jpeg");
         Log.d(TAG, "temp profile URI: " + uri1);
 
