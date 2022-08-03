@@ -139,7 +139,11 @@ public class ProfileFragment extends Fragment {
                             profileName.setText(jsonResponse.getString("name"));
                             profileBio.setText(jsonResponse.getString("description"));
                             Bitmap profilePhoto = decodeImage(jsonResponse.getString("photo"));
-                            profilePic.setImageBitmap(profilePhoto);
+                            if(profilePhoto == null) {
+                                profilePic.setImageDrawable(null);
+                            } else {
+                                profilePic.setImageBitmap(profilePhoto);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
