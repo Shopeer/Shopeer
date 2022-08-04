@@ -126,13 +126,17 @@ public class EditSearchActivity extends AppCompatActivity {
         deleteButton = findViewById(R.id.delete_search_button);
         saveButton = findViewById(R.id.save_search_button);
 
+        TextView pageTitle = findViewById(R.id.edit_search_toolbar_text);
+
         // check if creating a new search or not
         Intent intent = getIntent();
         this.isNewSearch = intent.getBooleanExtra("isNewSearch", true);
 
         // is an existing search open for editing
         if (!isNewSearch) {
-            //TODO: set inputs as existing values from the intent data
+            pageTitle.setText("Edit Search");
+
+            //set inputs as existing values from the intent data
             oldSearchName = intent.getStringExtra("searchName");
             searchName.setText(oldSearchName);
 
@@ -180,6 +184,7 @@ public class EditSearchActivity extends AppCompatActivity {
         }
         else {
             Log.d(TAG, "creating a new search");
+            pageTitle.setText("Create Search");
             setDefaultLocation();
         }
 
