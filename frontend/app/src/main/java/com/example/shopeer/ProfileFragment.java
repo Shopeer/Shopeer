@@ -151,7 +151,7 @@ public class ProfileFragment extends Fragment {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse login: " + error.toString());
+                    Log.d(TAG, "onErrorResponse profile: " + error.toString());
                 }
             });
             requestQueue.add(stringRequest);

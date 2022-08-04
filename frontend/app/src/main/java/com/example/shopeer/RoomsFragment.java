@@ -1,6 +1,7 @@
 package com.example.shopeer;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,12 +12,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -38,7 +42,7 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
     private View view;
 
     private final String roomsUrl = "http://20.230.148.126:8080/chat/room/all?email=" + MainActivity.email;
-
+    final private String profileUrl = "http://20.230.148.126:8080/user/profile";
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -81,8 +85,8 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                                 try{
                                     for (int i = 0; i < response.length(); i++) {
                                         JSONObject obj = response.getJSONObject(i);
-                                        String name = obj.getString("name");
                                         String roomId = obj.getString("_id");
+                                        String roomName = obj.getString("name");
 
                                         JSONArray chatHist = obj.getJSONArray("chathistory");
                                         String lastMessage = "Say Hi!";
@@ -92,7 +96,17 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                                             lastMessage = lastMessageObj.getString("text");
                                             timeLM = lastMessageObj.getString("time");
                                         }
-                                        roomList.add(new RoomObject(roomId, name, lastMessage, timeLM, R.drawable.temp_profile));
+                                        RoomObject roomObject = new RoomObject(roomId, roomName, lastMessage, timeLM, null);
+
+                                        // get email of other person
+                                        JSONArray members = obj.getJSONArray("peerlist");
+                                        for(int j=0; j<members.length(); j++) {
+                                            String eml =  members.getString(j);
+                                            if (MainActivity.email.compareTo(eml) != 0) {
+                                                fillRoomInfo(eml, roomObject);
+                                            }
+                                        }
+
                                     }
                                     Log.d(TAG, "received rooms");
                                     // initialize recycler view
@@ -111,6 +125,37 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                     }
                 });
         requestQueue.add(jsonArrayRequest);
+    }
+
+    private void fillRoomInfo(String email, RoomObject roomObject) {
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+            String url = profileUrl + "?email=" + email;
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.d(TAG, "onResponse fill room info: " + response);
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String name = jsonResponse.getString("name");
+                        roomObject.setRoomName(name);
+                        Bitmap image = ProfileFragment.newInstance().decodeImage(jsonResponse.getString("photo"));
+                        roomObject.setRoomProfilePic(image);
+                        roomList.add(roomObject);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "onErrorResponse fill rooms: " + error.toString());
+                }
+            });
+            requestQueue.add(stringRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
