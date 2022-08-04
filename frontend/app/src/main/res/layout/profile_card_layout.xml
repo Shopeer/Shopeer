@@ -104,7 +104,9 @@
                     android:layout_alignParentEnd="true"
                     android:gravity="center"
                     android:text="Name"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"/>
             </TableRow>
 
             <TableRow
@@ -118,7 +120,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-
+                    android:textSize="16sp"
                     android:text="[nothing]" />
             </TableRow>
         </TableLayout>

@@ -347,10 +347,13 @@ public class ManageSearchesTest {
     public void B_createSearch() {
         onView(withId(R.id.add_search_button)).perform(click());
 
+        // set search name
+        onView(withId(R.id.search_name_text)).perform(replaceText("mySearch"));
+
         // default values for creating a new search
         onView(withId(R.id.search_name_text)).check(matches(withText("mySearch")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
-        onView(withId(R.id.distance_number)).check(matches(withText("10")));
+        onView(withId(R.id.distance_number)).check(matches(withText("")));
         onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_groceries_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isNotChecked()));
@@ -358,7 +361,9 @@ public class ManageSearchesTest {
         onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
-        onView(withId(R.id.budget_number)).check(matches(withText("100")));
+        onView(withId(R.id.budget_number)).check(matches(withText("")));
+
+        onView(withId(R.id.search_name_text)).perform(replaceText("mySearch"));
     }
 
     //@Test // 3
@@ -402,10 +407,13 @@ public class ManageSearchesTest {
     public void E_createAnotherSearch() {
         onView(withId(R.id.add_search_button)).perform(click());
 
+        // set search name
+        onView(withId(R.id.search_name_text)).perform(replaceText("mySearch"));
+
         // default values for creating a new search
         onView(withId(R.id.search_name_text)).check(matches(withText("mySearch")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
-        onView(withId(R.id.distance_number)).check(matches(withText("10")));
+        onView(withId(R.id.distance_number)).check(matches(withText("")));
         onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_groceries_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isNotChecked()));
@@ -413,7 +421,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
-        onView(withId(R.id.budget_number)).check(matches(withText("100")));
+        onView(withId(R.id.budget_number)).check(matches(withText("")));
     }
 
     //@Test // 6
@@ -485,7 +493,7 @@ public class ManageSearchesTest {
 
         onView(withId(R.id.search_name_text)).check(matches(withText("mySearch")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
-        onView(withId(R.id.distance_number)).check(matches(withText("10")));
+        onView(withId(R.id.distance_number)).check(matches(withText("0")));
         onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_groceries_checkBox)).check(matches(isChecked()));
         onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isNotChecked()));
@@ -493,7 +501,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
-        onView(withId(R.id.budget_number)).check(matches(withText("100")));
+        onView(withId(R.id.budget_number)).check(matches(withText("0")));
     }
 
     //@Test // 10
@@ -584,7 +592,7 @@ public class ManageSearchesTest {
         // edit should show previous search values
         onView(withId(R.id.search_name_text)).check(matches(withText("movies")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
-        onView(withId(R.id.distance_number)).check(matches(withText("10")));
+        onView(withId(R.id.distance_number)).check(matches(withText("0")));
         onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_groceries_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isChecked()));
@@ -592,7 +600,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
-        onView(withId(R.id.budget_number)).check(matches(withText("100")));
+        onView(withId(R.id.budget_number)).check(matches(withText("0")));
     }
 
     //@Test // 17
