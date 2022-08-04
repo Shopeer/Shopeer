@@ -68,6 +68,10 @@ public class ManageSearchesTest {
     final static String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
     final static String emailAddr = "@test.com";
 
+    // Google Places autocomplete search bar
+    final int PLACES_AUTOCOMPLETE_SEARCH_BAR_ID = 2131231134;
+    final int PLACES_AUTOCOMPLETE_LIST_ID = 2131231127;
+
     final static Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     private static View mainDecorView;
@@ -343,10 +347,13 @@ public class ManageSearchesTest {
     public void B_createSearch() {
         onView(withId(R.id.add_search_button)).perform(click());
 
+        // set search name
+        onView(withId(R.id.search_name_text)).perform(replaceText("mySearch"));
+
         // default values for creating a new search
         onView(withId(R.id.search_name_text)).check(matches(withText("mySearch")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
-        onView(withId(R.id.distance_number)).check(matches(withText("10")));
+        onView(withId(R.id.distance_number)).check(matches(withText("")));
         onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_groceries_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isNotChecked()));
@@ -354,7 +361,9 @@ public class ManageSearchesTest {
         onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
-        onView(withId(R.id.budget_number)).check(matches(withText("100")));
+        onView(withId(R.id.budget_number)).check(matches(withText("")));
+
+        onView(withId(R.id.search_name_text)).perform(replaceText("mySearch"));
     }
 
     //@Test // 3
@@ -398,10 +407,13 @@ public class ManageSearchesTest {
     public void E_createAnotherSearch() {
         onView(withId(R.id.add_search_button)).perform(click());
 
+        // set search name
+        onView(withId(R.id.search_name_text)).perform(replaceText("mySearch"));
+
         // default values for creating a new search
         onView(withId(R.id.search_name_text)).check(matches(withText("mySearch")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
-        onView(withId(R.id.distance_number)).check(matches(withText("10")));
+        onView(withId(R.id.distance_number)).check(matches(withText("")));
         onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_groceries_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isNotChecked()));
@@ -409,7 +421,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
-        onView(withId(R.id.budget_number)).check(matches(withText("100")));
+        onView(withId(R.id.budget_number)).check(matches(withText("")));
     }
 
     //@Test // 6
@@ -481,7 +493,7 @@ public class ManageSearchesTest {
 
         onView(withId(R.id.search_name_text)).check(matches(withText("mySearch")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
-        onView(withId(R.id.distance_number)).check(matches(withText("10")));
+        onView(withId(R.id.distance_number)).check(matches(withText("0")));
         onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_groceries_checkBox)).check(matches(isChecked()));
         onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isNotChecked()));
@@ -489,7 +501,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
-        onView(withId(R.id.budget_number)).check(matches(withText("100")));
+        onView(withId(R.id.budget_number)).check(matches(withText("0")));
     }
 
     //@Test // 10
@@ -501,10 +513,6 @@ public class ManageSearchesTest {
     //@Test // 11
     public void K_editLocation() {
         onView(withId(R.id.autocomplete_fragment)).perform(click()) ;
-
-        // Google Places autocomplete search bar
-        final int PLACES_AUTOCOMPLETE_SEARCH_BAR_ID = 2131231133;
-        final int PLACES_AUTOCOMPLETE_LIST_ID = 2131231126;
 
         onView(withId(PLACES_AUTOCOMPLETE_SEARCH_BAR_ID)).perform(typeTextIntoFocusedView("costco"), closeSoftKeyboard());
         onView(allOf(withId(PLACES_AUTOCOMPLETE_LIST_ID),
@@ -584,7 +592,7 @@ public class ManageSearchesTest {
         // edit should show previous search values
         onView(withId(R.id.search_name_text)).check(matches(withText("movies")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
-        onView(withId(R.id.distance_number)).check(matches(withText("10")));
+        onView(withId(R.id.distance_number)).check(matches(withText("0")));
         onView(withId(R.id.activity_bulkBuy_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_groceries_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_entertainment_checkBox)).check(matches(isChecked()));
@@ -592,7 +600,7 @@ public class ManageSearchesTest {
         onView(withId(R.id.activity_restaurants_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_fashion_checkBox)).check(matches(isNotChecked()));
         onView(withId(R.id.activity_books_checkBox)).check(matches(isNotChecked()));
-        onView(withId(R.id.budget_number)).check(matches(withText("100")));
+        onView(withId(R.id.budget_number)).check(matches(withText("0")));
     }
 
     //@Test // 17

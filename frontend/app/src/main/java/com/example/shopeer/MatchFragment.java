@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -488,6 +489,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             holder.blockButton.setVisibility(VISIBLE);
 
             holder.peerPhoto.setVisibility(VISIBLE);
+            holder.peerPhotoCard.setVisibility(VISIBLE);
             holder.peerDescription.setVisibility(VISIBLE);
 
             // checked if blocked
@@ -499,6 +501,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                 // profile info also set to invisible
                 holder.peerPhoto.setVisibility(View.INVISIBLE);
+                holder.peerPhotoCard.setVisibility(View.INVISIBLE);
                 holder.peerDescription.setVisibility(View.INVISIBLE);
             }
             // check if sent invite
@@ -699,6 +702,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         class ProfileCardVH extends RecyclerView.ViewHolder {
             ImageView peerPhoto;
+            CardView peerPhotoCard;
             TextView peerName;
             TextView peerDescription;
             Button friendButton;
@@ -710,6 +714,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 super(itemView);
 
                 peerPhoto = itemView.findViewById(R.id.peer_profile_photo);
+                peerPhotoCard = itemView.findViewById(R.id.peer_profile_photo_cardView);
                 peerName = itemView.findViewById(R.id.peer_name_text);
                 peerDescription = itemView.findViewById(R.id.peer_description_text);
                 friendButton = itemView.findViewById(R.id.friend_button);

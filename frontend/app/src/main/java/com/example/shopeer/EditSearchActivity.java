@@ -126,13 +126,17 @@ public class EditSearchActivity extends AppCompatActivity {
         deleteButton = findViewById(R.id.delete_search_button);
         saveButton = findViewById(R.id.save_search_button);
 
+        TextView pageTitle = findViewById(R.id.edit_search_toolbar_text);
+
         // check if creating a new search or not
         Intent intent = getIntent();
         this.isNewSearch = intent.getBooleanExtra("isNewSearch", true);
 
         // is an existing search open for editing
         if (!isNewSearch) {
-            //TODO: set inputs as existing values from the intent data
+            pageTitle.setText("Edit Search");
+
+            //set inputs as existing values from the intent data
             oldSearchName = intent.getStringExtra("searchName");
             searchName.setText(oldSearchName);
 
@@ -180,6 +184,7 @@ public class EditSearchActivity extends AppCompatActivity {
         }
         else {
             Log.d(TAG, "creating a new search");
+            pageTitle.setText("Create Search");
             setDefaultLocation();
         }
 
@@ -258,10 +263,17 @@ public class EditSearchActivity extends AppCompatActivity {
                 double lonInput = locationLon;
 
                 // pos int only, by textedit
-                int rangeInput = Integer.parseInt(distanceNumber.getText().toString());
-                if (rangeInput >= 100) {
-                    Toast.makeText(EditSearchActivity.this, "set distance range below 100 km", Toast.LENGTH_SHORT).show();
-                    canSave = false;
+                String rangeInputText = distanceNumber.getText().toString();
+                int rangeInput;
+                if (rangeInputText.compareTo("") == 0) {
+                    rangeInput = 0;
+                }
+                else {
+                    rangeInput = Integer.parseInt(rangeInputText);
+                    if (rangeInput >= 100) {
+                        Toast.makeText(EditSearchActivity.this, "set distance range below 100 km", Toast.LENGTH_SHORT).show();
+                        canSave = false;
+                    }
                 }
 
                 // at least one activity chosen
@@ -272,7 +284,14 @@ public class EditSearchActivity extends AppCompatActivity {
                 }
 
                 // pos int only, by textedit
-                int budgetInput = Integer.parseInt(budgetNumber.getText().toString());
+                String budgetInputText = budgetNumber.getText().toString();
+                int budgetInput;
+                if (budgetInputText.compareTo("") == 0) {
+                    budgetInput = 0;
+                }
+                else {
+                    budgetInput = Integer.parseInt(budgetNumber.getText().toString());
+                }
 
                 // send request
                 if (!canSave) {

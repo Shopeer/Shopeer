@@ -2,6 +2,8 @@ package com.example.shopeer;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -20,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +36,7 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,8 +58,11 @@ public class ProfileFragment extends Fragment {
     private ImageView profilePic;
     private ImageView cameraButton;
     private ImageView editButton;
+    private Button logoutButton;
+    private Button deleteButton;
 
     final private String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
+    final private String deleteUrl = "http://20.230.148.126:8080/user/registration?email=";
 
     private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -112,6 +119,8 @@ public class ProfileFragment extends Fragment {
         init(v);
         getProfileInfo();
         setUpdateProfile();
+        setLogoutButton();
+        setDeleteButton();
         return v;
     }
 
@@ -122,6 +131,8 @@ public class ProfileFragment extends Fragment {
         profilePic = v.findViewById(R.id.profilePic_imageView);
         cameraButton = v.findViewById(R.id.camera_imageView);
         editButton = v.findViewById(R.id.edit_imageView);
+        logoutButton = v.findViewById(R.id.LogoutButton);
+        deleteButton = v.findViewById(R.id.DeleteAccButton);
     }
 
     private void getProfileInfo() {
@@ -192,6 +203,79 @@ public class ProfileFragment extends Fragment {
                 startActivity(intent);
             }
         });
+    }
+
+    private void setLogoutButton() {
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GoogleSignInClient client = GoogleSignIn.getClient(getContext(), LoginActivity.gso);
+                client.signOut();
+                Toast.makeText(getActivity(), "Successfully Logged Out", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                startActivity(intent);
+
+            }
+        });
+    }
+
+    private void setDeleteButton() {
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                createDeleteDialog();
+            }
+        });
+    }
+    private void createDeleteDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setCancelable(true);
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete your account?");
+        builder.setPositiveButton("Confirm",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d(TAG, "Deleting account");
+                        GoogleSignInClient client = GoogleSignIn.getClient(getContext(), LoginActivity.gso);
+                        client.signOut();
+
+                        deleteAccount();
+                    }
+                });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d(TAG, "delete cancelled");
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void deleteAccount() {
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+            String url = deleteUrl + MainActivity.email;
+            StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Toast.makeText(getActivity(), "Account Successfully deleted", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getContext(), LoginActivity.class);
+                    startActivity(intent);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "onErrorResponse login: " + error.toString());
+                }
+            });
+            requestQueue.add(stringRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateProfileInBackend(String encodedImage) {
