@@ -20,11 +20,15 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertTrue;
 
+import static java.lang.Thread.sleep;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -85,6 +89,7 @@ public class ModifyProfileTest {
     @Before
     public void testSetup() {
         Intents.init();
+
         //setup to test Toast message
         activityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<MainActivity>() {
             @Override
@@ -159,6 +164,12 @@ public class ModifyProfileTest {
         onView(withText("Enable permissions to set photo"))
                 .inRoot(withDecorView(not(decorView)))
                 .check(matches(isDisplayed()));
+
+        try {
+            sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getPackageName() {
@@ -174,7 +185,8 @@ public class ModifyProfileTest {
         //check if camera icon exist
         goToProfile();
         onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
-//        assertHasNoDrawable(R.id.profilePic_imageView);
+        assertHasNoDrawable(R.id.profilePic_imageView);
+//        onView(withId(R.id.profilePic_imageView)).check(matches(noDrawable()));
 
         //clicks camera icon
         onView(withId(R.id.camera_imageView)).perform(click());
@@ -184,6 +196,14 @@ public class ModifyProfileTest {
 
         onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
         assertHasAnyDrawable(R.id.profilePic_imageView);
+//        assertHasDrawable(R.id.profilePic_imageView, R.drawable.temp_profile);
+//        onView(withId(R.id.profilePic_imageView)).check(matches(withDrawable(R.drawable.temp_profile)));
+
+        try {
+            sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private Instrumentation.ActivityResult stubImagePicker() {
@@ -194,12 +214,12 @@ public class ModifyProfileTest {
 //        Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/drawable/temp_profile.jpeg");
 //        Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.temp_profile);
 //        Log.d(TAG, "image path: " + testContext.getExternalFilesDir());
-        Uri uri1 = Uri.parse(testContext.getExternalFilesDir("jpeg") + "temp_profile.jpeg");
-        Log.d(TAG, "temp profile URI: " + uri1);
-
-        Parcelable parcelable1 = (Parcelable) uri1;
-        parcels.add(parcelable1);
-        bundle.putParcelableArrayList(Intent.EXTRA_STREAM, parcels);
+//        Log.d(TAG, "temp profile URI: " + uri1);
+//
+//        Parcelable parcelable1 = (Parcelable) uri1;
+//        parcels.add(parcelable1);
+//        bundle.putParcelableArrayList(Intent.EXTRA_STREAM, parcels);
+        bundle.putParcelable(Intent.EXTRA_STREAM, BitmapFactory.decodeResource(InstrumentationRegistry.getInstrumentation().getTargetContext().getResources(), R.drawable.temp_profile));
         // Create the Intent that will include the bundle.
         resultData.putExtras(bundle);
 
@@ -227,6 +247,12 @@ public class ModifyProfileTest {
         onView(withText("Invalid Name"))
                 .inRoot(withDecorView(not(decorView)))
                 .check(matches(isDisplayed()));
+
+        try {
+            sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -259,6 +285,9 @@ public class ModifyProfileTest {
 
     @After
     public void testCleanup() {
+        // revoke permissions
+        InstrumentationRegistry.getInstrumentation().getUiAutomation().executeShellCommand("pm revoke ${getTargetContext().packageName} android.permission.WRITE_EXTERNAL_STORAGE");
+
         // delete user
         String url = profileUrl + email;
         Log.d(TAG, "DELETE_registration: " + url);
