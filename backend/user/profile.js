@@ -69,7 +69,11 @@ user_profile_router.put("/profile", async (req, res) => {
 // Body (Parameter): {"name":<user_name>, "email":<user_email>}
 // Response: user_id
 user_profile_router.post("/registration", async (req, res) => {
-    var profile = req.query
+    if (req.body) {
+        var profile = req.body
+    } else {
+        var profile = req.query
+    }
     if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
     } else if (!validator.isAlpha(profile.name)) {
