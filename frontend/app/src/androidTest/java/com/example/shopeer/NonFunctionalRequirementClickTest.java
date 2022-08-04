@@ -11,6 +11,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.content.Intent;
@@ -81,14 +82,14 @@ public class NonFunctionalRequirementClickTest {
         clicks++;
 
         onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("from match page"))));
-        assert(clicks <= 5);
+        assertTrue(clicks <= 5);
     }
 
     @Test
     public void CreateSearchFromProfilePage() {
         int clicks = 0;
 
-        // navigate to position page
+        // navigate to profile page
         onView(allOf(withId(R.id.profileFragment), withContentDescription("Profile"),
                 childAtPosition(childAtPosition(withId(R.id.bottom_navigation_view), 0), 2),
                 isDisplayed())).perform(click());
@@ -116,14 +117,14 @@ public class NonFunctionalRequirementClickTest {
         clicks++;
 
         onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("from profile page"))));
-        assert(clicks <= 5);
+        assertTrue(clicks <= 5);
     }
 
     @Test
     public void CreateSearchFromRoomsPage() {
         int clicks = 0;
 
-        // navigate to position page
+        // navigate to rooms page
         onView(allOf(withId(R.id.roomsFragment), withContentDescription("Rooms"),
                 childAtPosition(childAtPosition(withId(R.id.bottom_navigation_view), 0), 0),
                 isDisplayed())).perform(click());
@@ -150,7 +151,7 @@ public class NonFunctionalRequirementClickTest {
         clicks++;
 
         onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("from rooms page"))));
-        assert(clicks <= 5);
+        assertTrue(clicks <= 5);
     }
 
     /////////////////////////////////// set up and clean up ////////////////////////////////////////
