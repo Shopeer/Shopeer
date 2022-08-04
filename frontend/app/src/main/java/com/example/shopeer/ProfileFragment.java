@@ -247,6 +247,7 @@ public class ProfileFragment extends Fragment {
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                Log.d(TAG, "delete cancelled");
             }
         });
 
