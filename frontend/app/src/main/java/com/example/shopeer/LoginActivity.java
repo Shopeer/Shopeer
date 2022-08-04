@@ -33,8 +33,10 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private Button registerButton;
     private int RC_SIGN_IN=1;
-    final static String TAG = "SignIn Activity";
+    private static final String TAG = "LoginActivity";
     private GoogleSignInClient mGoogleSignInClient;
+
+    public static GoogleSignInOptions gso;
 
     final private String regisUrl = "http://20.230.148.126:8080/user/registration";
     final private String loginUrl = "http://20.230.148.126:8080/user/profile";
@@ -51,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
 
@@ -110,7 +112,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    private void signOut() {
+    public void signOut() {
         mGoogleSignInClient.signOut();
     }
 
@@ -201,23 +203,17 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(String response) {
                     Log.d(TAG, "onResponse login: " + response);
-                    if ("".equals(response)) {
-                        Log.d(TAG, "No user registered");
-                        Toast.makeText(LoginActivity.this, "No user found, please Register", Toast.LENGTH_LONG).show();
-                    } else {
-                        // redirect to MainActivity
-                        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-                        mainIntent.putExtra("name", account.getDisplayName());
-                        mainIntent.putExtra("email", account.getEmail());
-                        //mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
-                        //Log.d(TAG, "onResponse: " + account.getPhotoUrl().toString());
-                        startActivity(mainIntent);
-                    }
+                    // no "response" in json output means returns user object
+                    Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                    mainIntent.putExtra("name", account.getDisplayName());
+                    mainIntent.putExtra("email", account.getEmail());
+                    startActivity(mainIntent);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG, "onErrorResponse login: " + error.toString());
+                    Toast.makeText(LoginActivity.this, "No user found, please Register", Toast.LENGTH_LONG).show();
                     signOut();
                 }
             });
