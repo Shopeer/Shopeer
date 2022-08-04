@@ -43,7 +43,7 @@ import org.junit.runners.MethodSorters;
 
 @LargeTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class NFRClickTest {
+public class NonFunctionalRequirementClickTest {
     final static String name = "NFRCTest";
     final static String TAG = "NFRC Test";
     final static String profileUrl = "http://20.230.148.126:8080/user/registration?email=";
