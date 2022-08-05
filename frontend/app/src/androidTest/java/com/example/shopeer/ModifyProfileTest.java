@@ -98,7 +98,9 @@ public class ModifyProfileTest {
 
         //check if camera icon exist
         onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
-        onView(withId(R.id.profilePic_imageView)).check(matches(not(isDisplayed())));
+
+        assertHasNoDrawable(R.id.profilePic_imageView);
+        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
 
         //clicks camera icon
         onView(withId(R.id.camera_imageView)).perform(click());
@@ -125,8 +127,9 @@ public class ModifyProfileTest {
 
         //check if camera icon exist
         onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
+
         assertHasNoDrawable(R.id.profilePic_imageView);
-        onView(withId(R.id.profilePic_imageView)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
 
         //clicks camera icon
         onView(withId(R.id.camera_imageView)).perform(click());
@@ -135,6 +138,7 @@ public class ModifyProfileTest {
         onView(withId(R.id.mock_camera_permission_allow_button)).perform(click());
 
         // check profile picture set
+        assertHasAnyDrawable(R.id.profilePic_imageView);
         onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
     }
 
@@ -190,6 +194,7 @@ public class ModifyProfileTest {
 
         onView(withId(R.id.updateProfileButton)).perform(click());
         numClicks ++;
+
         onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
         onView(withId(R.id.profileName_textView)).check(matches(withText("espresso")));
         onView(withId(R.id.profileBio_textView)).check(matches(withText("edited with espresso")));

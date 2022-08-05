@@ -25,7 +25,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -193,6 +192,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 Log.d(TAG, "Checking permissions to access photos");
 
+                // mocking permission
                 if (isModifyProfileTest) {
                     // check mock permission
                     if (modifyProfileTestCameraPermission) {
@@ -243,14 +243,9 @@ public class ProfileFragment extends Fragment {
         // create the popup window
         int width = LinearLayout.LayoutParams.WRAP_CONTENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        boolean focusable = true; // lets taps outside the popup also dismiss it
-        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, true);
 
         popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-
-        // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window tolken
-        //popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
         popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
 
         Button mockAllowPermissionButton = popupView.findViewById(R.id.mock_camera_permission_allow_button);

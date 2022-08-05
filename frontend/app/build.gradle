@@ -65,6 +65,7 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.4.0'
 
+    androidTestImplementation 'com.adevinta.android:barista:4.2.0'
     androidTestImplementation "androidx.test.espresso:espresso-contrib:3.4.0"
 
 }
