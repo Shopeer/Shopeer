@@ -193,7 +193,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 Log.d(TAG, "Checking permissions to access photos");
 
-                if (true){//isModifyProfileTest) {
+                if (isModifyProfileTest) {
                     // check mock permission
                     if (modifyProfileTestCameraPermission) {
                         // "selecting" image
@@ -243,7 +243,7 @@ public class ProfileFragment extends Fragment {
         // create the popup window
         int width = LinearLayout.LayoutParams.WRAP_CONTENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        boolean focusable = false; // lets taps outside the popup also dismiss it
+        boolean focusable = true; // lets taps outside the popup also dismiss it
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
 
         popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
@@ -269,6 +269,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
                 modifyProfileTestCameraPermission = false;
                 popupWindow.dismiss();
+                Toast.makeText(getContext(), "Enable permissions to set photo", Toast.LENGTH_SHORT).show();
             }
         });
     }

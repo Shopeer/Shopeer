@@ -88,6 +88,9 @@ public class ModifyProfileTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
 
+    @Rule
+    public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
+
     @Before
     public void testSetup() {
         Intents.init();
@@ -163,18 +166,19 @@ public class ModifyProfileTest {
 
 
         //Deny Permission
-        try {
-            sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.camera_imageView)).perform(click());
-        //PermissionGranter.denyPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+        onView(withId(R.id.mock_camera_permission_deny_button)).perform(click());
 
         //check toast message
         onView(withText("Enable permissions to set photo"))
                 .inRoot(withDecorView(not(decorView)))
                 .check(matches(isDisplayed()));
+
+        // wait for toast message to clear
+        try {
+            sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getPackageName() {
@@ -198,7 +202,8 @@ public class ModifyProfileTest {
         onView(withId(R.id.camera_imageView)).perform(click());
 
         //Allow Permission
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
+        onView(withId(R.id.mock_camera_permission_allow_button)).perform(click());
+        //PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
 
         onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
         assertHasAnyDrawable(R.id.profilePic_imageView);
@@ -250,6 +255,7 @@ public class ModifyProfileTest {
                 .inRoot(withDecorView(not(decorView)))
                 .check(matches(isDisplayed()));
 
+        // wait for toast message to clear
         try {
             sleep(3000);
         } catch (InterruptedException e) {
