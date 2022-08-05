@@ -41,6 +41,9 @@ public class LoginActivity extends AppCompatActivity {
     final private String regisUrl = "http://20.230.148.126:8080/user/registration";
     final private String loginUrl = "http://20.230.148.126:8080/user/profile";
 
+    final private int ERROR_USER_EXIST = 409;
+    final private int ERROR_USER_NOT_FOUND = 404;
+
     private boolean register;
 
     @Override
@@ -169,7 +172,10 @@ public class LoginActivity extends AppCompatActivity {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse register: " + error.toString());
+                    Log.d(TAG, "onErrorResponse register: " + error.networkResponse.statusCode + " "+ error.toString());
+                    if (ERROR_USER_EXIST == error.networkResponse.statusCode) {
+                        Toast.makeText(LoginActivity.this, "User already exist, please login", Toast.LENGTH_LONG).show();
+                    }
                     signOut();
 
                 }
@@ -212,8 +218,10 @@ public class LoginActivity extends AppCompatActivity {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse login: " + error.toString());
-                    Toast.makeText(LoginActivity.this, "No user found, please Register", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "onErrorResponse login: " + error.networkResponse.statusCode + " " + error.toString());
+                    if (ERROR_USER_NOT_FOUND == error.networkResponse.statusCode) {
+                        Toast.makeText(LoginActivity.this, "No user found, please Register", Toast.LENGTH_LONG).show();
+                    }
                     signOut();
                 }
             });
