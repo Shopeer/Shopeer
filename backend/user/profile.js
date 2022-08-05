@@ -87,7 +87,7 @@ user_profile_router.post("/registration", async (req, res) => {
     }
     if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
-    } else if (!validator.isAlpha(profile.name)) {
+    } else if (!error_check_registration(profile.name)) {
         res.status(400).send("Error: Invalid name")
     } else {
         profile_email = profile.email
@@ -152,6 +152,17 @@ function create_user_object(body) {
 
 async function getUser(profile_email) {
     return await user_collection.findOne({ email: profile_email })
+}
+
+function error_check_registration(body) {
+
+    if (!onlyLettersAndSpaces(body.name)) {
+        return false
+    }
+    return true
+}
+function onlyLettersAndSpaces(str) {
+    return /^[A-Za-z\s]*$/.test(str);
 }
 
 
