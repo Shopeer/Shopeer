@@ -44,6 +44,7 @@ import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 
 import com.adevinta.android.barista.interaction.PermissionGranter;
 import com.android.volley.Request;
@@ -79,6 +80,7 @@ public class ModifyProfileTest {
     static {
         intent = new Intent(ApplicationProvider.getApplicationContext(), MainActivity.class);
         intent.putExtra("email", "test@email.com");
+        intent.putExtra("isMPTest", true);
     }
 
     private View decorView;
@@ -158,18 +160,21 @@ public class ModifyProfileTest {
         onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
         //clicks camera icon
         onView(withId(R.id.camera_imageView)).perform(click());
+
+
         //Deny Permission
-        PermissionGranter.denyPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+        try {
+            sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.camera_imageView)).perform(click());
+        //PermissionGranter.denyPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+
         //check toast message
         onView(withText("Enable permissions to set photo"))
                 .inRoot(withDecorView(not(decorView)))
                 .check(matches(isDisplayed()));
-
-        try {
-            sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private String getPackageName() {
@@ -180,13 +185,14 @@ public class ModifyProfileTest {
     @Test
     public void C_acceptPermission() {
         //stubs the image picker
-        intending(not(isInternal())).respondWith(stubImagePicker());
+        //intending(not(isInternal())).respondWith(stubImagePicker());
 
         //check if camera icon exist
         goToProfile();
         onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
         assertHasNoDrawable(R.id.profilePic_imageView);
 //        onView(withId(R.id.profilePic_imageView)).check(matches(noDrawable()));
+
 
         //clicks camera icon
         onView(withId(R.id.camera_imageView)).perform(click());
@@ -199,11 +205,7 @@ public class ModifyProfileTest {
 //        assertHasDrawable(R.id.profilePic_imageView, R.drawable.temp_profile);
 //        onView(withId(R.id.profilePic_imageView)).check(matches(withDrawable(R.drawable.temp_profile)));
 
-        try {
-            sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
     }
 
     private Instrumentation.ActivityResult stubImagePicker() {
