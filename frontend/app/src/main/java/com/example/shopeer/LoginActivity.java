@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -157,20 +158,21 @@ public class LoginActivity extends AppCompatActivity {
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("name", account.getDisplayName());
             jsonBody.put("email", account.getEmail());
-            try{
-                Log.d(TAG, account.getPhotoUrl().toString());
-                URL imgUrl = new URL(account.getPhotoUrl().toString());
-                Bitmap image = BitmapFactory.decodeStream(imgUrl.openConnection().getInputStream());
-                String encodedString = ProfileFragment.newInstance().encodeImage(image);
-                jsonBody.put("photo", encodedString);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try{
+//                Log.d(TAG, account.getPhotoUrl().toString());
+//                URL imgUrl = new URL(account.getPhotoUrl().toString());
+//                Bitmap image = BitmapFactory.decodeStream(imgUrl.openConnection().getInputStream());
+//                String encodedString = ProfileFragment.newInstance().encodeImage(image);
+//                Log.d(TAG, "registerUser photo: "+ encodedString.substring(0,8));
+//                jsonBody.put("photo", encodedString);
+//            } catch (MalformedURLException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
             final String requestBody = jsonBody.toString();
 
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, regisUrl, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.d(TAG, "onResponse register: " + response);

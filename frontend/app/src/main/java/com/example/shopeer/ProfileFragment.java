@@ -280,12 +280,12 @@ public class ProfileFragment extends Fragment {
 
     private void updateProfileInBackend(String encodedImage) {
         try{
-            String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail();
+            String url = profileUrl + MainActivity.email;
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("photo", encodedImage);
             final String requestBody = jsonObject.toString();
 
-            Log.d(TAG, "onClick: " + url);
+            Log.d(TAG, "PUT photo to BE: " + url);
             try {
                 RequestQueue requestQueue = Volley.newRequestQueue(getContext());
                 StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {

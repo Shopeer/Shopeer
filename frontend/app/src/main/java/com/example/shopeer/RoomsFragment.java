@@ -97,13 +97,15 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                                             timeLM = lastMessageObj.getString("time");
                                         }
                                         RoomObject roomObject = new RoomObject(roomId, roomName, lastMessage, timeLM, null);
+                                        Log.d(TAG, "room object: " + roomObject);
 
                                         // get email of other person
-                                        JSONArray members = obj.getJSONArray("peerlist");
+                                        JSONArray members = obj.getJSONArray("peerslist");
                                         for(int j=0; j<members.length(); j++) {
-                                            String eml =  members.getString(j);
-                                            if (MainActivity.email.compareTo(eml) != 0) {
-                                                fillRoomInfo(eml, roomObject);
+                                            String email =  members.getString(j);
+                                            if (!MainActivity.email.equals(email)) {
+                                                Log.d(TAG, "other email: " + email);
+                                                fillRoomInfo(email, roomObject);
                                             }
                                         }
 
