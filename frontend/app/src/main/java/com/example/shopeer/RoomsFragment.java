@@ -37,6 +37,7 @@ import java.util.ArrayList;
 public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoomListener{
     final static String TAG = "RoomsFragment";
     RecyclerView recyclerView;
+    RoomRecyclerAdapter recyclerAdapter;
     private ArrayList<RoomObject> roomList;
 
     private View view;
@@ -66,12 +67,21 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_rooms, container, false);
         roomList = new ArrayList<>();
+        initView(v);
         // fetch data of peers and add to peerList
         fetchAllRooms();
         Log.d(TAG, roomList.toString());
 
         view = v;
         return v;
+    }
+
+    private void initView(View v) {
+        // initialize recycler view
+        recyclerView = v.findViewById(R.id.recyclerView);
+        recyclerAdapter = new RoomRecyclerAdapter(roomList, RoomsFragment.this);
+        recyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     private void fetchAllRooms() {
@@ -97,7 +107,6 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                                             timeLM = lastMessageObj.getString("time");
                                         }
                                         RoomObject roomObject = new RoomObject(roomId, roomName, lastMessage, timeLM, null);
-                                        Log.d(TAG, "room object: " + roomObject);
 
                                         // get email of other person
                                         JSONArray members = obj.getJSONArray("peerslist");
@@ -110,12 +119,8 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                                         }
 
                                     }
-                                    Log.d(TAG, "received rooms");
-                                    // initialize recycler view
-                                    recyclerView = view.findViewById(R.id.recyclerView);
-                                    RoomRecyclerAdapter recyclerAdapter = new RoomRecyclerAdapter(roomList, RoomsFragment.this);
-                                    recyclerView.setAdapter(recyclerAdapter);
-                                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                    Log.d(TAG, "received rooms" + roomList);
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -144,6 +149,7 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                         Bitmap image = ProfileFragment.newInstance().decodeImage(jsonResponse.getString("photo"));
                         roomObject.setRoomProfilePic(image);
                         roomList.add(roomObject);
+                        recyclerAdapter.notifyDataSetChanged();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -168,7 +174,8 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
         Intent intent = new Intent(getActivity(), ChatActivity.class);
         intent.putExtra("room_id", roomList.get(position).getRoomId());
         intent.putExtra("room_name", roomList.get(position).getRoomName());
-        intent.putExtra("room_pic", roomList.get(position).getRoomProfilePic());
+        String encodedImage = ProfileFragment.newInstance().encodeImage(roomList.get(position).getRoomProfilePic());
+        intent.putExtra("room_pic", encodedImage);
         startActivity(intent);
     }
 }

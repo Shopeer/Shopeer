@@ -327,6 +327,9 @@ public class ProfileFragment extends Fragment {
 
 
     public String encodeImage(Bitmap bitmap) {
+        if (bitmap == null) {
+            return "";
+        }
         int previewWidth = 150;
         int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
         Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
