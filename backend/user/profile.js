@@ -40,7 +40,7 @@ user_profile_router.put("/profile", async (req, res) => {
         res.status(400).send("Error: Invalid name")
     } else if (!validator.isEmail(profile_email)) {
         res.status(400).send("Error: Invalid email")
-    } else if (!validator.isAlpha(profile_name)) {
+    } else if (!error_check_registration(profile_name)) {
         res.status(400).send("Error: Invalid name")
     } else {
         var find_cursor = await user_collection.findOne({ email: profile_email })
@@ -154,9 +154,10 @@ async function getUser(profile_email) {
     return await user_collection.findOne({ email: profile_email })
 }
 
-function error_check_registration(body) {
+function error_check_registration(field) {
 
-    if (!onlyLettersAndSpaces(body.name)) {
+    if (!onlyLettersAndSpaces(field)) {
+        console.log(field)
         return false
     }
     return true
