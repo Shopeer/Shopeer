@@ -69,10 +69,21 @@ user_profile_router.put("/profile", async (req, res) => {
 // Body (Parameter): {"name":<user_name>, "email":<user_email>}
 // Response: user_id
 user_profile_router.post("/registration", async (req, res) => {
-    if (req.body) {
-        var profile = req.body
+    var profile
+    if (req.query.email != null && req.query.name != null) {
+        profile = {
+            name: req.query.name,
+            email: req.query.email
+        }
+    } else if (req.body != null) {
+        profile = {
+            name: req.body.name,
+            email: req.body.email,
+            photo: req.body.photo
+        }
     } else {
-        var profile = req.query
+        res.status(400).send("Error: Invalid fields")
+        return
     }
     if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
@@ -84,13 +95,15 @@ user_profile_router.post("/registration", async (req, res) => {
         var find_cursor = await user_collection.findOne({ email: profile_email })
         if (find_cursor) {
             res.status(409).send("User already exists")
-        } else {
+        }  else {
             var user_object = create_user_object(profile)
             var result_debug = await user_collection.insertOne(user_object)
             res.status(201).send("Success")
         }
     }
 })
+
+
 
 // Delete User DELETE https://shopeer.com/user/registration?user_id=[user_id]
 // Removes the user from User Database and clears all info regarding the user
