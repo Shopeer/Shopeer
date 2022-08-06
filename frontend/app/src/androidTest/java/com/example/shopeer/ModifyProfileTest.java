@@ -27,6 +27,7 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -173,7 +174,7 @@ public class ModifyProfileTest {
     }
 
     private String getPackageName() {
-        RoomObject x = new RoomObject("a","a", "a", "a", 1);
+        RoomObject x = new RoomObject("a","a", "a", "a", null);
         return x.getClass().getPackage().getName();
     }
 
