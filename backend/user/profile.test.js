@@ -11,14 +11,16 @@ const tim_email = 'timothy_test_user@test.com'
 const tim_name = 'timothy'
 const pam_email = 'pambert_test_user@test.com'
 const pam_name = 'pambert'
-var emails = [rob_email, bob_email, tim_email]
-var names = [rob_name, bob_name, tim_name]
+const sam_email = 'sambert_test_user@test.com'
+const sam_name = 'sambert'
+var emails = [rob_email, bob_email, tim_email, pam_email, sam_email]
+var names = [rob_name, bob_name, tim_name, pam_name, sam_name]
 
 async function initializeDatabase() {
   await user_collection.insertMany([{ name: names[0], email: emails[0] }, { name: names[1], email: emails[1] }, { name: names[2], email: emails[2] }])
 }
 async function resetDatabase() {
-  await user_collection.deleteMany({})
+  await user_collection.deleteMany({email: {$in: emails}})
 }
 
 beforeAll(() => {
@@ -148,18 +150,19 @@ describe('Tests for Profile Submodule', function () {
       expect(response.text).toEqual("Error: Invalid email");
     });
 
-    it('PUT /profile - invalid name', async function () {
-      const response = await request(app)
-        .put('/user/profile')
-        .query({
-          email: emails[0]
-        })
-        .send({
-          name: ""
-        })
-      expect(response.status).toEqual(400);
-      expect(response.text).toEqual("Error: Invalid name");
-    });
+    // Comment out as empty name is now allowed.
+    // it('PUT /profile - invalid name', async function () {
+    //   const response = await request(app)
+    //     .put('/user/profile')
+    //     .query({
+    //       email: emails[0]
+    //     })
+    //     .send({
+    //       name: ""
+    //     })
+    //   expect(response.status).toEqual(400);
+    //   expect(response.text).toEqual("Error: Invalid name");
+    // });
 
     it('PUT /profile - null email', async function () {
       const response = await request(app)
@@ -174,18 +177,19 @@ describe('Tests for Profile Submodule', function () {
       expect(response.text).toEqual("Error: Invalid email");
     });
 
-    it('PUT /profile - null name', async function () {
-      const response = await request(app)
-        .put('/user/profile')
-        .query({
-          email: emails[0]
-        })
-        .send({
-          name: null
-        })
-      expect(response.status).toEqual(400);
-      expect(response.text).toEqual("Error: Invalid name");
-    });
+    // Commenting out this test, as "name" is now allowed to be null.
+    // it('PUT /profile - null name', async function () {
+    //   const response = await request(app)
+    //     .put('/user/profile')
+    //     .query({
+    //       email: emails[0]
+    //     })
+    //     .send({
+    //       name: null
+    //     })
+    //   expect(response.status).toEqual(400);
+    //   expect(response.text).toEqual("Error: Invalid name");
+    // });
 
     it('PUT /profile - user not found', async function () {
       const response = await request(app)
@@ -202,6 +206,19 @@ describe('Tests for Profile Submodule', function () {
   })
 
   describe('POST /user/registration', function () {
+    it('POST /registration in body - success', async function () {
+      const response = await request(app)
+        .post('/user/registration')
+        .send({
+          email: sam_email,
+          name: sam_name,
+          photo: "randomphotostring"
+        })
+      expect(response.status).toEqual(201);
+      expect(response.text).toEqual("Success");
+    });
+
+
     it('POST /registration - success', async function () {
       const response = await request(app)
         .post('/user/registration')
