@@ -263,11 +263,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                             String email = peerObject.getString("email");
 
-                            if (managePeers.contains(email)) {
-                                continue;
-                            }
-
-
                             String name = peerObject.getString("name");
                             String description = peerObject.getString("description");
                             String photo = peerObject.getString("photo");
@@ -287,6 +282,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG, "onErrorResponse GET suggestions: " + error.toString());
+                    Toast.makeText(getContext(), "error loading suggestions", Toast.LENGTH_SHORT).show();
                 }
             });
             requestQueue.add(jsonArrayRequest);
@@ -555,8 +551,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                         Intent intent = new Intent(getActivity(), ChatActivity.class);
                         try {
                             intent.putExtra("room_id", response.getString("insertedId"));
-                            intent.putExtra("room_name", roomName);
-                            intent.putExtra("room_pic", 1); //TODO: make sure this is an actual pic later
+                            intent.putExtra("room_name", peer.getName());
+                            intent.putExtra("room_pic", peer.getPhotoBitmap());
                             startActivity(intent);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -618,7 +614,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                         if (response.compareToIgnoreCase("success, both are now peers.") == 0) {
                             createChatroom(email, peer, holder);
-                            return;
                         }
 
                         // set button visibility
