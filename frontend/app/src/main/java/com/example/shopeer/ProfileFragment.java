@@ -1,5 +1,7 @@
 package com.example.shopeer;
 
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,6 +10,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -19,11 +23,14 @@ import androidx.fragment.app.Fragment;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,6 +70,10 @@ public class ProfileFragment extends Fragment {
 
     final private String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
     final private String deleteUrl = "http://20.230.148.126:8080/user/registration?email=";
+
+    private static boolean isModifyProfileTest;
+    private boolean modifyProfileTestCameraPermission = false;
+    private View view;
 
     private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -110,6 +121,8 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        isModifyProfileTest = getActivity().getIntent().getBooleanExtra("isMPTest", false);
     }
 
     @Override
@@ -121,6 +134,7 @@ public class ProfileFragment extends Fragment {
         setUpdateProfile();
         setLogoutButton();
         setDeleteButton();
+        view = v;
         return v;
     }
 
@@ -148,7 +162,15 @@ public class ProfileFragment extends Fragment {
                         try {
                             JSONObject jsonResponse = new JSONObject(response);
                             profileName.setText(jsonResponse.getString("name"));
-                            profileBio.setText(jsonResponse.getString("description"));
+
+                            String desc = jsonResponse.getString("description");
+                            if (desc.compareTo("null") == 0) {
+                                profileBio.setText("[nothing]");
+                            }
+                            else {
+                                profileBio.setText(desc);
+                            }
+
                             Bitmap profilePhoto = decodeImage(jsonResponse.getString("photo"));
                             if(profilePhoto == null) {
                                 profilePic.setImageDrawable(null);
@@ -162,7 +184,7 @@ public class ProfileFragment extends Fragment {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse login: " + error.toString());
+                    Log.d(TAG, "onErrorResponse profile: " + error.toString());
                 }
             });
             requestQueue.add(stringRequest);
@@ -177,6 +199,21 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Checking permissions to access photos");
+
+                // mocking permission
+                if (isModifyProfileTest) {
+                    // check mock permission
+                    if (modifyProfileTestCameraPermission) {
+                        // "selecting" image
+                        profilePic.setImageResource(R.drawable.temp_profile);
+                    }
+                    else {
+                        // ask for permission
+                        mockCameraPermission();
+                    }
+                    return;
+                }
+
                 // ask for permission
                 try {
                     if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
@@ -201,6 +238,41 @@ public class ProfileFragment extends Fragment {
                 Log.d(TAG, "Editing profile info");
                 Intent intent = new Intent(getContext(), UpdateProfileActivity.class);
                 startActivity(intent);
+            }
+        });
+    }
+
+    private void mockCameraPermission() {
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = LayoutInflater.from(getActivity()).inflate(R.layout.mock_camera_permission_popup, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, true);
+
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        Button mockAllowPermissionButton = popupView.findViewById(R.id.mock_camera_permission_allow_button);
+        mockAllowPermissionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                modifyProfileTestCameraPermission = true;
+                popupWindow.dismiss();
+                profilePic.setImageResource(R.drawable.temp_profile);
+            }
+        });
+
+        Button mockDenyPermissionButton = popupView.findViewById(R.id.mock_camera_permission_deny_button);
+        mockDenyPermissionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                modifyProfileTestCameraPermission = false;
+                popupWindow.dismiss();
+                Toast.makeText(getContext(), "Enable permissions to set photo", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -280,12 +352,12 @@ public class ProfileFragment extends Fragment {
 
     private void updateProfileInBackend(String encodedImage) {
         try{
-            String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail();
+            String url = profileUrl + MainActivity.email;
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("photo", encodedImage);
             final String requestBody = jsonObject.toString();
 
-            Log.d(TAG, "onClick: " + url);
+            Log.d(TAG, "PUT photo to BE: " + url);
             try {
                 RequestQueue requestQueue = Volley.newRequestQueue(getContext());
                 StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
@@ -327,6 +399,9 @@ public class ProfileFragment extends Fragment {
 
 
     public String encodeImage(Bitmap bitmap) {
+        if (bitmap == null) {
+            return "";
+        }
         int previewWidth = 150;
         int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
         Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);

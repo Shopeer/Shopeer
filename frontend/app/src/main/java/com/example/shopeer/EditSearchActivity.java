@@ -226,6 +226,7 @@ public class EditSearchActivity extends AppCompatActivity {
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 Log.d(TAG, "onErrorResponse DELETE_search: " + error.toString());
+                                Toast.makeText(EditSearchActivity.this, "error deleting search", Toast.LENGTH_SHORT).show();
                             }
                         });
 

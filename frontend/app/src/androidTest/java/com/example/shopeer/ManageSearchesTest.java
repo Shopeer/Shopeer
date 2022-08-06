@@ -69,8 +69,8 @@ public class ManageSearchesTest {
     final static String emailAddr = "@test.com";
 
     // Google Places autocomplete search bar
-    final int PLACES_AUTOCOMPLETE_SEARCH_BAR_ID = 2131231134;
-    final int PLACES_AUTOCOMPLETE_LIST_ID = 2131231127;
+    final int PLACES_AUTOCOMPLETE_SEARCH_BAR_ID = 2131231139;
+    final int PLACES_AUTOCOMPLETE_LIST_ID = 2131231132;
 
     final static Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
