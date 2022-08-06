@@ -1,9 +1,6 @@
 const request = require('supertest');
-const express = require('express');
 var bodyParser = require('body-parser')
-// const app = express()
 
-// reuse original application?
 const app = require('../config/app')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
