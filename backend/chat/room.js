@@ -3,7 +3,6 @@ const router = express.Router();
 const ObjectId = require("mongodb").ObjectId;
 const {user_collection, room_collection} = require('../config/mongodb_connection')
 
-
 /**************** Room submodule **************** */
 
 /**
