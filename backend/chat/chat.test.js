@@ -1,5 +1,5 @@
 const request = require('supertest');
-const express = require('express');
+require('express');
 var bodyParser = require('body-parser')
 // const app = express()
 
@@ -34,14 +34,14 @@ const testUserF = {
   name: "Fay",
   email: "fay@test.com"
 }
-const testMessageA = {
-  email: testUserA.email, 
-  text: "sup!", time: "3 PM"
-}
-const testMessageB = {
-  email: testUserA.email, 
-  text: "this is a unique message to test POST message!", time: "3 PM"
-}
+// const testMessageA = {
+//   email: testUserA.email, 
+//   text: "sup!", time: "3 PM"
+// }
+// const testMessageB = {
+//   email: testUserA.email, 
+//   text: "this is a unique message to test POST message!", time: "3 PM"
+// }
 const testRoom = {
   name: "Alice/Bob", 
   peerslist: [testUserA.email, testUserB.email], 
@@ -75,6 +75,7 @@ afterAll(() => {
 
 async function initializeDatabase() {
   try {
+
     // console.log("Initializing...")
     // register some users
     await request(app).post('/user/registration').query({ name: testUserA.name, email: testUserA.email})
@@ -369,14 +370,14 @@ describe("Delete room scenario", () => {
     // first try to delete the room, just in case
     await request(app).delete('/chat/room').query({ room_id: fakeRoomId })
     
-    const response = await request(app).delete('/chat/room').query({ room_id: fakeRoomId }).set('Accept', 'application/json').send( testMessageA )
+    const response = await request(app).delete('/chat/room').query({ room_id: fakeRoomId }).set('Accept', 'application/json')
     expect(response.body).toEqual({"response": "Room not found."});
     expect(response.status).toEqual(404);
   });
 
   it('should return 400 for invalid room id', async function () {
       
-    const response = await request(app).delete('/chat/room').query({ room_id: invalidRoomId }).set('Accept', 'application/json').send( testMessageA )
+    const response = await request(app).delete('/chat/room').query({ room_id: invalidRoomId }).set('Accept', 'application/json')
     expect(response.body).toEqual({"response": "Invalid room id."});
     expect(response.status).toEqual(400);
   });
@@ -385,7 +386,7 @@ describe("Delete room scenario", () => {
     // first create a room
     var delete_room = await request(app).post('/chat/room').set('Accept', 'application/json').send( testRoom_3 )
     // try to delete it
-    const response = await request(app).delete('/chat/room').query({ room_id: delete_room.body.insertedId }).set('Accept', 'application/json').send( testMessageA )
+    const response = await request(app).delete('/chat/room').query({ room_id: delete_room.body.insertedId }).set('Accept', 'application/json')
     expect(response.body).toEqual({"response": "Deleted room."});
     expect(response.status).toEqual(200);
     // double check that it was removed from the database

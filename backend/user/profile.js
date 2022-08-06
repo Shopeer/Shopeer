@@ -104,7 +104,7 @@ user_profile_router.post("/registration", async (req, res) => {
             res.status(409).send("User already exists")
         }  else {
             var user_object = create_user_object(profile)
-            var result_debug = await user_collection.insertOne(user_object)
+            //var result_debug = await user_collection.insertOne(user_object)
             res.status(201).send("Success")
         }
     }

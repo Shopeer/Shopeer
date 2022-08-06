@@ -4,7 +4,7 @@
 // const IP = "20.230.148.126";
 
 
-const PORT = 8080;
+const PORT = 3000;
 
 const app = require('./app.js')
 

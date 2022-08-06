@@ -48,7 +48,7 @@ async function createSearches() {
     //         "max_range": 10,
     //         "max_budget": 100
     //     })
-    var search_object = {
+    search_object = {
         "search_name": "Bob search",
         "activity": [
             "groceries test",

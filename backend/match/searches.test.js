@@ -89,7 +89,7 @@ describe('Tests for Searches Submodule', function () {
     it('GET /match/searches success', async function () {
 
       const old_search_name = "ChangedSearchName"
-      const new_search_name = "NewChangedSearchName"
+      //const new_search_name = "NewChangedSearchName"
       await request(app)
         .post('/user/registration')
         .query({
@@ -495,7 +495,7 @@ describe('Tests for Searches Submodule', function () {
           .put('/match/searches')
           .query({
             email: "PutSearch@gmail.com",
-            search_name: search_name
+            search_name
           })
           .send(search_object)
           .set('Accept', 'application/json')
