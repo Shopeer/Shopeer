@@ -21,7 +21,6 @@
 
 - Chat Folder
     - rooms.js
-    - message.js
 
 ### How to run backend tests
 ```

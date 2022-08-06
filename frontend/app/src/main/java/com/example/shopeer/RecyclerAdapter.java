@@ -32,7 +32,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         RoomObject roomObject = roomList.get(position);
 
         holder.peerName.setText(roomObject.getRoomName());
-        holder.peerProfilePic.setImageResource(roomObject.getRoomProfilePic());
+        holder.peerProfilePic.setImageBitmap(roomObject.getRoomProfilePic());
         holder.lastMessage.setText(roomObject.getLastMessage());
         holder.timeofLM.setText(roomObject.getTimeofLM());
 

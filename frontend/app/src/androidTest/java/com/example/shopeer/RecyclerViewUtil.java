@@ -1,4 +1,4 @@
-package espressotests;
+package com.example.shopeer;
 
 import android.content.res.Resources;
 import android.view.View;

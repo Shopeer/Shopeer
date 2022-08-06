@@ -2,15 +2,10 @@ const SocketServer = require("websocket").server;
 const http = require("http");
 const PORT = 8000;
 
-const uri = "mongodb://admin:shopeer@20.230.148.126:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+const {user_collection, room_collection} = require('../config/mongodb_connection')
 
-// const uri = "mongodb://127.0.0.1:27017";
-const { MongoClient } = require("mongodb");
-const client = new MongoClient(uri);
 var ObjectId = require("mongodb").ObjectId;
-
 const server = http.createServer((req, res) => {});
-const coll = client.db("shopeer_database").collection("room_collection");
 
 server.listen(PORT, () => {
   console.log(`Listening on port ${PORT}...`);
@@ -39,7 +34,7 @@ wsServer.on("request", (req) => {
     try {
       // searches for a document with the following fields
       //appends an object to the "chathistory" array
-      var doc = await coll.updateOne({ _id: ObjectId(room_id) },{ $push: { chathistory: { mssg_id, email, text, time } } }
+      var doc = await room_collection.updateOne({ _id: ObjectId(room_id) },{ $push: { chathistory: { mssg_id, email, text, time } } }
       );
       if (!doc) {
         console.log("Room not found.");
@@ -47,7 +42,7 @@ wsServer.on("request", (req) => {
       }
       // console.log(doc);
       if (doc.modifiedCount === 1) {
-        console.log(await coll.findOne({ _id: ObjectId(room_id) }));
+        console.log(await room_collection.findOne({ _id: ObjectId(room_id) }));
         console.log("Message successfully posted.");
       } else {
         console.log("failed");

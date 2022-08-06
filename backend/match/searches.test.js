@@ -4,7 +4,7 @@
 
 const request = require('supertest');
 const app = require('../config/app')
-var user_collection = require('../config/mongodb_connection')
+const {user_collection, room_collection} = require('../config/mongodb_connection')
 
 const ann_email = 'test_user_ann@test.com'
 const ann_name = 'test_user_ann'

@@ -3,7 +3,11 @@ package com.example.shopeer;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,19 +31,31 @@ import com.google.android.gms.tasks.Task;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private Button registerButton;
     private int RC_SIGN_IN=1;
-    final static String TAG = "SignIn Activity";
+    private static final String TAG = "LoginActivity";
     private GoogleSignInClient mGoogleSignInClient;
+
+    public static GoogleSignInOptions gso;
 
     final private String regisUrl = "http://20.230.148.126:8080/user/registration";
     final private String loginUrl = "http://20.230.148.126:8080/user/profile";
+    final private String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
+
+    final private int ERROR_USER_EXIST = 409;
+    final private int ERROR_USER_NOT_FOUND = 404;
 
     private boolean register;
+    GoogleSignInAccount userAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
 
@@ -110,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    private void signOut() {
+    public void signOut() {
         mGoogleSignInClient.signOut();
     }
 
@@ -135,6 +151,7 @@ public class LoginActivity extends AppCompatActivity {
         else {
             // TODO:get user info and call backend to register or login
             if (register) {
+                userAccount = account;
                 registerUser(account);
             }
             else {
@@ -146,28 +163,33 @@ public class LoginActivity extends AppCompatActivity {
     private void registerUser(GoogleSignInAccount account) {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(this);
-            String url = regisUrl + "?email=" + account.getEmail() +"&" + "name=" + account.getDisplayName();
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("name", account.getDisplayName());
             jsonBody.put("email", account.getEmail());
+
             final String requestBody = jsonBody.toString();
 
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, regisUrl, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.d(TAG, "onResponse register: " + response);
-                    // redirect to MainActivity
-                    Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-                    mainIntent.putExtra("name", account.getDisplayName());
-                    mainIntent.putExtra("email", account.getEmail());
-                    //mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
-                    mainIntent.putExtra("page", MainActivity.PROFILE_ID);
-                    startActivity(mainIntent);
+
+                    // set profile image
+                    if (account.getPhotoUrl() != null) {
+                        new GetUrlPicture().execute(account.getPhotoUrl().toString());
+
+                    }
+                    else {
+                        registeredGoToMainActivity();
+                    }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse register: " + error.toString());
+                    Log.d(TAG, "onErrorResponse register: " + error.networkResponse.statusCode + " "+ error.toString());
+                    if (ERROR_USER_EXIST == error.networkResponse.statusCode) {
+                        Toast.makeText(LoginActivity.this, "User already exist, please login", Toast.LENGTH_LONG).show();
+                    }
                     signOut();
 
                 }
@@ -193,6 +215,16 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private void registeredGoToMainActivity() {
+        // redirect to MainActivity
+        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+        mainIntent.putExtra("name", userAccount.getDisplayName());
+        mainIntent.putExtra("email", userAccount.getEmail());
+        //mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
+        mainIntent.putExtra("page", MainActivity.PROFILE_ID);
+        startActivity(mainIntent);
+    }
+
     private void loginUser(GoogleSignInAccount account) {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -201,23 +233,19 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(String response) {
                     Log.d(TAG, "onResponse login: " + response);
-                    if ("".equals(response)) {
-                        Log.d(TAG, "No user registered");
-                        Toast.makeText(LoginActivity.this, "No user found, please Register", Toast.LENGTH_LONG).show();
-                    } else {
-                        // redirect to MainActivity
-                        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-                        mainIntent.putExtra("name", account.getDisplayName());
-                        mainIntent.putExtra("email", account.getEmail());
-                        //mainIntent.putExtra("pic_uri", account.getPhotoUrl().toString());
-                        //Log.d(TAG, "onResponse: " + account.getPhotoUrl().toString());
-                        startActivity(mainIntent);
-                    }
+                    // no "response" in json output means returns user object
+                    Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                    mainIntent.putExtra("name", account.getDisplayName());
+                    mainIntent.putExtra("email", account.getEmail());
+                    startActivity(mainIntent);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse login: " + error.toString());
+                    Log.d(TAG, "onErrorResponse login: " + error.networkResponse.statusCode + " " + error.toString());
+                    if (ERROR_USER_NOT_FOUND == error.networkResponse.statusCode) {
+                        Toast.makeText(LoginActivity.this, "No user found, please Register", Toast.LENGTH_LONG).show();
+                    }
                     signOut();
                 }
             });
@@ -226,4 +254,97 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    private void updateProfileInBackend(String encodedImage) {
+        try{
+            String url = profileUrl + MainActivity.email;
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("photo", encodedImage);
+            final String requestBody = jsonObject.toString();
+
+            Log.d(TAG, "PUT photo to BE: " + url);
+            try {
+                RequestQueue requestQueue = Volley.newRequestQueue(this);
+                StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, "profile photo updated");
+                        registeredGoToMainActivity();
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, "onErrorResponse login: " + error.toString());
+                        registeredGoToMainActivity();
+                    }
+                }) {
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
+                    }
+
+                    @Override
+                    public byte[] getBody() throws AuthFailureError {
+                        try {
+                            return requestBody == null ? null : requestBody.getBytes("utf-8");
+                        } catch (UnsupportedEncodingException uee) {
+                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                            return null;
+                        }
+                    }
+                };
+                requestQueue.add(stringRequest);
+            } catch (Exception e) {
+                e.printStackTrace();
+                registeredGoToMainActivity();
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String encodeImage(Bitmap bitmap) {
+        if (bitmap == null) {
+            return "";
+        }
+        int previewWidth = 150;
+        int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
+        Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        previewBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(bytes, Base64.DEFAULT);
+    }
+
+    private class GetUrlPicture extends AsyncTask<String, Void, Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            try {
+                URL url = new URL(params[0]);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(input);
+                return bitmap;
+            } catch (IOException e) {
+                // Log exception
+                Log.e(TAG, "bad url");
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            if (result != null) {
+                updateProfileInBackend(encodeImage(result));
+            }
+            else {
+                registeredGoToMainActivity();
+            }
+        }
+    }
+
 }

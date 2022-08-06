@@ -34,7 +34,7 @@ public class RoomRecyclerAdapter extends RecyclerView.Adapter<RoomRecyclerAdapte
 
 //        holder.roomId = roomObject.getRoomId();
         holder.roomName.setText(roomObject.getRoomName());
-        holder.roomProfilePic.setImageResource(roomObject.getRoomProfilePic());
+        holder.roomProfilePic.setImageBitmap(roomObject.getRoomProfilePic());
         holder.lastMessage.setText(roomObject.getLastMessage());
         holder.timeofLM.setText(roomObject.getTimeofLM());
 

@@ -1,7 +1,7 @@
-var express = require("express")
+const express = require("express")
 const user_peers_router = express.Router()
 var {router, getUser} = require('../user/profile')
-var user_collection = require('../config/mongodb_connection')
+const {user_collection, room_collection} = require('../config/mongodb_connection')
 
 
 
@@ -305,11 +305,11 @@ user_peers_router.post("/invitations", async (req, res) => {
             res.status(404).json({response: "Target user not found."})
             return
         }
-        if (target_cursor.blocked.includes(profile_email)) {
-            // console.log("This user is blocked.")
-            res.status(400).send({response: "The target user cannot be invited."})
-            return
-        }
+        // if (target_cursor.blocked.includes(profile_email)) {
+        //     // console.log("This user is blocked.")
+        //     res.status(400).send({response: "The target user cannot be invited."})
+        //     return
+        // }
         if (find_cursor.peers.includes(target_peer_email)) {
             // console.log("Target already in peerlist")
             res.status(409).send({response: "Target already in peerlist."})

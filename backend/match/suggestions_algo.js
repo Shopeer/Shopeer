@@ -1,13 +1,10 @@
-
-
-var express = require("express")
+const express = require("express")
 const suggestions_algo_router = express.Router()
 const validator = require('validator')
 
 const app = require('../config/app')
 
-
-var user_collection = require('../config/mongodb_connection')
+const {user_collection, room_collection} = require('../config/mongodb_connection')
 
 //const activities = ["groceries", "entertainment", "bulkbuy", "hiking", "restaurants", "fashion", "books"]
 
