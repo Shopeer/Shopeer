@@ -6,6 +6,7 @@
     - server.js
     - apps.js
     - mongodb_connection.js
+    - socket.js
 
 - Match Folder
     - searches.js
