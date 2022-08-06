@@ -1,7 +1,7 @@
 var express = require("express")
 const user_profile_router = express.Router()
 const validator = require('validator')
-const user_collection = require('../config/mongodb_connection')
+var user_collection = require('../config/mongodb_connection')
 
 
 // Profile Submodule
@@ -13,9 +13,7 @@ const user_collection = require('../config/mongodb_connection')
 // Response: User details (profile, bio, name)
 user_profile_router.get("/profile", async (req, res) => {
     var profile = req.query
-    if (req.query.email == null) {
-        res.status(400).send("Error: Invalid email")
-    } else if (!validator.isEmail(profile.email)) {
+    if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
     } else {
         var find_cursor = await user_collection.findOne({ email: profile.email })
@@ -41,40 +39,39 @@ user_profile_router.put("/profile", async (req, res) => {
 
     if (profile_email == null) {
         res.status(400).send("Error: Invalid email")
-        return
-        
+
     } 
     else if (!validator.isEmail(profile_email)) {
         res.status(400).send("Error: Invalid email")
-        return
+
     } 
     // else if (!error_check_registration(profile_name)) {
     //     res.status(400).send("Error: Invalid name")
     // } 
-    // else {
-    var find_cursor = await user_collection.findOne({ email: profile_email })
-    if (!find_cursor) {
-        res.status(404).json({ response: "User not found." })
-        return
-    }
-    if (profile_name) {
-        if (!error_check_registration(profile_name)) {
-            res.status(400).send("Error: Invalid name")
+    else {
+        var find_cursor = await user_collection.findOne({ email: profile_email })
+        if (!find_cursor) {
+            res.status(404).json({ response: "User not found." })
             return
-        } 
-        await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
+        }
+        if (profile_name) {
+            if (profile_name.length === 0 || !error_check_registration(profile_name)) {
+                res.status(400).send("Error: Invalid name")
+                return
+            } 
+            await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
+        }
+        // if (profile_email) {
+        //     await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
+        // }
+        if (profile_description) {
+            await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
+        }
+        if (profile_photo) {
+            await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
+        }
+        res.status(200).send("Success")
     }
-    // if (profile_email) {
-    //     await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
-    // }
-    if (profile_description) {
-        await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
-    }
-    if (profile_photo) {
-        await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
-    }
-    res.status(200).send("Success")
-    // }
 })
 
 
@@ -94,10 +91,7 @@ user_profile_router.post("/registration", async (req, res) => {
             email: req.body.email,
             photo: req.body.photo
         }
-    } else {
-        res.status(400).send("Error: Invalid fields")
-        return
-    }
+    } 
     if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
     } else if (!error_check_registration(profile.name)) {
@@ -169,8 +163,7 @@ async function getUser(profile_email) {
 
 function error_check_registration(field) {
 
-    if (!onlyLettersAndSpaces(field)) {
-        console.log(field)
+    if (!onlyLettersAndSpaces(field) || !field) {
         return false
     }
     return true

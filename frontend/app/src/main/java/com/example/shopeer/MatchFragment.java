@@ -40,6 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -262,11 +263,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                             String email = peerObject.getString("email");
 
-                            if (managePeers.contains(email)) {
-                                continue;
-                            }
-
-
                             String name = peerObject.getString("name");
                             String description = peerObject.getString("description");
                             String photo = peerObject.getString("photo");
@@ -286,6 +282,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG, "onErrorResponse GET suggestions: " + error.toString());
+                    Toast.makeText(getContext(), "error loading suggestions", Toast.LENGTH_SHORT).show();
                 }
             });
             requestQueue.add(jsonArrayRequest);
@@ -554,8 +551,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                         Intent intent = new Intent(getActivity(), ChatActivity.class);
                         try {
                             intent.putExtra("room_id", response.getString("insertedId"));
-                            intent.putExtra("room_name", roomName);
-                            intent.putExtra("room_pic", 1); //TODO: make sure this is an actual pic later
+                            intent.putExtra("room_name", peer.getName());
+                            intent.putExtra("room_pic", peer.getPhotoBitmap());
                             startActivity(intent);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -565,7 +562,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse POST_create_room: " + error.toString());
-                        Toast.makeText(getContext(), "error creating chatroom with" + peer.getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "error creating chatroom with " + peer.getName(), Toast.LENGTH_SHORT).show();
 
                     }
                 });
@@ -594,7 +591,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse DELETE_invitation: " + error.toString());
-                        Toast.makeText(getContext(), "error removing invite to" + peer.getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "error removing invite to " + peer.getName(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 requestQueue.add(jsonObjReq);
@@ -615,7 +612,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                         manageInvites.add(peer.getEmail());
 
-                        if (response.compareToIgnoreCase("success, both are now peers") == 0) {
+                        if (response.compareToIgnoreCase("{\"response\":\"Success, both are now peers.\"}") == 0) {
+                            Log.d(TAG, "POST_invitation all g" );
                             createChatroom(email, peer, holder);
                         }
 
@@ -626,7 +624,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse POST_invitation: " + error.toString());
-                        Toast.makeText(getContext(), "error sending invite to" + peer.getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "error sending invite to " + peer.getName(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 requestQueue.add(stringReq);

@@ -336,11 +336,9 @@ public class EditSearchActivity extends AppCompatActivity {
 
             search.put("max_budget", budgetInput);
 
-            JSONObject body = new JSONObject();
-            body.put("search", search);
-            Log.d(TAG, "POST_search request body: " + body);
+            Log.d(TAG, "POST_search request body: " + search);
 
-            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, body, new Response.Listener<JSONObject>() {
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, search, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     Log.d(TAG, "post_search response: " + response);
@@ -379,7 +377,7 @@ public class EditSearchActivity extends AppCompatActivity {
 
     // updating existing search is PUT request
     private void updateSearch(String nameInput, String locationInput, double latInput, double lonInput, int rangeInput, ArrayList<String> activitiesInput, int budgetInput) {
-        String url = searchUrl + MainActivity.email + "&search=" + oldSearchName;
+        String url = searchUrl + MainActivity.email + "&search_name=" + oldSearchName;
 
         Log.d(TAG, "update existing PUT_search: " + url);
         try {
@@ -401,11 +399,9 @@ public class EditSearchActivity extends AppCompatActivity {
 
             search.put("max_budget", budgetInput);
 
-            JSONObject body = new JSONObject();
-            body.put("search", search);
-            Log.d(TAG, "PUT_search request body: " + body);
+            Log.d(TAG, "PUT_search request body: " + search);
 
-            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.PUT, url, body, new Response.Listener<JSONObject>() {
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.PUT, url, search, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     Log.d(TAG, "post_search response: " + response);

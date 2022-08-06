@@ -86,6 +86,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 Log.d(TAG, "onErrorResponse login:  " + error.toString());
+                                Toast.makeText(UpdateProfileActivity.this, "error updating profile", Toast.LENGTH_SHORT).show();
                             }
                         }) {
                             @Override
@@ -136,7 +137,15 @@ public class UpdateProfileActivity extends AppCompatActivity {
                     try {
                         JSONObject jsonResponse = new JSONObject(response);
                         nameInput.setText(jsonResponse.getString("name"));
-                        bioInput.setText(jsonResponse.getString("description"));
+
+                        String desc = jsonResponse.getString("description");
+                        if (desc.compareTo("null") == 0) {
+                            bioInput.setText("");
+                        }
+                        else {
+                            bioInput.setText(desc);
+                        }
+
                         Bitmap profilephoto = ProfileFragment.newInstance().decodeImage(jsonResponse.getString("photo"));
                         profilePic.setImageBitmap(profilephoto);
                     } catch (JSONException e) {

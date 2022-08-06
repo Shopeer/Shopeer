@@ -305,11 +305,11 @@ user_peers_router.post("/invitations", async (req, res) => {
             res.status(404).json({response: "Target user not found."})
             return
         }
-        if (target_cursor.blocked.includes(profile_email)) {
-            // console.log("This user is blocked.")
-            res.status(400).send({response: "The target user cannot be invited."})
-            return
-        }
+        // if (target_cursor.blocked.includes(profile_email)) {
+        //     // console.log("This user is blocked.")
+        //     res.status(400).send({response: "The target user cannot be invited."})
+        //     return
+        // }
         if (find_cursor.peers.includes(target_peer_email)) {
             // console.log("Target already in peerlist")
             res.status(409).send({response: "Target already in peerlist."})
