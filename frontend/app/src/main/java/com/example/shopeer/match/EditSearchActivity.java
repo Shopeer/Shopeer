@@ -131,6 +131,8 @@ public class EditSearchActivity extends AppCompatActivity {
 
         TextView pageTitle = findViewById(R.id.edit_search_toolbar_text);
 
+        TextView pageTitle = findViewById(R.id.edit_search_toolbar_text);
+
         // check if creating a new search or not
         Intent intent = getIntent();
         this.isNewSearch = intent.getBooleanExtra("isNewSearch", true);
@@ -188,6 +190,7 @@ public class EditSearchActivity extends AppCompatActivity {
         else {
             Log.d(TAG, "creating a new search");
             pageTitle.setText("Create Search");
+            pageTitle.setText("Create Search");
             setDefaultLocation();
         }
 
@@ -229,6 +232,7 @@ public class EditSearchActivity extends AppCompatActivity {
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 Log.d(TAG, "onErrorResponse DELETE_search: " + error.toString());
+                                Toast.makeText(EditSearchActivity.this, "error deleting search", Toast.LENGTH_SHORT).show();
                                 Toast.makeText(EditSearchActivity.this, "error deleting search", Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -289,12 +293,19 @@ public class EditSearchActivity extends AppCompatActivity {
 
                 // pos int only, by textedit
                 String budgetInputText = budgetNumber.getText().toString();
+                String budgetInputText = budgetNumber.getText().toString();
                 int budgetInput;
                 if (budgetInputText.compareTo("") == 0) {
                     budgetInput = 0;
                 }
                 else {
+                    budgetInput;
+                if (budgetInputText.compareTo("") == 0) {
+                    budgetInput = 0;
+                }
+                else {
                     budgetInput = Integer.parseInt(budgetNumber.getText().toString());
+                }
                 }
 
                 // send request
@@ -380,7 +391,7 @@ public class EditSearchActivity extends AppCompatActivity {
 
     // updating existing search is PUT request
     private void updateSearch(String nameInput, String locationInput, double latInput, double lonInput, int rangeInput, ArrayList<String> activitiesInput, int budgetInput) {
-        String url = searchUrl + MainActivity.email + "&search_name=" + oldSearchName;
+        String url = searchUrl + MainActivity.email + "&search_name_name=" + oldSearchName;
 
         Log.d(TAG, "update existing PUT_search: " + url);
         try {
@@ -472,4 +483,5 @@ public class EditSearchActivity extends AppCompatActivity {
         return activities;
     }
 
+>>>>>>> main:frontend/app/src/main/java/com/example/shopeer/EditSearchActivity.java
 }

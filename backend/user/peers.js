@@ -1,7 +1,7 @@
-var express = require("express")
+const express = require("express")
 const user_peers_router = express.Router()
 var {router, getUser} = require('../user/profile')
-var user_collection = require('../config/mongodb_connection')
+const {user_collection, room_collection} = require('../config/mongodb_connection')
 
 
 

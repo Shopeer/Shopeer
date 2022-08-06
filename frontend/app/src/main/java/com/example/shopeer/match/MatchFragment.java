@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -71,9 +72,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     ArrayList<ProfileObject> suggestions = new ArrayList<>();
 
     // peer management lists
-    HashSet<String> manageBlocked = new HashSet<>();
-    HashSet<String> manageInvites = new HashSet<>();
-    HashSet<String> managePeers = new HashSet<>();
+    HashSet<String> manageBlocked = new HashSet<>() = new HashSet<>();
+    HashSet<String> manageInvites = new HashSet<>() = new HashSet<>();
+    HashSet<String> managePeers = new HashSet<>() = new HashSet<>();
 
     ProfileObject myProfile;
 
@@ -284,6 +285,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG, "onErrorResponse GET suggestions: " + error.toString());
                     Toast.makeText(getContext(), "error loading suggestions", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "error loading suggestions", Toast.LENGTH_SHORT).show();
                 }
             });
             requestQueue.add(jsonArrayRequest);
@@ -488,6 +490,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
             holder.peerPhoto.setVisibility(VISIBLE);
             holder.peerPhotoCard.setVisibility(VISIBLE);
+            holder.peerPhotoCard.setVisibility(VISIBLE);
             holder.peerDescription.setVisibility(VISIBLE);
 
             // checked if blocked
@@ -499,6 +502,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                 // profile info also set to invisible
                 holder.peerPhoto.setVisibility(View.INVISIBLE);
+                holder.peerPhotoCard.setVisibility(View.INVISIBLE);
                 holder.peerPhotoCard.setVisibility(View.INVISIBLE);
                 holder.peerDescription.setVisibility(View.INVISIBLE);
             }
@@ -563,6 +567,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse POST_create_room: " + error.toString());
+                        Toast.makeText(getContext(), "error creating chatroom with " + peer.getName(), Toast.LENGTH_SHORT).show();
                         Toast.makeText(getContext(), "error creating chatroom with " + peer.getName(), Toast.LENGTH_SHORT).show();
 
                     }
@@ -697,6 +702,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         class ProfileCardVH extends RecyclerView.ViewHolder {
             ImageView peerPhoto;
             CardView peerPhotoCard;
+            CardView peerPhotoCard;
             TextView peerName;
             TextView peerDescription;
             Button friendButton;
@@ -709,6 +715,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                 peerPhoto = itemView.findViewById(R.id.peer_profile_photo);
                 peerPhotoCard = itemView.findViewById(R.id.peer_profile_photo_cardView);
+                peerPhotoCard = itemView.findViewById(R.id.peer_profile_photo_cardView);
                 peerName = itemView.findViewById(R.id.peer_name_text);
                 peerDescription = itemView.findViewById(R.id.peer_description_text);
                 friendButton = itemView.findViewById(R.id.friend_button);
@@ -719,3 +726,4 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
         }
     }
 }
+>>>>>>> main:frontend/app/src/main/java/com/example/shopeer/MatchFragment.java

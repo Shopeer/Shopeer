@@ -87,7 +87,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG, "onErrorResponse login:  " + error.toString());
+                                Log.d(TAG, "onErrorResponse login:   " + error.toString());
+                                Toast.makeText(UpdateProfileActivity.this, "error updating profile", Toast.LENGTH_SHORT).show();
                                 Toast.makeText(UpdateProfileActivity.this, "error updating profile", Toast.LENGTH_SHORT).show();
                             }
                         }) {
@@ -165,4 +166,5 @@ public class UpdateProfileActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+>>>>>>> main:frontend/app/src/main/java/com/example/shopeer/UpdateProfileActivity.java
 }

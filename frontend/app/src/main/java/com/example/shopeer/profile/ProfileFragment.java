@@ -4,10 +4,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -22,11 +26,15 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -44,6 +52,7 @@ import com.example.shopeer.LoginActivity;
 import com.example.shopeer.MainActivity;
 import com.example.shopeer.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 
 import org.json.JSONException;
@@ -68,8 +77,15 @@ public class ProfileFragment extends Fragment {
     private ImageView editButton;
     private Button logoutButton;
     private Button deleteButton;
+    private Button logoutButton;
+    private Button deleteButton;
 
     final private String profileUrl = "http://20.230.148.126:8080/user/profile?email=";
+    final private String deleteUrl = "http://20.230.148.126:8080/user/registration?email=";
+
+    private static boolean isModifyProfileTest;
+    private boolean modifyProfileTestCameraPermission = false;
+    private View view;
     final private String deleteUrl = "http://20.230.148.126:8080/user/registration?email=";
 
     private static boolean isModifyProfileTest;
@@ -124,6 +140,8 @@ public class ProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         isModifyProfileTest = getActivity().getIntent().getBooleanExtra("isMPTest", false);
+
+        isModifyProfileTest = getActivity().getIntent().getBooleanExtra("isMPTest", false);
     }
 
     @Override
@@ -133,6 +151,9 @@ public class ProfileFragment extends Fragment {
         init(v);
         getProfileInfo();
         setUpdateProfile();
+        setLogoutButton();
+        setDeleteButton();
+        view = v;
         setLogoutButton();
         setDeleteButton();
         view = v;
@@ -146,6 +167,8 @@ public class ProfileFragment extends Fragment {
         profilePic = v.findViewById(R.id.profilePic_imageView);
         cameraButton = v.findViewById(R.id.camera_imageView);
         editButton = v.findViewById(R.id.edit_imageView);
+        logoutButton = v.findViewById(R.id.LogoutButton);
+        deleteButton = v.findViewById(R.id.DeleteAccButton);
         logoutButton = v.findViewById(R.id.LogoutButton);
         deleteButton = v.findViewById(R.id.DeleteAccButton);
     }
@@ -176,7 +199,11 @@ public class ProfileFragment extends Fragment {
                             if(profilePhoto == null) {
                                 profilePic.setImageDrawable(null);
                             } else {
+                                if(profilePhoto == null) {
+                                profilePic.setImageDrawable(null);
+                            } else {
                                 profilePic.setImageBitmap(profilePhoto);
+                            }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -200,6 +227,21 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Checking permissions to access photos");
+
+                // mocking permission
+                if (isModifyProfileTest) {
+                    // check mock permission
+                    if (modifyProfileTestCameraPermission) {
+                        // "selecting" image
+                        profilePic.setImageResource(R.drawable.temp_profile);
+                    }
+                    else {
+                        // ask for permission
+                        mockCameraPermission();
+                    }
+                    return;
+                }
+
 
                 // mocking permission
                 if (isModifyProfileTest) {
@@ -241,6 +283,111 @@ public class ProfileFragment extends Fragment {
                 startActivity(intent);
             }
         });
+    }
+
+    private void mockCameraPermission() {
+        View popupView = LayoutInflater.from(getActivity()).inflate(R.layout.mock_camera_permission_popup, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, true);
+
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        Button mockAllowPermissionButton = popupView.findViewById(R.id.mock_camera_permission_allow_button);
+        mockAllowPermissionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                modifyProfileTestCameraPermission = true;
+                popupWindow.dismiss();
+                profilePic.setImageResource(R.drawable.temp_profile);
+            }
+        });
+
+        Button mockDenyPermissionButton = popupView.findViewById(R.id.mock_camera_permission_deny_button);
+        mockDenyPermissionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                modifyProfileTestCameraPermission = false;
+                popupWindow.dismiss();
+                Toast.makeText(getContext(), "Enable permissions to set photo", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setLogoutButton() {
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GoogleSignInClient client = GoogleSignIn.getClient(getContext(), LoginActivity.gso);
+                client.signOut();
+                Toast.makeText(getActivity(), "Successfully Logged Out", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                startActivity(intent);
+
+            }
+        });
+    }
+
+    private void setDeleteButton() {
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                createDeleteDialog();
+            }
+        });
+    }
+    private void createDeleteDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setCancelable(true);
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete your account?");
+        builder.setPositiveButton("Confirm",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d(TAG, "Deleting account");
+                        GoogleSignInClient client = GoogleSignIn.getClient(getContext(), LoginActivity.gso);
+                        client.signOut();
+
+                        deleteAccount();
+                    }
+                });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d(TAG, "delete cancelled");
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void deleteAccount() {
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+            String url = deleteUrl + MainActivity.email;
+            StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Toast.makeText(getActivity(), "Account Successfully deleted", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getContext(), LoginActivity.class);
+                    startActivity(intent);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, "onErrorResponse login: " + error.toString());
+                }
+            });
+            requestQueue.add(stringRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void mockCameraPermission() {
@@ -400,6 +547,9 @@ public class ProfileFragment extends Fragment {
         if (bitmap == null) {
             return "";
         }
+        if (bitmap == null) {
+            return "";
+        }
         int previewWidth = 150;
         int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
         Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);
@@ -422,4 +572,5 @@ public class ProfileFragment extends Fragment {
             return null;
         }
     }
+>>>>>>> main:frontend/app/src/main/java/com/example/shopeer/ProfileFragment.java
 }

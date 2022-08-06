@@ -62,3 +62,4 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 }
+>>>>>>> main:frontend/app/src/main/java/com/example/shopeer/RecyclerAdapter.java

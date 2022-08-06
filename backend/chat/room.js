@@ -1,17 +1,8 @@
-// chat.js - chat route module
-
 const express = require("express");
 const router = express.Router();
-const uri = "mongodb://admin:shopeer@20.230.148.126:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.5.0"
+const ObjectId = require("mongodb").ObjectId;
+const {user_collection, room_collection} = require('../config/mongodb_connection')
 
-// const uri = "mongodb://127.0.0.1:27017";
-const { MongoClient } = require("mongodb");
-const client = new MongoClient(uri);
-var ObjectId = require("mongodb").ObjectId;
-
-module.exports = router;
-const coll = client.db("shopeer_database").collection("room_collection");
-var user_collection = require('../config/mongodb_connection')
 /**************** Room submodule **************** */
 
 /**
@@ -30,7 +21,7 @@ router.get("/all", async (req, res) => {
     res.status(404).json({ response: "User not found." })
     return
   }
-  let roomsCursor = await coll.find({peerslist: { $in: [req.query.email] },})
+  let roomsCursor = await room_collection.find({peerslist: { $in: [req.query.email] },})
   await roomsCursor.forEach((getRooms = (room) => {roomArr.push(room);}))
   res.status(200).send(roomArr)
   
@@ -55,7 +46,7 @@ router.get("/history", async (req, res) => {
     res.status(400).json({ response: "Invalid room id." })
     return
   }
-  var doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
+  var doc = await room_collection.findOne({ _id: ObjectId(req.query.room_id) });
   if (!doc) {
     res.status(404).json({ response: "Room not found." })
     return
@@ -159,7 +150,7 @@ router.post("/", async (req, res) => {
     return;
   }
 
-  var doc = await coll.insertOne({
+  var doc = await room_collection.insertOne({
     name,
     peerslist,
     chathistory
@@ -180,7 +171,7 @@ router.get("/summary", async (req, res) => {
     res.status(400).json({ response: "Invalid room id." });
     return
   }
-  var doc = await coll.findOne({ _id: ObjectId(req.query.room_id) });
+  var doc = await room_collection.findOne({ _id: ObjectId(req.query.room_id) });
   if (!doc) {
     res.status(404).json({ response: "Room not found." });
     return
@@ -218,7 +209,7 @@ router.delete("/", async (req, res) => {
     // res.status(200).send("deleted " + count + " rooms")
     // return
   }
-  var doc = await coll.deleteOne({
+  var doc = await room_collection.deleteOne({
     _id: ObjectId(req.query.room_id),
   });
   
@@ -231,3 +222,6 @@ router.delete("/", async (req, res) => {
   }
 
 });
+
+
+module.exports = router;
