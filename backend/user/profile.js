@@ -36,32 +36,40 @@ user_profile_router.put("/profile", async (req, res) => {
     var profile_description = req.body.description
     var profile_photo = req.body.photo
 
-    if (profile_name == null) {
-        res.status(400).send("Error: Invalid name")
-    } else if (!validator.isEmail(profile_email)) {
+
+    if (profile_email == null) {
         res.status(400).send("Error: Invalid email")
-    } else if (!error_check_registration(profile_name)) {
-        res.status(400).send("Error: Invalid name")
-    } else {
-        var find_cursor = await user_collection.findOne({ email: profile_email })
-        if (!find_cursor) {
-            res.status(404).json({ response: "User not found." })
-            return
-        }
-        if (profile_name) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
-        }
-        if (profile_email) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
-        }
-        if (profile_description) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
-        }
-        if (profile_photo) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
-        }
-        res.status(200).send("Success")
+    } 
+    else if (!validator.isEmail(profile_email)) {
+        res.status(400).send("Error: Invalid email")
+    } 
+    // else if (!error_check_registration(profile_name)) {
+    //     res.status(400).send("Error: Invalid name")
+    // } 
+    // else {
+    var find_cursor = await user_collection.findOne({ email: profile_email })
+    if (!find_cursor) {
+        res.status(404).json({ response: "User not found." })
+        return
     }
+    if (profile_name) {
+        if (!error_check_registration(profile_name)) {
+            res.status(400).send("Error: Invalid name")
+            return
+        } 
+        await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
+    }
+    // if (profile_email) {
+    //     await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
+    // }
+    if (profile_description) {
+        await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
+    }
+    if (profile_photo) {
+        await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
+    }
+    res.status(200).send("Success")
+    // }
 })
 
 
