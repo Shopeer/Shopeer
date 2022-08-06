@@ -20,7 +20,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -86,7 +85,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG, "onErrorResponse login: " + error.toString());
+                                Log.d(TAG, "onErrorResponse login:  " + error.toString());
                             }
                         }) {
                             @Override

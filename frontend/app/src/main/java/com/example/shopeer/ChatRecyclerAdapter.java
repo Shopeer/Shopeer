@@ -20,15 +20,8 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
     private LayoutInflater inflater;
     private ArrayList<JSONObject> messagesList;
 
-<<<<<<< HEAD
     public ChatRecyclerAdapter(LayoutInflater inflater, ArrayList<JSONObject> messagesList) {
         this.inflater = inflater;
-=======
-    TextView textViewMessage;
-    TextView messageTime;
-
-    public ChatRecyclerAdapter(ArrayList<ChatObject> messagesList) {
->>>>>>> main
         this.messagesList = messagesList;
     }
 
@@ -47,7 +40,6 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-<<<<<<< HEAD
         JSONObject message = messagesList.get(position);
         try {
             if(holder.getClass() == SenderViewHolder.class) {
@@ -63,15 +55,6 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
 
         } catch(JSONException e) {
             e.printStackTrace();
-=======
-        ChatObject message = messagesList.get(position);
-        if(holder.getClass() == SenderViewHolder.class) {
-            textViewMessage.setText(message.getText());
-            messageTime.setText(message.getCurrenttime());
-        } else {
-            textViewMessage.setText(message.getText());
-            messageTime.setText(message.getCurrenttime());
->>>>>>> main
         }
     }
 
@@ -110,7 +93,8 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
 
     // Helper classes
     public class SenderViewHolder extends RecyclerView.ViewHolder {
-
+        TextView textViewMessage;
+        TextView messageTime;
 
         public SenderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -120,12 +104,9 @@ public class ChatRecyclerAdapter  extends RecyclerView.Adapter {
     }
 
     public class ReceivedViewHolder extends RecyclerView.ViewHolder {
-<<<<<<< HEAD
         TextView senderName;
         TextView textViewMessage;
         TextView messageTime;
-=======
->>>>>>> main
 
         public ReceivedViewHolder(@NonNull View itemView) {
             super(itemView);

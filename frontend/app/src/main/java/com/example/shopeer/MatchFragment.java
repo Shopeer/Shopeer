@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -488,6 +489,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
             holder.blockButton.setVisibility(VISIBLE);
 
             holder.peerPhoto.setVisibility(VISIBLE);
+            holder.peerPhotoCard.setVisibility(VISIBLE);
             holder.peerDescription.setVisibility(VISIBLE);
 
             // checked if blocked
@@ -499,6 +501,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                 // profile info also set to invisible
                 holder.peerPhoto.setVisibility(View.INVISIBLE);
+                holder.peerPhotoCard.setVisibility(View.INVISIBLE);
                 holder.peerDescription.setVisibility(View.INVISIBLE);
             }
             // check if sent invite
@@ -538,7 +541,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, "POST_create_room response: " + response);
-                        Toast.makeText(getContext(), "created new chatroom with " + peer.getEmail(), Toast.LENGTH_LONG).show();
 
                         data.remove(holder.getBindingAdapterPosition()); // pass by ref, so will update this.suggestions also
                         notifyItemRemoved(holder.getBindingAdapterPosition());
@@ -563,6 +565,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse POST_create_room: " + error.toString());
+                        Toast.makeText(getContext(), "error creating chatroom with" + peer.getName(), Toast.LENGTH_SHORT).show();
 
                     }
                 });
@@ -581,7 +584,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, "DELETE_invitation response: " + response);
-                        Toast.makeText(getContext(), "redacted invitation to " + peer.getEmail(), Toast.LENGTH_LONG).show();
 
                         manageInvites.remove(peer.getEmail());
 
@@ -592,7 +594,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse DELETE_invitation: " + error.toString());
-                        Toast.makeText(getContext(), "error: could not redact invite to" + peer.getEmail(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "error removing invite to" + peer.getName(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 requestQueue.add(jsonObjReq);
@@ -610,7 +612,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, "POST_invitation response: " + response);
-                        Toast.makeText(getContext(), "sent invitation to " + peer.getEmail(), Toast.LENGTH_SHORT).show();
 
                         manageInvites.add(peer.getEmail());
 
@@ -625,7 +626,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse POST_invitation: " + error.toString());
-                        Toast.makeText(getContext(), "error: could not send invite to" + peer.getEmail(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "error sending invite to" + peer.getName(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 requestQueue.add(stringReq);
@@ -643,18 +644,16 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, "DELETE_block response: " + response);
-                        Toast.makeText(getContext(), "ublocked " + peer.getEmail(), Toast.LENGTH_LONG).show();
 
                         manageBlocked.remove(peer.getEmail());
 
                         setButtonVisibility(peer, holder);
-
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse DELETE_block: " + error.toString());
-                        Toast.makeText(getContext(), "error: could not ublock " + peer.getEmail(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "error unblocking " + peer.getName(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 requestQueue.add(jsonObjReq);
@@ -673,7 +672,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, "POST_block response: " + response);
-                        Toast.makeText(getContext(), "blocked " + peer.getEmail(), Toast.LENGTH_LONG).show();
 
                         manageBlocked.add(peer.getEmail());
 
@@ -683,7 +681,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse post_search: " + error.toString());
-                        Toast.makeText(getContext(), "error: could block " + peer.getEmail(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "error blocking " + peer.getName(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 requestQueue.add(jsonObjReq);
@@ -699,6 +697,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
         class ProfileCardVH extends RecyclerView.ViewHolder {
             ImageView peerPhoto;
+            CardView peerPhotoCard;
             TextView peerName;
             TextView peerDescription;
             Button friendButton;
@@ -710,6 +709,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 super(itemView);
 
                 peerPhoto = itemView.findViewById(R.id.peer_profile_photo);
+                peerPhotoCard = itemView.findViewById(R.id.peer_profile_photo_cardView);
                 peerName = itemView.findViewById(R.id.peer_name_text);
                 peerDescription = itemView.findViewById(R.id.peer_description_text);
                 friendButton = itemView.findViewById(R.id.friend_button);

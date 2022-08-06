@@ -1,4 +1,4 @@
-package espressotests;
+package com.example.shopeer;
 
 import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
@@ -6,28 +6,23 @@ import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.intent.Intents.intending;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.isInternal;
+
 import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
-import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasDrawable;
+import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasAnyDrawable;
 import static com.adevinta.android.barista.assertion.BaristaImageViewAssertions.assertHasNoDrawable;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertTrue;
 
+import static java.lang.Thread.sleep;
+
 import android.Manifest;
-import android.app.Activity;
-import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,17 +35,14 @@ import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 
-import com.adevinta.android.barista.interaction.PermissionGranter;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.shopeer.MainActivity;
-import com.example.shopeer.R;
-import com.example.shopeer.RoomObject;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -62,8 +54,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-
-import java.util.ArrayList;
 
 @RunWith(AndroidJUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -78,6 +68,7 @@ public class ModifyProfileTest {
     static {
         intent = new Intent(ApplicationProvider.getApplicationContext(), MainActivity.class);
         intent.putExtra("email", "test@email.com");
+        intent.putExtra("isMPTest", true);
     }
 
     private View decorView;
@@ -85,55 +76,8 @@ public class ModifyProfileTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(intent);
 
-    @Before
-    public void testSetup() {
-        Intents.init();
-        //setup to test Toast message
-        activityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<MainActivity>() {
-            @Override
-            public void perform(MainActivity activity) {
-                decorView = activity.getWindow().getDecorView();
-            }
-        });
-
-        // setup picture
-//        savePickedImage();
-
-        // setup new user
-        String url = profileUrl + email + "&name=Modify Profile Test";
-        Log.d(TAG, "POST_registration: " + url);
-        try {
-            RequestQueue requestQueue = Volley.newRequestQueue(testContext);
-            StringRequest jsonStrReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d(TAG, "GET_profile response: " + response);
-//                    assertNotEquals(response.compareToIgnoreCase("user already exists"), 0);
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e(TAG, "onErrorResponse POST_registration: " + error.toString());
-//                    fail("Could not create new user during setup: \n" + "onErrorResponse POST_registration: " + error.toString());
-                }
-            });
-            requestQueue.add(jsonStrReq);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void goToProfile() {
-        ViewInteraction bottomNavigationItemView = onView(
-                allOf(withId(R.id.profileFragment), withContentDescription("Profile"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.bottom_navigation_view),
-                                        0),
-                                2),
-                        isDisplayed()));
-        bottomNavigationItemView.perform(click());
-    }
+    @Rule
+    public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
 
     @Test
     public void A_isProfileFragment() {
@@ -149,62 +93,52 @@ public class ModifyProfileTest {
 
     @Test
     public void B_declinePermission() {
-        //check if camera icon exist
         goToProfile();
 
+        //check if camera icon exist
         onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
+
+        assertHasNoDrawable(R.id.profilePic_imageView);
         onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
+
         //clicks camera icon
         onView(withId(R.id.camera_imageView)).perform(click());
+
         //Deny Permission
-        PermissionGranter.denyPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+        onView(withId(R.id.mock_camera_permission_deny_button)).perform(click());
+
         //check toast message
         onView(withText("Enable permissions to set photo"))
                 .inRoot(withDecorView(not(decorView)))
                 .check(matches(isDisplayed()));
-    }
 
-    private String getPackageName() {
-        RoomObject x = new RoomObject("a","a", "a", "a", 1);
-        return x.getClass().getPackage().getName();
+        // wait for toast message to clear
+        try {
+            sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void C_acceptPermission() {
-        //stubs the image picker
-        intending(not(isInternal())).respondWith(stubImagePicker());
+        goToProfile();
 
         //check if camera icon exist
-        goToProfile();
         onView(withId(R.id.camera_imageView)).check(matches(isDisplayed()));
+
         assertHasNoDrawable(R.id.profilePic_imageView);
+        onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
 
         //clicks camera icon
         onView(withId(R.id.camera_imageView)).perform(click());
 
         //Allow Permission
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.READ_EXTERNAL_STORAGE);
+        onView(withId(R.id.mock_camera_permission_allow_button)).perform(click());
 
+        // check profile picture set
+        assertHasAnyDrawable(R.id.profilePic_imageView);
         onView(withId(R.id.profilePic_imageView)).check(matches(isDisplayed()));
-        assertHasDrawable(R.id.profilePic_imageView, R.drawable.temp_profile);
-    }
-
-    private Instrumentation.ActivityResult stubImagePicker() {
-        // Build the result to return when the activity is launched.
-        Intent resultData = new Intent();
-        Bundle bundle = new Bundle();
-        ArrayList<Parcelable> parcels = new ArrayList<>();
-//        Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/drawable/temp_profile.jpeg");
-        Uri uri1 = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.temp_profile);
-        Log.d(TAG, "temp profile URI: " + uri1);
-
-        Parcelable parcelable1 = (Parcelable) uri1;
-        parcels.add(parcelable1);
-        bundle.putParcelableArrayList(Intent.EXTRA_STREAM, parcels);
-        // Create the Intent that will include the bundle.
-        resultData.putExtras(bundle);
-
-        return new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
     }
 
     @Test
@@ -224,10 +158,18 @@ public class ModifyProfileTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.updateProfileButton)).perform(click());
+
         //check toast message
         onView(withText("Invalid Name"))
                 .inRoot(withDecorView(not(decorView)))
                 .check(matches(isDisplayed()));
+
+        // wait for toast message to clear
+        try {
+            sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -251,6 +193,7 @@ public class ModifyProfileTest {
 
         onView(withId(R.id.updateProfileButton)).perform(click());
         numClicks ++;
+
         onView(withId(R.id.edit_imageView)).check(matches(isDisplayed()));
         onView(withId(R.id.profileName_textView)).check(matches(withText("espresso")));
         onView(withId(R.id.profileBio_textView)).check(matches(withText("edited with espresso")));
@@ -258,8 +201,46 @@ public class ModifyProfileTest {
         assertTrue("number of clicks must be <=5", numClicks <=5);
     }
 
+    /////////////////////////////////// test set up and clean up ///////////////////////////////////
+    @Before
+    public void testSetup() {
+        Intents.init();
+
+        //setup to test Toast message
+        activityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<MainActivity>() {
+            @Override
+            public void perform(MainActivity activity) {
+                decorView = activity.getWindow().getDecorView();
+            }
+        });
+
+        // setup new user
+        String url = profileUrl + email + "&name=Modify Profile Test";
+        Log.d(TAG, "POST_registration: " + url);
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(testContext);
+            StringRequest jsonStrReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.d(TAG, "GET_profile response: " + response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e(TAG, "onErrorResponse POST_registration: " + error.toString());
+                }
+            });
+            requestQueue.add(jsonStrReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @After
     public void testCleanup() {
+        // revoke permissions
+        InstrumentationRegistry.getInstrumentation().getUiAutomation().executeShellCommand("pm revoke ${getTargetContext().packageName} android.permission.WRITE_EXTERNAL_STORAGE");
+
         // delete user
         String url = profileUrl + email;
         Log.d(TAG, "DELETE_registration: " + url);
@@ -269,13 +250,11 @@ public class ModifyProfileTest {
                 @Override
                 public void onResponse(String response) {
                     Log.d(TAG, "DELETE_registration response: " + response);
-//                    assertEquals(response.compareToIgnoreCase("user deleted"), 0);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.e(TAG, "onErrorResponse DELETE_registration: " + error.toString());
-//                    fail("Could not delete user during setup: \n" + "onErrorResponse DELETE_registration: " + error.toString());
                 }
             });
             requestQueue.add(jsonStrReq);
@@ -283,6 +262,19 @@ public class ModifyProfileTest {
             e.printStackTrace();
         }
         Intents.release();
+    }
+
+    //////////////////////////////////// helper functions //////////////////////////////////////////
+    private void goToProfile() {
+        ViewInteraction bottomNavigationItemView = onView(
+                allOf(withId(R.id.profileFragment), withContentDescription("Profile"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.bottom_navigation_view),
+                                        0),
+                                2),
+                        isDisplayed()));
+        bottomNavigationItemView.perform(click());
     }
 
     private static Matcher<View> childAtPosition(
