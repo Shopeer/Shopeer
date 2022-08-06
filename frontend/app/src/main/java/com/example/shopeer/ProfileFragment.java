@@ -162,7 +162,15 @@ public class ProfileFragment extends Fragment {
                         try {
                             JSONObject jsonResponse = new JSONObject(response);
                             profileName.setText(jsonResponse.getString("name"));
-                            profileBio.setText(jsonResponse.getString("description"));
+
+                            String desc = jsonResponse.getString("description");
+                            if (desc.compareTo("null") == 0) {
+                                profileBio.setText("[nothing]");
+                            }
+                            else {
+                                profileBio.setText(desc);
+                            }
+
                             Bitmap profilePhoto = decodeImage(jsonResponse.getString("photo"));
                             if(profilePhoto == null) {
                                 profilePic.setImageDrawable(null);
@@ -176,7 +184,7 @@ public class ProfileFragment extends Fragment {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse login: " + error.toString());
+                    Log.d(TAG, "onErrorResponse profile: " + error.toString());
                 }
             });
             requestQueue.add(stringRequest);
@@ -344,12 +352,12 @@ public class ProfileFragment extends Fragment {
 
     private void updateProfileInBackend(String encodedImage) {
         try{
-            String url = profileUrl + GoogleSignIn.getLastSignedInAccount(getContext()).getEmail();
+            String url = profileUrl + MainActivity.email;
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("photo", encodedImage);
             final String requestBody = jsonObject.toString();
 
-            Log.d(TAG, "onClick: " + url);
+            Log.d(TAG, "PUT photo to BE: " + url);
             try {
                 RequestQueue requestQueue = Volley.newRequestQueue(getContext());
                 StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
@@ -391,6 +399,9 @@ public class ProfileFragment extends Fragment {
 
 
     public String encodeImage(Bitmap bitmap) {
+        if (bitmap == null) {
+            return "";
+        }
         int previewWidth = 150;
         int previewHeight = bitmap.getHeight() * previewWidth / bitmap.getWidth();
         Bitmap previewBitmap = Bitmap.createScaledBitmap(bitmap, previewWidth, previewHeight, false);

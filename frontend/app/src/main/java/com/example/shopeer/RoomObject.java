@@ -1,12 +1,14 @@
 package com.example.shopeer;
 
+import android.graphics.Bitmap;
+
 public class RoomObject {
 
     private String roomId;
     private String roomName;
     private String lastMessage;
     private String timeofLM;
-    private int roomProfilePic;
+    private Bitmap roomProfilePic;
 
     public String getRoomId() {
         return roomId;
@@ -16,7 +18,7 @@ public class RoomObject {
         this.roomId = roomId;
     }
 
-    public RoomObject(String roomId, String roomName, String lastMessage, String timeofLM, int roomProfilePic) {
+    public RoomObject(String roomId, String roomName, String lastMessage, String timeofLM, Bitmap roomProfilePic) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.lastMessage = lastMessage;
@@ -48,11 +50,11 @@ public class RoomObject {
         this.timeofLM = timeofLM;
     }
 
-    public int getRoomProfilePic() {
+    public Bitmap getRoomProfilePic() {
         return roomProfilePic;
     }
 
-    public void setRoomProfilePic(int roomProfilePic) {
+    public void setRoomProfilePic(Bitmap roomProfilePic) {
         this.roomProfilePic = roomProfilePic;
     }
 }
