@@ -2,26 +2,57 @@
 
 ## Directory Structure & Test file locations
 
-- Config Folder
+- Config Folder/Module
     - server.js
     - apps.js
     - mongodb_connection.js
     - socket.js
 
-- Match Folder
+- Match Folder/Module
     - searches.js
     - searches.test.js          (Tests for mocking and without mocking)
     - suggestions_algo.js
     - suggestions_algo.test.js  (Tests for mocking and without mocking)
 
-- User Folder
+- User Folder/Module
     - profile.js
     - profile.test.js (Tests for mocking and without mocking)
     - peers.js
     - peers.test.js   (Tests for mocking and without mocking)
 
-- Chat Folder
+- Room Folder/Module
     - rooms.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### How to run backend tests
 ```

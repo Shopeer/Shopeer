@@ -11,5 +11,4 @@ const mongoClient = new MongoClient(uri)
 const user_collection = mongoClient.db(process.env.DB_DATABASE).collection("user_collection")
 const room_collection = mongoClient.db(process.env.DB_DATABASE).collection("room_collection")
 mongoClient.connect()
-console.log("Database: " + process.env.DB_DATABASE)
 module.exports = {user_collection, room_collection}
