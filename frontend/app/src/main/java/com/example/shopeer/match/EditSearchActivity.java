@@ -131,8 +131,6 @@ public class EditSearchActivity extends AppCompatActivity {
 
         TextView pageTitle = findViewById(R.id.edit_search_toolbar_text);
 
-        TextView pageTitle = findViewById(R.id.edit_search_toolbar_text);
-
         // check if creating a new search or not
         Intent intent = getIntent();
         this.isNewSearch = intent.getBooleanExtra("isNewSearch", true);
@@ -293,20 +291,14 @@ public class EditSearchActivity extends AppCompatActivity {
 
                 // pos int only, by textedit
                 String budgetInputText = budgetNumber.getText().toString();
-                String budgetInputText = budgetNumber.getText().toString();
                 int budgetInput;
-                if (budgetInputText.compareTo("") == 0) {
-                    budgetInput = 0;
-                }
-                else {
-                    budgetInput;
                 if (budgetInputText.compareTo("") == 0) {
                     budgetInput = 0;
                 }
                 else {
                     budgetInput = Integer.parseInt(budgetNumber.getText().toString());
                 }
-                }
+
 
                 // send request
                 if (!canSave) {
@@ -483,5 +475,4 @@ public class EditSearchActivity extends AppCompatActivity {
         return activities;
     }
 
->>>>>>> main:frontend/app/src/main/java/com/example/shopeer/EditSearchActivity.java
 }

@@ -230,5 +230,4 @@ public class ChatActivity extends AppCompatActivity {
         requestQueue.add(jsonArrayRequest);
     }
 
->>>>>>> main:frontend/app/src/main/java/com/example/shopeer/ChatActivity.java
 }

@@ -76,4 +76,3 @@ public class RoomRecyclerAdapter extends RecyclerView.Adapter<RoomRecyclerAdapte
         void onRoomClick(int position);
     }
 }
->>>>>>> main:frontend/app/src/main/java/com/example/shopeer/RoomRecyclerAdapter.java

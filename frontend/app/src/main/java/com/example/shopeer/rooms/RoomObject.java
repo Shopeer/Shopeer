@@ -60,4 +60,3 @@ public class RoomObject {
         this.roomProfilePic = roomProfilePic;
     }
 }
->>>>>>> main:frontend/app/src/main/java/com/example/shopeer/RoomObject.java

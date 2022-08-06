@@ -166,5 +166,4 @@ public class UpdateProfileActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
->>>>>>> main:frontend/app/src/main/java/com/example/shopeer/UpdateProfileActivity.java
 }

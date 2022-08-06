@@ -42,7 +42,6 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
     final static String TAG = "RoomsFragment";
     RecyclerView recyclerView;
     RoomRecyclerAdapter recyclerAdapter;
-    RoomRecyclerAdapter recyclerAdapter;
     private ArrayList<RoomObject> roomList;
 
     private final String roomsUrl = "http://20.230.148.126:8080/chat/room/all?email=" + MainActivity.email;
@@ -87,14 +86,6 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void initView(View v) {
-        // initialize recycler view
-        recyclerView = v.findViewById(R.id.recyclerView);
-        recyclerAdapter = new RoomRecyclerAdapter(roomList, RoomsFragment.this);
-        recyclerView.setAdapter(recyclerAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-    }
-
     private void fetchAllRooms() {
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
@@ -107,7 +98,6 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
                                     for (int i = 0; i < response.length(); i++) {
                                         JSONObject obj = response.getJSONObject(i);
                                         String roomId = obj.getString("_id");
-                                        String roomName = obj.getString("name");
                                         String roomName = obj.getString("name");
 
                                         JSONArray chatHist = obj.getJSONArray("chathistory");
@@ -178,38 +168,6 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
         }
     }
 
-    private void fillRoomInfo(String email, RoomObject roomObject) {
-        try {
-            RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-            String url = profileUrl + "?email=" + email;
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d(TAG, "onResponse fill room info: " + response);
-                    try {
-                        JSONObject jsonResponse = new JSONObject(response);
-                        String name = jsonResponse.getString("name");
-                        roomObject.setRoomName(name);
-                        Bitmap image = ProfileFragment.newInstance().decodeImage(jsonResponse.getString("photo"));
-                        roomObject.setRoomProfilePic(image);
-                        roomList.add(roomObject);
-                        recyclerAdapter.notifyDataSetChanged();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, "onErrorResponse fill rooms: " + error.toString());
-                }
-            });
-            requestQueue.add(stringRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void onRoomClick(int position) {
         Log.d(TAG, "onRoomClick: clicked.");
@@ -222,5 +180,4 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
         intent.putExtra("room_pic", encodedImage);
         startActivity(intent);
     }
->>>>>>> main:frontend/app/src/main/java/com/example/shopeer/RoomsFragment.java
 }

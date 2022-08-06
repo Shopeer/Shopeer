@@ -39,10 +39,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-<<<<<<< HEAD:frontend/app/src/androidTest/java/com/example/shopeer/BrowseManagePeersTest.java
 import com.example.shopeer.rooms.chat.ChatActivity;
-=======
->>>>>>> main:frontend/app/src/androidTest/java/espressotests/BrowseManagePeersTest.java
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
