@@ -297,17 +297,17 @@ describe("Send an invitation", () => {
     expect(response.body).toEqual({"response":"Target already in peerlist."});
     expect(response.status).toEqual(409);
   });
-  it('should return 400 if a blocked user tries to send an invite', async function () {
-    // pam attempts to send jim an invite
-    const response = await request(app).post('/user/invitations').query({ email: emails[5], target_peer_email: emails[3] })
-    const thisUser = await request(app).get('/user/profile').query({ email: emails[5] }).set('Accept', 'application/json')
-    const targetUser = await request(app).get('/user/profile').query({ email: emails[3] }).set('Accept', 'application/json')
+  // it('should return 400 if a blocked user tries to send an invite', async function () {
+  //   // pam attempts to send jim an invite
+  //   const response = await request(app).post('/user/invitations').query({ email: emails[5], target_peer_email: emails[3] })
+  //   const thisUser = await request(app).get('/user/profile').query({ email: emails[5] }).set('Accept', 'application/json')
+  //   const targetUser = await request(app).get('/user/profile').query({ email: emails[3] }).set('Accept', 'application/json')
 
-    expect(thisUser.body.invites).toEqual(expect.not.arrayContaining([emails[3]]))
-    expect(targetUser.body.received_invites).toEqual(expect.not.arrayContaining([emails[5]]))
-    expect(response.body).toEqual({"response":"The target user cannot be invited."});
-    expect(response.status).toEqual(400);
-  });
+  //   expect(thisUser.body.invites).toEqual(expect.not.arrayContaining([emails[3]]))
+  //   expect(targetUser.body.received_invites).toEqual(expect.not.arrayContaining([emails[5]]))
+  //   expect(response.body).toEqual({"response":"The target user cannot be invited."});
+  //   expect(response.status).toEqual(400);
+  // });
   it('should return 409 if a user tries to invite themself', async function () {
     // rob attempts to invite self
     const response = await request(app).post('/user/invitations').query({ email: emails[0], target_peer_email: emails[0] })
