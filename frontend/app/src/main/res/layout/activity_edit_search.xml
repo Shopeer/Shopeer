@@ -11,7 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/chat_grey"
-        android:padding="5dp">
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="20dp"
+        >
 
         <Button
             android:id="@+id/delete_search_button"
@@ -29,16 +32,44 @@
             android:text="save" />
 
         <TableRow
+            android:id="@+id/edit_search_toolbar_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="-17dp"
+            >
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/edit_search_toolbar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+
+                <TextView
+                    android:id="@+id/edit_search_toolbar_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Edit Search"
+                    android:textColor="@color/black"
+                    android:textSize="25dp"
+                    android:textStyle="bold"
+                    />
+
+            </androidx.appcompat.widget.Toolbar>
+        </TableRow>
+
+        <TableRow
             android:id="@+id/searchName_row"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edit_search_toolbar_row"
+            android:layout_marginBottom="20dp">
 
             <TextView
                 android:id="@+id/textView10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="search name: "
-                android:textSize="14sp" />
+                android:textSize="18sp" />
 
             <EditText
                 android:id="@+id/search_name_text"
@@ -48,7 +79,8 @@
                 android:inputType="textPersonName"
                 android:maxLength="30"
                 android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 "
-                android:text="mySearch" />
+                android:hint="new search"
+                />
 
         </TableRow>
 
@@ -56,7 +88,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/location_row"
-            android:layout_below="@id/searchName_row">
+            android:layout_below="@id/searchName_row"
+            android:layout_marginBottom="20dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -71,25 +104,30 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="location: "
-                        android:textSize="14sp" />
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/search_location_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="current location" />
+                        android:text="current location"
+                        android:textSize="18sp"
+                        android:textColor="@color/black"/>
                 </TableRow>
 
                 <TableRow
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp">
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="wrap_content"
-                        android:layout_height="30dp" >
+                        android:layout_height="30dp"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center">
 
                         <fragment android:id="@+id/autocomplete_fragment"
-                            android:layout_width="400dp"
+                            android:layout_width="360dp"
                             android:layout_height="match_parent"
                             android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
                             />
@@ -105,13 +143,15 @@
             android:id="@+id/distance_row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/location_row">
+            android:layout_below="@id/location_row"
+            android:layout_marginBottom="20dp">
 
             <TextView
                 android:id="@+id/textView7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="distance range (km):" />
+                android:text="distance range (km):"
+                android:textSize="18sp"/>
 
             <EditText
                 android:id="@+id/distance_number"
@@ -121,15 +161,31 @@
                 android:inputType="number"
                 android:digits="0123456789"
                 android:maxLength="3"
-                android:text="10"/>
+                android:hint="0 km"/>
 
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/activity_row0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/distance_row"
+            >
+
+            <TextView
+                android:id="@+id/activity_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="activities: "
+                android:textSize="18sp" />
         </TableRow>
 
         <TableRow
             android:id="@+id/activity_row1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/distance_row">
+            android:layout_below="@id/activity_row0"
+            >
 
             <CheckBox
                 android:id="@+id/activity_groceries_checkBox"
@@ -153,7 +209,8 @@
             android:id="@+id/activity_row2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/activity_row1">
+            android:layout_below="@id/activity_row1"
+            android:layout_marginBottom="20dp">
 
             <CheckBox
                 android:id="@+id/activity_hiking_checkBox"
@@ -183,23 +240,25 @@
             android:id="@+id/budget_row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/activity_row2">
+            android:layout_below="@id/activity_row2"
+            >
 
             <TextView
                 android:id="@+id/textView8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Budget (CAD):" />
+                android:text="budget (CAD):"
+                android:textSize="18sp"/>
 
             <EditText
                 android:id="@+id/budget_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="number"
                 android:digits="0123456789"
-                android:maxLength="9"
-                android:text="100"/>
+                android:ems="10"
+                android:hint="$0"
+                android:inputType="number"
+                android:maxLength="9" />
 
         </TableRow>
 
