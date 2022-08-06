@@ -23,14 +23,22 @@ const testUserD = {
   name: "Dee",
   email: "dee@test.com"
 }
-const testMessageA = {
-  email: testUserA.email, 
-  text: "sup!", time: "3 PM"
+const testUserE = {
+  name: "Em",
+  email: "em@test.com"
 }
-const testMessageB = {
-  email: testUserA.email, 
-  text: "this is a unique message to test POST message!", time: "3 PM"
+const testUserF = {
+  name: "Fay",
+  email: "fay@test.com"
 }
+// const testMessageA = {
+//   email: testUserA.email, 
+//   text: "sup!", time: "3 PM"
+// }
+// const testMessageB = {
+//   email: testUserA.email, 
+//   text: "this is a unique message to test POST message!", time: "3 PM"
+// }
 const testRoom = {
   name: "Alice/Bob", 
   peerslist: [testUserA.email, testUserB.email], 
@@ -41,6 +49,12 @@ const testRoom_2 = {
   peerslist: [testUserA.email, testUserC.email], 
   chathistory: [] 
 }
+const testRoom_3 = {
+  name: "Em/Fay", 
+  peerslist: [testUserE.email, testUserF.email], 
+  chathistory: [] 
+}
+
 
 var roomIds = [];
 
@@ -50,23 +64,30 @@ beforeAll(() => {
 });
 
 afterAll(() => {
+  // console.log("room ids:")
+  // console.log(roomIds)
   return resetDatabase()
 
 })
 
 async function initializeDatabase() {
   try {
+
     // console.log("Initializing...")
     // register some users
     await request(app).post('/user/registration').query({ name: testUserA.name, email: testUserA.email})
     await request(app).post('/user/registration').query({ name: testUserB.name, email: testUserB.email})
     await request(app).post('/user/registration').query({ name: testUserC.name, email: testUserC.email})
     await request(app).post('/user/registration').query({ name: testUserD.name, email: testUserD.email})
-    // make A and B peers, and A and C peers
+    await request(app).post('/user/registration').query({ name: testUserE.name, email: testUserE.email})
+    await request(app).post('/user/registration').query({ name: testUserF.name, email: testUserF.email})
+    // make A and B peers, and A and C peers, and E and F peers
     await request(app).post('/user/invitations').query({ email: testUserA.email, target_peer_email: testUserB.email})
     await request(app).post('/user/invitations').query({ email: testUserB.email, target_peer_email: testUserA.email})
     await request(app).post('/user/invitations').query({ email: testUserA.email, target_peer_email: testUserC.email})
     await request(app).post('/user/invitations').query({ email: testUserC.email, target_peer_email: testUserA.email})
+    await request(app).post('/user/invitations').query({ email: testUserE.email, target_peer_email: testUserF.email})
+    await request(app).post('/user/invitations').query({ email: testUserF.email, target_peer_email: testUserE.email})
     // create two chatrooms, one with A/C and one with A/B
     var room = await request(app).post('/chat/room').set('Accept', 'application/json').send( testRoom )
     // // console.log(room.body)
@@ -91,6 +112,8 @@ async function resetDatabase() {
     await request(app).delete('/user/registration').query({ email: testUserB.email })
     await request(app).delete('/user/registration').query({ email: testUserC.email })
     await request(app).delete('/user/registration').query({ email: testUserD.email })
+    await request(app).delete('/user/registration').query({ email: testUserE.email })
+    await request(app).delete('/user/registration').query({ email: testUserF.email })
     
   } catch (err) {
     // console.log(err)
@@ -167,11 +190,13 @@ describe("Get all rooms scenario", () => {
 
   it('should successfully return all rooms containing a user', async function () {
     const response = await request(app).get('/chat/room/all').query({ email: testUserA.email }).set('Accept', 'application/json')
-    expect(response.body.length).toEqual(2);
+    // console.log(response)
+    
     expect(response.body[0].name).toEqual("Alice/Bob");
     expect(response.body[1].name).toEqual("Alice/Cathy");
     expect(response.body[0]._id).toEqual(roomIds[0]);
     expect(response.body[1]._id).toEqual(roomIds[1]);
+    expect(response.body.length).toEqual(2);
     expect(response.status).toEqual(200);
   });
 
@@ -215,16 +240,17 @@ describe("Get chatroom history scenario", () => {
   //     .send( newMssg3 )
     
   //   var response = await request(app).get('/chat/room/history').query({room_id: [roomIds[0] ]})
-  //   expect(response.body.length).toEqual(3);
-  //   expect(response.body[0].email).toEqual(newMssg1.email)
-  //   expect(response.body[1].email).toEqual(newMssg2.email)
-  //   expect(response.body[2].email).toEqual(newMssg3.email)
-  //   expect(response.body[0].text).toEqual(newMssg1.text)
-  //   expect(response.body[1].text).toEqual(newMssg2.text)
-  //   expect(response.body[2].text).toEqual(newMssg3.text)
-  //   expect(response.body[0].time).toEqual(newMssg1.time)
-  //   expect(response.body[1].time).toEqual(newMssg2.time)
-  //   expect(response.body[2].time).toEqual(newMssg3.time)
+  //   // no longer works due to POST Message removal
+  //   expect(response.body.length).toEqual(0);
+  //   // expect(response.body[0].email).toEqual(newMssg1.email)
+  //   // expect(response.body[1].email).toEqual(newMssg2.email)
+  //   // expect(response.body[2].email).toEqual(newMssg3.email)
+  //   // expect(response.body[0].text).toEqual(newMssg1.text)
+  //   // expect(response.body[1].text).toEqual(newMssg2.text)
+  //   // expect(response.body[2].text).toEqual(newMssg3.text)
+  //   // expect(response.body[0].time).toEqual(newMssg1.time)
+  //   // expect(response.body[1].time).toEqual(newMssg2.time)
+  //   // expect(response.body[2].time).toEqual(newMssg3.time)
   //   expect(response.status).toEqual(200);
   // });
 
@@ -318,12 +344,12 @@ describe("Post new room scenario", () => {
     await request(app).post('/user/invitations').query({ email: testUserB.email, target_peer_email: testUserD.email})
     await request(app).post('/user/invitations').query({ email: testUserD.email, target_peer_email: testUserB.email})
 
-    var room = {
+    var peerroom = {
       name: "they're peers!", 
       peerslist: [testUserB.email, testUserD.email], 
       chathistory: [] 
     }
-    response = await request(app).post('/chat/room').set('Accept', 'application/json').send( room )
+    response = await request(app).post('/chat/room').set('Accept', 'application/json').send( peerroom )
     expect(response.status).toEqual(201);
     // check that a room was created
     var roomId = response.body.insertedId
@@ -341,27 +367,27 @@ describe("Delete room scenario", () => {
     // first try to delete the room, just in case
     await request(app).delete('/chat/room').query({ room_id: fakeRoomId })
     
-    const response = await request(app).delete('/chat/room').query({ room_id: fakeRoomId }).set('Accept', 'application/json').send( testMessageA )
+    const response = await request(app).delete('/chat/room').query({ room_id: fakeRoomId }).set('Accept', 'application/json')
     expect(response.body).toEqual({"response": "Room not found."});
     expect(response.status).toEqual(404);
   });
 
   it('should return 400 for invalid room id', async function () {
       
-    const response = await request(app).delete('/chat/room').query({ room_id: invalidRoomId }).set('Accept', 'application/json').send( testMessageA )
+    const response = await request(app).delete('/chat/room').query({ room_id: invalidRoomId }).set('Accept', 'application/json')
     expect(response.body).toEqual({"response": "Invalid room id."});
     expect(response.status).toEqual(400);
   });
 
   it('should successfully delete a room', async function () {
     // first create a room
-    var room = await request(app).post('/chat/room').set('Accept', 'application/json').send( testRoom )
+    var delete_room = await request(app).post('/chat/room').set('Accept', 'application/json').send( testRoom_3 )
     // try to delete it
-    const response = await request(app).delete('/chat/room').query({ room_id: room.body.insertedId }).set('Accept', 'application/json').send( testMessageA )
+    const response = await request(app).delete('/chat/room').query({ room_id: delete_room.body.insertedId }).set('Accept', 'application/json')
     expect(response.body).toEqual({"response": "Deleted room."});
     expect(response.status).toEqual(200);
     // double check that it was removed from the database
-    var deletedCheck = await request(app).get('/chat/room/history').set('Accept', 'application/json').query( {room_id: room.body.insertedId} )
+    var deletedCheck = await request(app).get('/chat/room/history').set('Accept', 'application/json').query( {room_id: delete_room.body.insertedId} )
     expect(deletedCheck.status).toEqual(404)
   });
 
@@ -395,9 +421,10 @@ describe("Get chatroom summary scenario", () => {
     
   //   var response = await request(app).get('/chat/room/summary').query({room_id: [roomIds[1] ]})
   //   expect(response.body.name).toEqual(testRoom_2.name)
-  //   expect(response.body.lastmessage.email).toEqual(newMssg1.email)
-  //   expect(response.body.lastmessage.text).toEqual(newMssg1.text)
-  //   expect(response.body.lastmessage.time).toEqual(newMssg1.time)
+  //   // cannot test below due to removal of POST message
+  //   // expect(response.body.lastmessage.email).toEqual(newMssg1.email)
+  //   // expect(response.body.lastmessage.text).toEqual(newMssg1.text)
+  //   // expect(response.body.lastmessage.time).toEqual(newMssg1.time)
   //   expect(response.status).toEqual(200);
   // });
 

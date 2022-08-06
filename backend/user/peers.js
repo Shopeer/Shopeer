@@ -28,7 +28,8 @@ user_peers_router.get("/peers", async (req, res) => {
     var profile_email = req.query.email
     // try {
         var array = []
-        var find_cursor = await user_collection.findOne({ email: profile_email })
+        //var find_cursor = await user_collection.findOne({ email: profile_email })
+        var find_cursor = await getUser(profile_email)
         if (!find_cursor) {
             res.status(404).json({response: "User not found."})
             
