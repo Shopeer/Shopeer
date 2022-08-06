@@ -1,7 +1,7 @@
 var express = require("express")
 const user_profile_router = express.Router()
 const validator = require('validator')
-var user_collection = require('../config/mongodb_connection')
+const user_collection = require('../config/mongodb_connection')
 
 
 // Profile Submodule
@@ -13,7 +13,9 @@ var user_collection = require('../config/mongodb_connection')
 // Response: User details (profile, bio, name)
 user_profile_router.get("/profile", async (req, res) => {
     var profile = req.query
-    if (!validator.isEmail(profile.email)) {
+    if (req.query.email == null) {
+        res.status(400).send("Error: Invalid email")
+    } else if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
     } else {
         var find_cursor = await user_collection.findOne({ email: profile.email })
@@ -39,9 +41,12 @@ user_profile_router.put("/profile", async (req, res) => {
 
     if (profile_email == null) {
         res.status(400).send("Error: Invalid email")
+        return
+        
     } 
     else if (!validator.isEmail(profile_email)) {
         res.status(400).send("Error: Invalid email")
+        return
     } 
     // else if (!error_check_registration(profile_name)) {
     //     res.status(400).send("Error: Invalid name")
