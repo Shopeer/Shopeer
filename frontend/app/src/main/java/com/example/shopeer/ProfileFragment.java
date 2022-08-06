@@ -148,7 +148,15 @@ public class ProfileFragment extends Fragment {
                         try {
                             JSONObject jsonResponse = new JSONObject(response);
                             profileName.setText(jsonResponse.getString("name"));
-                            profileBio.setText(jsonResponse.getString("description"));
+
+                            String desc = jsonResponse.getString("description");
+                            if (desc.compareTo("null") == 0) {
+                                profileBio.setText("[nothing]");
+                            }
+                            else {
+                                profileBio.setText(desc);
+                            }
+
                             Bitmap profilePhoto = decodeImage(jsonResponse.getString("photo"));
                             if(profilePhoto == null) {
                                 profilePic.setImageDrawable(null);
