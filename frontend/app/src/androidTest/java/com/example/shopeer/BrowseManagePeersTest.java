@@ -210,13 +210,13 @@ public class BrowseManagePeersTest {
     }
 
     /////////////////////////////////// individual test step methods ///////////////////////////////
-    //@Test // 1
+    // 1
     public void A_registeredUserWithActiveSearch() {
         // spinner has a search
         onView(withId(R.id.search_spinner)).check(matches(withSpinnerText(containsString("mySearch"))));
     }
 
-    //@Test // 2
+    // 2
     public void B_AProfileCardShowing() {
         // A's pc is showing, friend and block enabled
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
@@ -229,7 +229,7 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    //@Test // 3
+    // 3
     public void C_blockA() {
         onView(profileCards.atPositionOnView(swipe, R.id.block_button)).perform(click());
 
@@ -251,7 +251,7 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    //@Test // 4
+    // 4
     public void D_swipeRightBProfileCardShowing() {
         // swipe right
         swipe++;
@@ -268,7 +268,7 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    //@Test // 5
+    // 5
     public void E_sendInviteToB() {
         onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).perform(click());
 
@@ -291,7 +291,7 @@ public class BrowseManagePeersTest {
 
     }
 
-    //@Test // 6
+    // 6
     public void F_swipeLeftAProfileCardShowing() {
         // swipe left
         swipe--;
@@ -308,7 +308,7 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    //@Test // 7
+    // 7
     public void G_unblockA() {
         onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).perform(click());
 
@@ -330,7 +330,7 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    //@Test // 8
+    // 8
     public void H_swipeRightBProfileCardShowing() {
         // swipe right
         swipe++;
@@ -347,7 +347,7 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(isDisplayed()));
     }
 
-    //@Test // 9
+    // 9
     public void I_removeInviteToB() {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).perform(click());
 
@@ -369,7 +369,7 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    //@Test // 10
+    // 10
     public void J_swipeRightCProfileCardShowing() {
         //swipe right
         swipe++;
@@ -386,7 +386,7 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
     }
 
-    //@Test // 11
+    // 11
     public void K_matchWithC() {
         Intents.init();
         onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).perform(click());
@@ -489,7 +489,6 @@ public class BrowseManagePeersTest {
     }
 
     private void createUser(String user) {
-        //assertEquals("com.example.volleysampleforgithub", appContext.getPackageName());
         // setup new user
         String url = profileUrl + user + emailAddr + "&name=" + user;
         Log.e(TAG, "POST_registration: " + url);
