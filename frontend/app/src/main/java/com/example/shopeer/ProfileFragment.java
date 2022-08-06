@@ -1,7 +1,5 @@
 package com.example.shopeer;
 
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
