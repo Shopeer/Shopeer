@@ -1,8 +1,8 @@
-var express = require("express")
+const express = require("express")
 const app = express()
 app.use(express.json())
 const validator = require('validator')
-var user_collection = require('../config/mongodb_connection')
+const {user_collection, room_collection} = require('../config/mongodb_connection')
 
 
 /////////////// match requests //////////////

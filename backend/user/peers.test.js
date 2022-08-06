@@ -89,7 +89,7 @@ describe("Get all peers scenario", () => {
     await request(app).delete('/user/registration').query({email: nonexistentEmail })
     // attempt to get a nonexisting user's peerlist
     const response = await request(app).get('/user/peers').query({ email: nonexistentEmail }).set('Accept', 'application/json')
-    console.log(response.body)
+    // console.log(response.body)
     expect(response.body).toEqual({"response":"User not found."});
     expect(response.status).toEqual(404);
   });
