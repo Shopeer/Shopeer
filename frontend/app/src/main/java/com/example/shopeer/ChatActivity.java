@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -123,6 +124,7 @@ public class ChatActivity extends AppCompatActivity {
         setSendMessageButton();
         setBackButton();
         fetchMessageHistory(roomId);
+        Log.d(TAG, "init done");
     }
 
 
@@ -132,13 +134,13 @@ public class ChatActivity extends AppCompatActivity {
         roomId = extras.getString("room_id");
         roomName = extras.getString("room_name");
         roomNameTextView.setText(roomName);
-        int imgUri = extras.getInt("room_pic");
-        if (imgUri==0) {
-            Toast.makeText(getApplicationContext(), "null is received", Toast.LENGTH_SHORT).show();
+        String encodedImage = extras.getString("room_pic");
+        if (encodedImage == null || encodedImage.compareTo("") == 0) {
+            Toast.makeText(getApplicationContext(), "Peer has no profile picture", Toast.LENGTH_SHORT).show();
         } else {
             // for room picture
-            roomPictureImageView.setImageResource(R.drawable.temp_profile);
-//            Picasso.get().load(imgUri).into(roomPictureImageView);
+            Bitmap image = ProfileFragment.newInstance().decodeImage(encodedImage);
+            roomPictureImageView.setImageBitmap(image);
         }
     }
 

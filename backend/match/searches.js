@@ -51,6 +51,7 @@ app.post("/searches", async (req, res) => {
         } else {
 
             if (find_cursor.searches.length == 0) {
+                
                 await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
                 find_cursor = await user_collection.findOne({ email: profile_email })
                 res.status(201).json({ response: 'Added new search' });
@@ -58,9 +59,12 @@ app.post("/searches", async (req, res) => {
                 for (let i = 0; i < find_cursor.searches.length; i++) {
                     if (find_cursor.searches[i].search_name == new_search_name) {
                         res.status(409).json({ response: 'Search already exists' });
-                        break
+                        return
                     }
                 }
+                await user_collection.updateOne({ email: profile_email }, { $push: { searches: search_object } })
+                find_cursor = await user_collection.findOne({ email: profile_email })
+                res.status(201).json({ response: 'Added new search' });
             }
         }
     }
@@ -101,7 +105,7 @@ app.put("/searches", async (req, res) => {
                 res.status(404).json({ response: 'search not found' });
             } else if (!duplicate) {
                 await user_collection.updateOne(
-                    { "email": req.query.email, "searches": { $elemMatch: { search_name: req.query } } },
+                    { "email": req.query.email, "searches": { $elemMatch: { search_name: old_search_name } } },
                     { $set: { "searches.$.search_name": new_search_name } }
                 )
                 res.status(200).json({ response: 'modified search_name' });
@@ -132,9 +136,12 @@ function error_check_search(body) {
     if (!onlyLettersAndSpacesAndNumbers(body.search_name)) {
         return false
     }
-    if (!onlyLettersAndSpaces(body.activity)) {
-        return false
+    for (var i = 0; i < body.activity.length; i++) {
+        if (!onlyLettersAndSpaces(body.activity[i])) {
+            return false
+        }
     }
+    
     if (!onlyLettersAndSpaces(body.location_name)) {
         return false
     }
