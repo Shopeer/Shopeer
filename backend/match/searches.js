@@ -4,7 +4,6 @@ app.use(express.json())
 const validator = require('validator')
 const {user_collection, room_collection} = require('../config/mongodb_connection')
 
-
 /////////////// match requests //////////////
 // Get Active searches GET https://shopeer.com/match/searches
 // Gets a list of all active_searches under the user from User Database
