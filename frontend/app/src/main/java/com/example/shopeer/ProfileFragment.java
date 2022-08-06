@@ -1,7 +1,5 @@
 package com.example.shopeer;
 
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -243,9 +241,6 @@ public class ProfileFragment extends Fragment {
     }
 
     private void mockCameraPermission() {
-        // inflate the layout of the popup window
-        LayoutInflater inflater = (LayoutInflater)
-                getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = LayoutInflater.from(getActivity()).inflate(R.layout.mock_camera_permission_popup, null);
 
         // create the popup window

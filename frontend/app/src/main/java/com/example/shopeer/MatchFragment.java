@@ -40,7 +40,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -70,9 +69,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
     ArrayList<ProfileObject> suggestions = new ArrayList<>();
 
     // peer management lists
-    HashSet<String> manageBlocked;
-    HashSet<String> manageInvites;
-    HashSet<String> managePeers;
+    HashSet<String> manageBlocked = new HashSet<>();
+    HashSet<String> manageInvites = new HashSet<>();
+    HashSet<String> managePeers = new HashSet<>();
 
     ProfileObject myProfile;
 

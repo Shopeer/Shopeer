@@ -8,7 +8,6 @@ import com.google.firebase.messaging.RemoteMessage;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
-    final private String profileUrl = "http://20.230.148.126:8080/user/registration/FCM?email=";
 
 
     // [START on_new_token]

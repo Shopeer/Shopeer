@@ -238,9 +238,6 @@ public class ModifyProfileTest {
 
     @After
     public void testCleanup() {
-        // revoke permissions
-        InstrumentationRegistry.getInstrumentation().getUiAutomation().executeShellCommand("pm revoke ${getTargetContext().packageName} android.permission.WRITE_EXTERNAL_STORAGE");
-
         // delete user
         String url = profileUrl + email;
         Log.d(TAG, "DELETE_registration: " + url);

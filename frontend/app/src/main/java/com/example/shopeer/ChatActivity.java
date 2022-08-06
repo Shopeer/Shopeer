@@ -135,14 +135,12 @@ public class ChatActivity extends AppCompatActivity {
         roomName = extras.getString("room_name");
         roomNameTextView.setText(roomName);
         String encodedImage = extras.getString("room_pic");
-//        Log.d(TAG, "setRoomInfo: " + encodedImage);
-        if (encodedImage == "") {
+        if (encodedImage == null || encodedImage.compareTo("") == 0) {
             Toast.makeText(getApplicationContext(), "Peer has no profile picture", Toast.LENGTH_SHORT).show();
         } else {
             // for room picture
             Bitmap image = ProfileFragment.newInstance().decodeImage(encodedImage);
             roomPictureImageView.setImageBitmap(image);
-//            Picasso.get().load(imgUri).into(roomPictureImageView);
         }
     }
 
