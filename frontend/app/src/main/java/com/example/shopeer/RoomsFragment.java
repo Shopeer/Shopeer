@@ -38,8 +38,6 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
     RoomRecyclerAdapter recyclerAdapter;
     private ArrayList<RoomObject> roomList;
 
-    private View view;
-
     private final String roomsUrl = "http://20.230.148.126:8080/chat/room/all?email=" + MainActivity.email;
     final private String profileUrl = "http://20.230.148.126:8080/user/profile";
     /**
@@ -70,7 +68,6 @@ public class RoomsFragment extends Fragment implements RoomRecyclerAdapter.OnRoo
         fetchAllRooms();
         Log.d(TAG, roomList.toString());
 
-        view = v;
         return v;
     }
 

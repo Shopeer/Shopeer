@@ -25,7 +25,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.view.View;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.intent.Intents;
@@ -280,7 +279,7 @@ public class BrowseManagePeersTest {
             e.printStackTrace();
         }
 
-        // B's pc is showing, cannot send invite since B blocked user
+        // B's pc is showing
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
         onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("B")));
         onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(withText("B's description")));
