@@ -169,7 +169,7 @@ public class ProfileFragment extends Fragment {
                         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                         pickImage.launch(intent);
                     } else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                        Toast.makeText(getContext(), "Enable permissions to set photo", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Enable permissions to set photo", Toast.LENGTH_SHORT).show();
                         requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
                     } else {
                         requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
