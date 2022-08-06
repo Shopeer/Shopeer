@@ -40,6 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -565,7 +566,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse POST_create_room: " + error.toString());
-                        Toast.makeText(getContext(), "error creating chatroom with" + peer.getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "error creating chatroom with " + peer.getName(), Toast.LENGTH_SHORT).show();
 
                     }
                 });
@@ -594,7 +595,7 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "onErrorResponse DELETE_invitation: " + error.toString());
-                        Toast.makeText(getContext(), "error removing invite to" + peer.getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "error removing invite to " + peer.getName(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 requestQueue.add(jsonObjReq);
@@ -615,8 +616,9 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                         manageInvites.add(peer.getEmail());
 
-                        if (response.compareToIgnoreCase("success, both are now peers") == 0) {
+                        if (response.compareToIgnoreCase("success, both are now peers.") == 0) {
                             createChatroom(email, peer, holder);
+                            return;
                         }
 
                         // set button visibility
@@ -625,8 +627,21 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        // get response
+                        if(error.networkResponse.data != null) {
+                            try {
+                                String response = new String(error.networkResponse.data,"UTF-8");
+                                if (response.compareToIgnoreCase("The target user cannot be invited.") == 0) {
+                                    Log.e(TAG, "onErrorResponse POST_invitation: target blocked user, cannot invite");
+                                    Toast.makeText(getContext(), "blocked from sending invite", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                            }
+                        }
                         Log.e(TAG, "onErrorResponse POST_invitation: " + error.toString());
-                        Toast.makeText(getContext(), "error sending invite to" + peer.getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "error sending invite to " + peer.getName(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 requestQueue.add(stringReq);

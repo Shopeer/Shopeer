@@ -9,6 +9,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
@@ -25,7 +26,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
 
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -40,6 +43,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.hamcrest.Matchers;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,6 +72,8 @@ public class BrowseManagePeersTest {
     private static int swipe; // +1 right, -1 left
 
     final Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
+    private static View mainDecorView;
 
     static Intent intent;
     static {
@@ -279,14 +285,27 @@ public class BrowseManagePeersTest {
             e.printStackTrace();
         }
 
+        // B's pc is showing, cannot send invite since B blocked user
         onView(profileCards.atPositionOnView(swipe, R.id.peer_profile_photo)).check(matches(isDisplayed()));
         onView(profileCards.atPositionOnView(swipe, R.id.peer_name_text)).check(matches(withText("B")));
         onView(profileCards.atPositionOnView(swipe, R.id.peer_description_text)).check(matches(withText("B's description")));
 
-        onView(profileCards.atPositionOnView(swipe, R.id.block_button)).check(matches(not(isDisplayed())));
+        onView(profileCards.atPositionOnView(swipe, R.id.block_button)).check(matches(isDisplayed()));
         onView(profileCards.atPositionOnView(swipe, R.id.unblock_button)).check(matches(not(isDisplayed())));
-        onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).check(matches(not(isDisplayed())));
-        onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.friend_button)).check(matches(isDisplayed()));
+        onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
+
+        //check toast message
+        onView(withText("blocked from sending invite"))
+                .inRoot(withDecorView(Matchers.not(mainDecorView)))
+                .check(matches(isDisplayed()));
+
+        // need to wait for toast message to clear for next test
+        try {
+            sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     //@Test // 6
@@ -403,6 +422,15 @@ public class BrowseManagePeersTest {
 
     @Before
     public void testSetup() {
+        //setup to test Toast message
+        activityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<MainActivity>() {
+            @Override
+            public void perform(MainActivity activity) {
+                mainDecorView = activity.getWindow().getDecorView();
+            }
+        });
+
+        // set up users
         createUser(name);
         try {
             sleep(1000);
