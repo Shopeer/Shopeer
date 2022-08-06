@@ -15,6 +15,7 @@ const chob_name = 'test_user_chob'
 const dob_email = 'test_user_dob@test.com'
 const dob_name = 'test_user_dob'
 var emails = [ann_email, bob_email, chob_email, dob_email]
+var moreemails = ["GetSearch@gmail.com", "Search@gmail.com", "Searchexist@gmail.com", "PutSearch@gmail.com"]
 var names = [ann_name, bob_name, chob_name, dob_name]
 
 async function initializeDatabase() {
@@ -22,6 +23,7 @@ async function initializeDatabase() {
 }
 async function resetDatabase() {
   await user_collection.deleteMany({email: {$in: emails}})
+  await user_collection.deleteMany({email: {$in: moreemails}})
 }
 
 
@@ -232,7 +234,7 @@ describe('Tests for Searches Submodule', function () {
             email: "Search@gmail.com"
           })
           .send({
-            search_name: "asdf",
+            search_name: "highly specific test name",
             activity: "asdf",
             location_name: "asdf",
             location_long: 49.49,
@@ -507,8 +509,8 @@ describe('Tests for Searches Submodule', function () {
 
       it('PUT /match/searches search not found', async function () {
 
-        const old_search_name = "ChangedSearchName"
-        const new_search_name = "NewChangedSearchName"
+        const old_search_name = "ChangedSearchName1"
+        const new_search_name = "NewChangedSearchName1"
         await request(app)
           .post('/user/registration')
           .query({
