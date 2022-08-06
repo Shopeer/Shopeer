@@ -1,7 +1,7 @@
 var express = require("express")
 const user_profile_router = express.Router()
 const validator = require('validator')
-var user_collection = require('../config/mongodb_connection')
+const user_collection = require('../config/mongodb_connection')
 
 
 // Profile Submodule
@@ -13,7 +13,9 @@ var user_collection = require('../config/mongodb_connection')
 // Response: User details (profile, bio, name)
 user_profile_router.get("/profile", async (req, res) => {
     var profile = req.query
-    if (!validator.isEmail(profile.email)) {
+    if (req.query.email == null) {
+        res.status(400).send("Error: Invalid email")
+    } else if (!validator.isEmail(profile.email)) {
         res.status(400).send("Error: Invalid email")
     } else {
         var find_cursor = await user_collection.findOne({ email: profile.email })
@@ -36,32 +38,43 @@ user_profile_router.put("/profile", async (req, res) => {
     var profile_description = req.body.description
     var profile_photo = req.body.photo
 
-    if (profile_name == null) {
-        res.status(400).send("Error: Invalid name")
-    } else if (!validator.isEmail(profile_email)) {
+
+    if (profile_email == null) {
         res.status(400).send("Error: Invalid email")
-    } else if (!error_check_registration(profile_name)) {
-        res.status(400).send("Error: Invalid name")
-    } else {
-        var find_cursor = await user_collection.findOne({ email: profile_email })
-        if (!find_cursor) {
-            res.status(404).json({ response: "User not found." })
-            return
-        }
-        if (profile_name) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
-        }
-        if (profile_email) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
-        }
-        if (profile_description) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
-        }
-        if (profile_photo) {
-            await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
-        }
-        res.status(200).send("Success")
+        return
+        
+    } 
+    else if (!validator.isEmail(profile_email)) {
+        res.status(400).send("Error: Invalid email")
+        return
+    } 
+    // else if (!error_check_registration(profile_name)) {
+    //     res.status(400).send("Error: Invalid name")
+    // } 
+    // else {
+    var find_cursor = await user_collection.findOne({ email: profile_email })
+    if (!find_cursor) {
+        res.status(404).json({ response: "User not found." })
+        return
     }
+    if (profile_name) {
+        if (!error_check_registration(profile_name)) {
+            res.status(400).send("Error: Invalid name")
+            return
+        } 
+        await user_collection.updateOne({ email: profile_email }, { $set: { name: profile_name } })
+    }
+    // if (profile_email) {
+    //     await user_collection.updateOne({ email: profile_email }, { $set: { email: profile_email } })
+    // }
+    if (profile_description) {
+        await user_collection.updateOne({ email: profile_email }, { $set: { description: profile_description } })
+    }
+    if (profile_photo) {
+        await user_collection.updateOne({ email: profile_email }, { $set: { photo: profile_photo } })
+    }
+    res.status(200).send("Success")
+    // }
 })
 
 
