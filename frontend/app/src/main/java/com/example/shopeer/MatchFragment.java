@@ -612,7 +612,8 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
 
                         manageInvites.add(peer.getEmail());
 
-                        if (response.compareToIgnoreCase("success, both are now peers.") == 0) {
+                        if (response.compareToIgnoreCase("{\"response\":\"Success, both are now peers.\"}") == 0) {
+                            Log.d(TAG, "POST_invitation all g" );
                             createChatroom(email, peer, holder);
                         }
 
