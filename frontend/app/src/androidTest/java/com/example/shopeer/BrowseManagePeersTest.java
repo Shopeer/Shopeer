@@ -296,7 +296,7 @@ public class BrowseManagePeersTest {
         onView(profileCards.atPositionOnView(swipe, R.id.unfriend_button)).check(matches(not(isDisplayed())));
 
         //check toast message
-        onView(withText("blocked from sending invite"))
+        onView(withText("error sending invite to B"))
                 .inRoot(withDecorView(Matchers.not(mainDecorView)))
                 .check(matches(isDisplayed()));
 

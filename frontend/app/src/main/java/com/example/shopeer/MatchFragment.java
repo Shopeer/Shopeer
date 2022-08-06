@@ -627,19 +627,6 @@ public class MatchFragment extends Fragment implements AdapterView.OnItemSelecte
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // get response
-                        if(error.networkResponse.data != null) {
-                            try {
-                                String response = new String(error.networkResponse.data,"UTF-8");
-                                if (response.compareToIgnoreCase("The target user cannot be invited.") == 0) {
-                                    Log.e(TAG, "onErrorResponse POST_invitation: target blocked user, cannot invite");
-                                    Toast.makeText(getContext(), "blocked from sending invite", Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                            } catch (UnsupportedEncodingException e) {
-                                e.printStackTrace();
-                            }
-                        }
                         Log.e(TAG, "onErrorResponse POST_invitation: " + error.toString());
                         Toast.makeText(getContext(), "error sending invite to " + peer.getName(), Toast.LENGTH_SHORT).show();
                     }
