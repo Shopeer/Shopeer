@@ -151,7 +151,7 @@ async function initializeDatabase() {
     // await createSearches()
 }
 async function resetDatabase() {
-    await user_collection.deleteMany({})
+    await user_collection.deleteMany({email: {$in: emails}})
 }
 
 beforeAll(() => {

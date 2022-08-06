@@ -95,7 +95,7 @@ async function get_viable_matches(user) {
     var viable_matches = await (user_collection.find(
         {
             email: { $ne: user.email },
-            blocked: { $nin: [user.email] }
+            peers: { $nin: [user.email] }
         }))
         .toArray()
     // // console.log(viable_matches)

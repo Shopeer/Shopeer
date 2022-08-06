@@ -21,7 +21,7 @@ async function initializeDatabase() {
   await user_collection.insertMany([{ name: names[0], email: emails[0] }, { name: names[1], email: emails[1] }, { name: names[2], email: emails[2] }, { name: names[3], email: emails[3] }])
 }
 async function resetDatabase() {
-  await user_collection.deleteMany({})
+  await user_collection.deleteMany({email: {$in: emails}})
 }
 
 
