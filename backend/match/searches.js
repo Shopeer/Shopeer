@@ -133,9 +133,12 @@ function error_check_search(body) {
     if (!onlyLettersAndSpacesAndNumbers(body.search_name)) {
         return false
     }
-    if (!onlyLettersAndSpaces(body.activity)) {
-        return false
+    for (var i = 0; i < body.activity.length; i++) {
+        if (!onlyLettersAndSpaces(body.activity[i])) {
+            return false
+        }
     }
+    
     if (!onlyLettersAndSpaces(body.location_name)) {
         return false
     }
