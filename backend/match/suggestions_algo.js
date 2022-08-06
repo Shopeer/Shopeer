@@ -1,8 +1,8 @@
 const express = require("express")
 const suggestions_algo_router = express.Router()
-const validator = require('validator')
+require('validator')
 
-const app = require('../config/app')
+require('../config/app')
 
 const {user_collection, room_collection} = require('../config/mongodb_connection')
 
@@ -89,12 +89,11 @@ async function get_viable_matches(user) {
     //         blocked: { $nin: [user.email] }
     //     }))
     //     .toArray()
-    var viable_matches = await (user_collection.find(
-        {
-            email: { $ne: user.email },
-            blocked: { $nin: [user.email] }
-        }))
-        .toArray()
+    var viable_matches = await (user_collection.find({
+        email: { $ne: user.email },
+        peers: { $nin: [user.email] }
+    }))
+    .toArray()
     // // console.log(viable_matches)
     // console.log("excluded")
     // // console.log(excluded_user_emails)
@@ -156,7 +155,7 @@ async function get_scores(user) {
     }
 
     user_scores.sort(function compareFn(a, b) {
-        if (a.score > b.score) {
+        if (a.score > b.score ) {
             return -1;
         }
         if (a.score < b.score) {

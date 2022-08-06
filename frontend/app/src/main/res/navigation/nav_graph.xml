@@ -7,17 +7,17 @@
 
     <fragment
         android:id="@+id/matchFragment"
-        android:name="com.example.shopeer.MatchFragment"
+        android:name="com.example.shopeer.match.MatchFragment"
         android:label="fragment_match"
         tools:layout="@layout/fragment_match" />
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.shopeer.ProfileFragment"
+        android:name="com.example.shopeer.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/roomsFragment"
-        android:name="com.example.shopeer.RoomsFragment"
+        android:name="com.example.shopeer.rooms.RoomsFragment"
         android:label="fragment_peers"
         tools:layout="@layout/fragment_rooms" />
 </navigation>

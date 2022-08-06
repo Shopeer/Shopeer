@@ -67,8 +67,8 @@ public class ManageSearchesTest {
     final static String emailAddr = "@test.com";
 
     // Google Places autocomplete search bar
-    final int PLACES_AUTOCOMPLETE_SEARCH_BAR_ID = 2131231144;
-    final int PLACES_AUTOCOMPLETE_LIST_ID = 2131231137;
+    final int PLACES_AUTOCOMPLETE_SEARCH_BAR_ID = 2131231141;
+    final int PLACES_AUTOCOMPLETE_LIST_ID = 2131231134;
 
     final static Context testContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
@@ -348,6 +348,9 @@ public class ManageSearchesTest {
         // set search name
         onView(withId(R.id.search_name_text)).perform(replaceText("mySearch"));
 
+        // set search name
+        onView(withId(R.id.search_name_text)).perform(replaceText("mySearch"));
+
         // default values for creating a new search
         onView(withId(R.id.search_name_text)).check(matches(withText("mySearch")));
         onView(withId(R.id.search_location_text)).check(matches(withText("North Pole")));
@@ -404,6 +407,9 @@ public class ManageSearchesTest {
     // 5
     public void E_createAnotherSearch() {
         onView(withId(R.id.add_search_button)).perform(click());
+
+        // set search name
+        onView(withId(R.id.search_name_text)).perform(replaceText("mySearch"));
 
         // set search name
         onView(withId(R.id.search_name_text)).perform(replaceText("mySearch"));
@@ -626,6 +632,7 @@ public class ManageSearchesTest {
     public void testSetup() {
         createUser(name);
         createUser("searchTest");
+        createUser("searchTest");
 
         //setup to test Toast message
         activityScenarioRule.getScenario().onActivity(new ActivityScenario.ActivityAction<MainActivity>() {
@@ -640,6 +647,7 @@ public class ManageSearchesTest {
     public void testCleanup() {
         // delete user
         deleteUser(name);
+        deleteUser("searchTest");
         deleteUser("searchTest");
     }
 

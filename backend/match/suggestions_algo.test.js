@@ -19,9 +19,9 @@ async function createSearches() {
     var search_object = {
         "search_name": "Ann search",
         "activity": [
-            "groceries",
-            "entertainment",
-            "bulk buy"
+            "groceries test",
+            "entertainment test",
+            "bulk buy test"
         ],
         "location_name": "North Pole",
         "location_long": 135,
@@ -48,16 +48,16 @@ async function createSearches() {
     //         "max_range": 10,
     //         "max_budget": 100
     //     })
-    var search_object = {
+    search_object = {
         "search_name": "Bob search",
         "activity": [
-            "groceries",
-            "bulk buy"
+            "groceries test",
+            "bulk buy test"
         ],
         "location_name": "North Pole",
         "location_long": 135.1,
         "location_lati": 90.1,
-        "max_range": 10,
+        "max_range": 25,
         "max_budget": 110
     }
     await user_collection.updateOne({ email: bob_email }, { $push: { searches: search_object } })
@@ -83,12 +83,12 @@ async function createSearches() {
     search_object = {
         "search_name": "Charlie search",
         "activity": [
-            "groceries",
+            "groceries test",
         ],
         "location_name": "North Pole",
         "location_long": 134.9,
         "location_lati": 89.9,
-        "max_range": 10,
+        "max_range": 25,
         "max_budget": 90
     }
 
@@ -114,7 +114,7 @@ async function createSearches() {
         search_object = {
             "search_name": "Charlie search",
             "activity": [
-                "groceries",
+                "groceries test",
             ],
             "location_name": "North Pole",
             "location_long": 135,
@@ -151,7 +151,7 @@ async function initializeDatabase() {
     // await createSearches()
 }
 async function resetDatabase() {
-    await user_collection.deleteMany({})
+    await user_collection.deleteMany({email: {$in: emails}})
 }
 
 beforeAll(() => {
@@ -173,28 +173,30 @@ describe('Tests for algorithm submodule', function () {
             .query({
                 email: ann_email
             })
+        
         // expect(response.status).toEqual(200);
         expect(JSON.parse(response.text)[0].email).toEqual("test_algo_dobert@test.com")
     })
 
-    // it('Bobs match list, expect [Ann, Charlie]', async function () {
-    //     const response = await request(app)
-    //         .get('/match/suggestions')
-    //         .query({
-    //             email: bob_email
-    //         })
-    //     expect(response.status).toEqual(200);
-    //     expect(JSON.parse(response.text)[0].email).toEqual("test_algo_ann@test.com")
-    // })
+    it('Bobs match list, expect [Ann, Charlie]', async function () {
+        const response = await request(app)
+            .get('/match/suggestions')
+            .query({
+                email: bob_email
+            })
+        // console.log(response)
+        expect(response.status).toEqual(200);
+        expect(JSON.parse(response.text)[0].email).toEqual("test_algo_charlie@test.com")
+    })
 
-    // it('Charlies match list, expect []', async function () {
-    //     const response = await request(app)
-    //         .get('/match/suggestions')
-    //         .query({
-    //             email: charlie_email
-    //         })
-    //     expect(response.status).toEqual(200);
-    //     expect(JSON.parse(response.text)[0].email).toEqual("test_algo_ann@test.com")
-    // })
+    it('Charlies match list, expect []', async function () {
+        const response = await request(app)
+            .get('/match/suggestions')
+            .query({
+                email: charlie_email
+            })
+        expect(response.status).toEqual(200);
+        expect(JSON.parse(response.text)[0].email).toEqual("test_algo_bob@test.com")
+    })
 
 })
